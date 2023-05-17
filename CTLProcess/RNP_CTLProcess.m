@@ -18,7 +18,7 @@ protocols = string({temp.name}');
 
 %% TODO: select date and protocol (default: empty for all)
 dateSel = "";
-protSel = "RNP_Noise";
+protSel = "RNP_ToneCF";
 
 %% BATCH
 for rIndex = 1 : length(protocols)
