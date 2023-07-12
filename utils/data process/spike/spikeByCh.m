@@ -8,5 +8,5 @@ for cIndex = 1 : length(chs)
     spikes{cIndex, 1} = spikeTime(spikeChs == chs(cIndex));
 end
 
-realChs = mod(chs, 200);
+realChs = mod(chs, 1000);
 spikeDataset = struct('ch', num2cell(chs), 'spike', spikes, 'realCh', num2cell(realChs));

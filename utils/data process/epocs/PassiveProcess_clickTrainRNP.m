@@ -1,4 +1,4 @@
-function trialAll = PassiveProcess_clickTrainContinuous(epocs)
+function trialAll = PassiveProcess_clickTrainRNP(epocs)
 %% Information extraction
 trialOnsetIndex = 1:length(epocs.ordr.data);
 soundOnsetTimeAll = epocs.ordr.onset * 1000; % ms

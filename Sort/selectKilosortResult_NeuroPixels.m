@@ -2,9 +2,9 @@ clear; clc
 cd(fileparts(mfilename("fullpath")));
 
 %%
-for mIndex = 1:2
+for mIndex = 1
     clearvars -except mIndex
-    MERGEPATH = strcat("F:\RNP\Rat1_SPR\Rat1SPR20230505\Merge", num2str(mIndex));
+    MERGEPATH = strcat("I:\neuroPixels\TDTTank\Rat2_SPR\Rat2SPR20230708\Merge", num2str(mIndex));
     load(fullfile(MERGEPATH,'mergePara.mat'));
     chAll = 384;
     fs = 30000;
@@ -15,18 +15,23 @@ for mIndex = 1:2
     % kiloSpikeAll = cell(max([chAll ch]),1);
 
     [spikeIdx, clusterIdx, templates, spikeTemplateIdx] = parseNPY(NPYPATH);
-    Idxs = sortrows(tabulate(clusterIdx), 2, "descend");
-    idx = Idxs(:, 2) > 1000;
-    tempIdx = Idxs(idx, [1, 2]);
-    nTemplates = size(templates, 1);
-
+    IDs = tabulate(clusterIdx);
+    idToDel = IDs(IDs(:, 2) < 1000, 1);
+    run("alignIdCh.m");
+    
+    idx = idCh(:, 1);
+    ch = idCh(:, 2);
     temp = [clusterIdx, spikeIdx];
-    kiloSpikeAll = cellfun(@(x) [double(spikeIdx(clusterIdx == x))/fs, x*ones(sum(clusterIdx == x), 1)], num2cell(tempIdx(:, 1)), "UniformOutput", false);
-    idx = tempIdx(:, 1);
-    ch = tempIdx(:, 1);
+    kiloSpikeAll = cellfun(@(x) [double(spikeIdx(clusterIdx == x))/fs, ch(idx == x)*ones(sum(clusterIdx == x), 1)], num2cell(idx), "UniformOutput", false);
+    
+
+    
     save([NPYPATH, '\selectCh.mat'], 'ch', 'idx', '-mat');
 
     %% split sort data into different blocks
+    if ~exist("BLOCKPATH", "var")
+        BLOCKPATH = BLOCKPATHTEMP;
+    end
     for blks = 1:length(BLOCKPATH)
         clear sortdata;
         if blks == length(BLOCKPATH)

@@ -10,7 +10,7 @@ end
 %% Loading data
 try
     disp("Try loading data from MAT");
-    load(strcat(MATPATH, "data.mat"));
+    load(MATPATH);
     WaveDataset = data.Wave;
     epocs = data.epocs;
     trialAll = processFcn(epocs);

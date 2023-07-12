@@ -1,20 +1,22 @@
 function RNP_ClickTrainProcess(MATPATH, FIGPATH)
 %% Parameter setting
-params.processFcn = @PassiveProcess_clickTrainContinuous;
-fd = 600;
+params.processFcn = @PassiveProcess_clickTrainRNP;
+
 fdMUA = 1000;
 temp = string(strsplit(MATPATH, "\"));
-dateStr = temp(end - 1);
+% dateStr = temp(end - 1);
 protStr = temp(end - 2);
-DATAPATH = strcat(MATPATH, "data.mat");
-FIGPATH = strcat(FIGPATH, dateStr, "\");
+DATAPATH = MATPATH;
+FIGPATH = strcat(FIGPATH, "\");
 
 temp = dir(FIGPATH);
 Exist_Single = any(contains(string({temp.name}), "CH"));
-Exist_CSD_MUA = any(contains(string({temp.name}), "LFP_Compare_CSD_MUA"));
-% Exist_CSD_MUA = 0;
-Exist_LFP_By_Ch = any(contains(string({temp.name}), "LFP_ch"));
-Exist_LFP_Acorss_Ch = any(contains(string({temp.name}), "LFP_Compare_Chs"));
+% Exist_CSD_MUA = any(contains(string({temp.name}), "LFP_Compare_CSD_MUA"));
+Exist_CSD_MUA = 1;
+% Exist_LFP_By_Ch = any(contains(string({temp.name}), "LFP_ch"));
+Exist_LFP_By_Ch = 1;
+% Exist_LFP_Acorss_Ch = any(contains(string({temp.name}), "LFP_Compare_Chs"));
+Exist_LFP_Acorss_Ch = 1;
 if all([Exist_LFP_Acorss_Ch, Exist_LFP_By_Ch, Exist_CSD_MUA, Exist_Single])
     return
 end
@@ -23,12 +25,14 @@ end
 
 %% load click train params
 CTLParams = MLA_ParseCTLParams(protStr);
-CTLFields = string(fields(CTLParams));
-for fIndex = 1 : length(CTLFields)
-    eval(strcat(CTLFields(fIndex), " = CTLParams.", CTLFields(fIndex), ";"));
-end
-lfpDataset = ECOGResample(lfpDataset, fd);
+parseStruct(CTLParams);
+fd = fs;
 
+if isequal(lfpDataset.lfp.fs, fd)
+    lfpDataset = ECOGResample(lfpDataset.lfp, fd);
+else
+    lfpDataset = lfpDataset.lfp;
+end
 %% set trialAll
 trialAll([trialAll.devOrdr] == 0) = [];
 devType = unique([trialAll.devOrdr]);
@@ -47,14 +51,14 @@ trialAllRaw = trialAll;
 trialAll = trialAll(idx);
 if ~Exist_CSD_MUA
     [~, WAVEDataset] = MUA_Preprocess(MATPATH);
-else
-    WAVEDataset = lfpDataset; % with no significance in fact
+    trialsWAVE = selectEcog(WAVEDataset, trialAll, "dev onset", Window);
 end
-trialsWAVE = selectEcog(WAVEDataset, trialAll, "dev onset", Window);
+
 
 % spike
 
 chSelect = [spikeDataset.realCh]';
+find(chSelect == 0)
 trialsSpike = selectSpike(spikeDataset, trialAllRaw, CTLParams, "dev onset");
 
 % initialize
@@ -74,7 +78,9 @@ for dIndex = 1:length(devType)
     tIndexRaw = [trialAllRaw.devOrdr] == devType(dIndex);
     trialsToFFT = trialsLFPRaw(tIndex);
     trialsLFP = trialsLFPFiltered(tIndex);
-    trialsWave = trialsWAVE(tIndex);
+    if ~Exist_CSD_MUA
+        trialsWave = trialsWAVE(tIndex);
+    end
     trialsSPK = trialsSpike(tIndexRaw);
     LFP = [];
     for ch = 1 : size(trialsLFPFiltered{1}, 1)
@@ -83,7 +89,7 @@ for dIndex = 1:length(devType)
     %% LFP
     % FFT
     tIdx = find(tFFT > FFTWin(dIndex, 1) & tFFT < FFTWin(dIndex, 2));
-    [ff, PMean{dIndex, 1}, trialsFFT]  = trialsECOGFFT(trialsToFFT, fs, tIdx, [], 2);
+    [ff, PMean{dIndex, 1}, trialsFFT]  = trialsECOGFFT(trialsToFFT, fd, tIdx, [], 2);
     % raw wave
     chMean{dIndex, 1} = cell2mat(cellfun(@mean , changeCellRowNum(trialsLFP), 'UniformOutput', false));
     %         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsLFP), 'UniformOutput', false));
@@ -148,12 +154,8 @@ end
 
 % single unit
 if ~Exist_Single
-    Fig = chPlotFcn(chSpikeLfp, CTLParams);
     mkdir(FIGPATH);
-    for cIndex = 1 : length(Fig)
-        print(Fig(cIndex), strcat(FIGPATH, "CH", num2str(spikeDataset(cIndex).ch)), "-djpeg", "-r300");
-        close(Fig(cIndex));
-    end
+    chPlotFcn(chSpikeLfp, CTLParams);
 end
 
 % lfp of whole period
@@ -183,10 +185,10 @@ end
 %     print(FigCSD, strcat(FIGPATH, "LFP_Compare_CSD_MUA"), "-djpeg", "-r300");
 % end
 SAVENAME = strcat(FIGPATH, "res.mat");
-for dIndex = 1 : length(chAll)
-    chAll(dIndex).chCSD = rmfield(chAll(dIndex).chCSD, ["Data", "t"]);
-    chAll(dIndex).chMUA = rmfield(chAll(dIndex).chMUA, ["Data", "tImage"]);
-end
+% for dIndex = 1 : length(chAll)
+%     chAll(dIndex).chCSD = rmfield(chAll(dIndex).chCSD, ["Data", "t"]);
+%     chAll(dIndex).chMUA = rmfield(chAll(dIndex).chMUA, ["Data", "tImage"]);
+% end
 save(SAVENAME, "chSpikeLfp", "chAll", "trialAll", "trialAllRaw", "-mat");
 close all;
 end

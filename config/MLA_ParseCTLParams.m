@@ -6,7 +6,7 @@ configTable = table2struct(readtable(configPath));
 mProtocol = configTable(matches({configTable.paradigm}', protStr));
 
 % parse CTLProt
-CTLParams.fs = 600;
+CTLParams.fs = 1000;
 CTLParams.S1Duration = str2double(string(strsplit(mProtocol.S1Duration, ",")));
 CTLParams.Window = str2double(string(strsplit(mProtocol.Window, ",")));
 CTLParams.selWin = str2double(string(strsplit(mProtocol.selWin, ",")));

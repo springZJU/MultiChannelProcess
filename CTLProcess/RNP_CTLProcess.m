@@ -3,8 +3,8 @@ clc; close all
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 %% TODO: Set ratName and rootpath
-ratName = "Rat1_SPR"; %% Custom
-ROOTPATH = "F:\RNP"; %% Custom
+ratName = "Rat2_SPR"; %% Custom
+ROOTPATH = "I:\neuroPixels"; %% Custom
 
 %% load protocols
 temp = strsplit(ratName, "_");
@@ -18,8 +18,9 @@ protocols = string({temp.name}');
 
 %% TODO: select date and protocol (default: empty for all)
 dateSel = "";
-protSel = "RNP_ToneCF";
-
+% protSel = "RNP_ToneCF";
+% protSel = ["RNP_TB_Basic", "RNP_TB_BaseICI", "RNP_TB_Ratio", "RNP_TB_Jitter"];
+protSel = "RNP_TB_Oscillation";
 %% BATCH
 for rIndex = 1 : length(protocols)
 
@@ -27,11 +28,10 @@ for rIndex = 1 : length(protocols)
     protocolStr = protocols(rIndex);
     temp = dir(protPathMat);
     temp(ismember(string({temp.name}'), [".", ".."])) = [];
-    FIGPATH = strcat(rootPathFig, protocolStr, "\");
 
     MATPATH = cellfun(@(x) string([char(protPathMat), x, '\data.mat']), {temp.name}', "UniformOutput", false);
     MATPATH = MATPATH( contains(string(MATPATH), dateSel) & contains(string(MATPATH), protSel) );
-    FIGPATH = cellfun(@(x) strcat(FIGPATH, string(x{end-1})), cellfun(@(y) strsplit(y, "\"), MATPATH, "UniformOutput", false), "UniformOutput", false);
+    FIGPATH = cellfun(@(x) strcat(rootPathFig, string(x{end-1}), "\", protocolStr), cellfun(@(y) strsplit(y, "\"), MATPATH, "UniformOutput", false), "UniformOutput", false);
     for mIndex = 1 : length(MATPATH)
         try % the function name equals the protocol name
             mFcn = eval(['@', char(protocolStr), ';']);

@@ -2,7 +2,7 @@ close all; clc; clear;
 cd(fileparts(mfilename("fullpath")));
 for mIndex = 1
 %% load data
-MERGEPATH = strcat("F:\RNP\Rat1_SPR\Rat1SPR20230505\Merge", num2str(mIndex));
+MERGEPATH = strcat("I:\neuroPixels\TDTTank\Rat2_SPR\Rat2SPR20230708\Merge", num2str(mIndex));
 binFile = strcat(MERGEPATH, "\Wave.bin");
 
 %% kilosort

@@ -3,7 +3,7 @@ narginchk(4, 5);
 if nargin < 5
     fd_lfp = 1000;
 end
-e = [];
+
 BLOCKPATH = recordInfo(idx).BLOCKPATH;
 sitePos = recordInfo(idx).sitePos;
 depth = recordInfo(idx).depth;

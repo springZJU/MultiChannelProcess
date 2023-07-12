@@ -4,7 +4,7 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 % set params
 xlsxPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
     "SPR_RNP_TBOffset_Recording.xlsx");
-tankSel = "Rat1SPR20230505";
+tankSel = "Rat2SPR20230708";
 dataType = "int16";
 binSec = 10; % sec per segment
 rowNum = 385;
@@ -22,14 +22,14 @@ binSize = round(fs*binSec);
 timer = 1;
 
 
-blockGroup = {[1:7], [8:10]};
+blockGroup = {[1:4, 6:11]};
 for mIndex = 1 : length(blockGroup)
     MERGEPATH = strcat(TANKNAME, "Merge", num2str(mIndex));
     mkdir(MERGEPATH);
     MERGEFILE = strcat(MERGEPATH, "\Wave.bin");
     fidOut = fopen(MERGEFILE, 'wb');
     blockN = 0;
-    for bIndex = blockGroup{mIndex}
+    for bIndex = 1 : length(blockGroup{mIndex})
         blockN = blockN + 1;
         segPoint(blockN) = timer/fs;
         fidRead = fopen(datName(bIndex), 'r');
@@ -46,7 +46,7 @@ for mIndex = 1 : length(blockGroup)
         timer = timer + length(sample_numbers);
     end
     fclose(fidOut);
-    BLOCKPATHTEMP = BLOCKPATH(blockGroup{mIndex});
+    BLOCKPATHTEMP = BLOCKPATH;
     save(strcat(MERGEPATH, "\mergePara.mat"),'segPoint','BLOCKPATHTEMP');
 end
 

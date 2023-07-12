@@ -47,12 +47,17 @@ else
 
         for tIndex = 1:length(segIndex)
             sampleinfo(tIndex, :) = segIndex(tIndex) + windowIndex;
-            trialSpike{tIndex, cIndex}(:, 1) = temp(temp > sampleinfo(tIndex, 1) & temp < sampleinfo(tIndex, 2)) - segIndex(tIndex);
-            trialSpike{tIndex, cIndex}(:, 2) = ones(length(trialSpike{tIndex, cIndex}), 1) * tIndex;
+            if any(temp > sampleinfo(tIndex, 1) & temp < sampleinfo(tIndex, 2))
+                trialSpike{tIndex, cIndex}(:, 1) = temp(temp > sampleinfo(tIndex, 1) & temp < sampleinfo(tIndex, 2)) - segIndex(tIndex);
+                trialSpike{tIndex, cIndex}(:, 2) = ones(length(trialSpike{tIndex, cIndex}), 1) * tIndex;
+            else
+                trialSpike{tIndex, cIndex}(1, 1) = windowIndex(1);
+                trialSpike{tIndex, cIndex}(1, 2) = -1e6;
+            end
         end
         %         PSTH{tIndex, cIndex} = calPsth(spikePlot{cIndex, 1}(:, 1), psthPara, scaleFactor, 'EDGE', Window, 'NTRIAL', length(trials));
     end
     res= cell2struct(trialSpike, string(cellfun(@(x) strcat("CH", string(num2str(x))), {spikeDataset.ch}', "uni", false)), 2);
-        return;
+    return;
 end
 end

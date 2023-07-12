@@ -2,11 +2,7 @@ function BLOCK = MLA_GetMatBlock(MATPATH)
 
 %% select excel
 if contains(MATPATH, "SPR")
-    recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\RatSiliconRecording\SPR_RLA_TBOffset_Recording.xlsx");
-elseif contains(MATPATH, "DXY")
-    recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\RatSiliconRecording\DXY_RLA_TBOffset_Recording.xlsx");
-elseif contains(MATPATH, "ZYY")
-    recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\RatSiliconRecording\ZYY_RLA_TBOffset_Recording.xlsx");
+    recordPath = strcat(fileparts(fileparts(fileparts(mfilename("fullpath")))), "\recordingExcel\SPR_RNP_TBOffset_Recording.xlsx");
 end
 %% read excel
 recordInfo = table2struct(readtable(recordPath));

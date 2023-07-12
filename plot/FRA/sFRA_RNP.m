@@ -29,7 +29,7 @@ for cIndex = 1:length(ch)
     Fig = plotTuning(result, "on");
     % save figures
     mkdir(FIGPATH);
-    print(Fig, strcat(FIGPATH,"Idx", num2str(ch(cIndex) + 1)), "-djpeg", "-r200");
+    print(Fig, strcat(FIGPATH,"\Idx", num2str(ch(cIndex) + 1)), "-djpeg", "-r200");
     close(Fig);
 end
 waitbar(1, mWaitbar, 'Done');

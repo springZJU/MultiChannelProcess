@@ -35,9 +35,9 @@ edges(:,2) = edges(:,1)+binsize;
 edges(:,3) = mean(edges,2);
 stepNum = size(edges,1);
 count = zeros(stepNum,1);
-if ~isempty(data) && max(data)>binsize
+if ~isempty(data(data > -1e6)) && max(data)>binsize
     for stepN = 1:stepNum
-        count = histcounts(data,edges(stepN,[1 2]));
+        count = histcounts(data(data>-1e6),edges(stepN,[1 2]));
         Psth(stepN).y = count/binsize/NTRIAL*scaleFactor;
         Psth(stepN).edges = edges(stepN,3)';
     end
