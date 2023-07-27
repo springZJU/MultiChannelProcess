@@ -1,4 +1,4 @@
-function MLA_MSTI_Process(MATPATH, FIGPATH)
+function RNP_MSTI(MATPATH, FIGPATH)
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 fd = 500;

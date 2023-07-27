@@ -17,7 +17,7 @@ fclose(fileID);
 
 % id和ch对应
 id = [cluster_info.cluster_id]';
-ch = [cluster_info.ch]';
+ch = [cluster_info.ch]' + 1;
 idCh = sortrows([id, ch], 2);
 idCh(ismember(idCh(:, 1), idToDel), :) = [];
 chs = unique(idCh(:, 2));

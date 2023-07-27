@@ -1,11 +1,18 @@
-function RNP_ClickTrainProcess(MATPATH, FIGPATH)
+MATPATH = 'H:\MGB\DDZ\ddz20230727\Block-8';
+FIGPATH = MATPATH;
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainRNP;
 
-fdMUA = 1000;
-temp = string(strsplit(MATPATH, "\"));
+
 % dateStr = temp(end - 1);
-protStr = temp(end - 2);
+% protStr = "TB_BaseICI_4_8_16";
+% protStr = "TB_Ratio_4_4.04";
+% protStr = "Offset_1_64_4s_MGB";
+protStr = "Offset_Duration_Effect_4ms_Reg_New";
+% protStr = "Offset_Variance_Last_N4_8_16";
+
+
+
 DATAPATH = MATPATH;
 FIGPATH = strcat(FIGPATH, "\");
 
@@ -89,12 +96,13 @@ for dIndex = 1:length(devType)
     %% LFP
     % FFT
     tIdx = find(tFFT > FFTWin(dIndex, 1) & tFFT < FFTWin(dIndex, 2));
-    [ff, PMean{dIndex, 1}, trialsFFT]  = trialsECOGFFT(trialsToFFT, fd, tIdx, [], 2);
+    [ff, PMean{dIndex, 1}, trialsFFT]  = trialsECOGFFT(trialsToFFT, lfpDataset.fs, tIdx, [], 2);
     % raw wave
     chMean{dIndex, 1} = cell2mat(cellfun(@mean , changeCellRowNum(trialsLFP), 'UniformOutput', false));
     %         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsLFP), 'UniformOutput', false));
 
     if ~Exist_CSD_MUA
+    fdMUA = 1000;
     % CSD
     [badCh, dz] = MLA_CSD_Config(MATPATH);
     CSD = CSD_Process(trialsLFP, Window, "kCSD", badCh, dz);
@@ -191,6 +199,6 @@ SAVENAME = strcat(FIGPATH, "res.mat");
 % end
 save(SAVENAME, "chSpikeLfp", "chAll", "trialAll", "trialAllRaw", "-mat");
 close all;
-end
+
 
 

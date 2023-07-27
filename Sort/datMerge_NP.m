@@ -1,13 +1,13 @@
 clc; clear
 % add path to the top
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
-% set params
+%% TODO:
 xlsxPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
     "SPR_RNP_TBOffset_Recording.xlsx");
-tankSel = "Rat2SPR20230708";
-dataType = "int16";
-binSec = 10; % sec per segment
-rowNum = 385;
+tankSel = "Rat2SPR20230722";
+blockGroup = {[1:8, 11:13]};
+%%
+
 % load excel
 [~, opts] = getTableValType(xlsxPath, "0");
 recordInfo = table2struct(readtable(xlsxPath, opts));
@@ -15,6 +15,11 @@ selData = recordInfo(contains([recordInfo.BLOCKPATH]', tankSel));
 BLOCKPATH = cellstr([selData.BLOCKPATH]');
 TANKNAME = strsplit(selData(1).BLOCKPATH, "Block");
 TANKNAME = TANKNAME(1);
+
+
+dataType = "int16";
+binSec = 10; % sec per segment
+rowNum = 385;
 datName = string(cellfun(@(x, y) strcat(x, "\", y, "-AP\continuous.dat"), [selData.datPath]', [selData.hardware]', "UniformOutput", false));
 sampleName = string(cellfun(@(x, y) strcat(x, "\", y, "-AP\sample_numbers.npy"), [selData.datPath]', [selData.hardware]', "UniformOutput", false));
 fs = unique([selData.SR_AP]');
@@ -22,11 +27,10 @@ binSize = round(fs*binSec);
 timer = 1;
 
 
-blockGroup = {[1:4, 6:11]};
 for mIndex = 1 : length(blockGroup)
     MERGEPATH = strcat(TANKNAME, "Merge", num2str(mIndex));
     mkdir(MERGEPATH);
-    MERGEFILE = strcat(MERGEPATH, "\Wave.bin");
+    MERGEFILE = strcat(MERGEPATH, "\Wave.bin");           
     fidOut = fopen(MERGEFILE, 'wb');
     blockN = 0;
     for bIndex = 1 : length(blockGroup{mIndex})

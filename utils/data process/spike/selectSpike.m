@@ -52,7 +52,7 @@ else
                 trialSpike{tIndex, cIndex}(:, 2) = ones(length(trialSpike{tIndex, cIndex}), 1) * tIndex;
             else
                 trialSpike{tIndex, cIndex}(1, 1) = windowIndex(1);
-                trialSpike{tIndex, cIndex}(1, 2) = -1e6;
+                trialSpike{tIndex, cIndex}(1, 2) = tIndex;
             end
         end
         %         PSTH{tIndex, cIndex} = calPsth(spikePlot{cIndex, 1}(:, 1), psthPara, scaleFactor, 'EDGE', Window, 'NTRIAL', length(trials));

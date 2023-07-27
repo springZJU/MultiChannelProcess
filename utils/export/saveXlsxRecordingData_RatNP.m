@@ -1,7 +1,7 @@
 function saveXlsxRecordingData_RatNP(ROOTPATH, recordInfo, idx, recordPath, fd_lfp)
 narginchk(4, 5);
 if nargin < 5
-    fd_lfp = 1000;
+    fd_lfp = 1200;
 end
 
 BLOCKPATH = recordInfo(idx).BLOCKPATH;
@@ -26,7 +26,13 @@ TTL_Onset = sample_times([0, diff(TTL)] > 0);
 if length(TTL_Onset) == length(buffer.epocs.Swep.onset)
     delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset], 1, 2));
 else
-    error("the TTL sync signal does not match the TDT epocs [Swep] store!");
+    keyboard;
+    isContinue = input('continue? y/n \n', 's');
+    if strcmpi(isContinue, "n")
+        error("the TTL sync signal does not match the TDT epocs [Swep] store!");
+    else %% custom
+        delta_T = mean(diff([buffer.epocs.ordr.onset, TTL_Onset], 1, 2));
+    end
 end
 
 %% try to get epocs

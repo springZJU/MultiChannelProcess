@@ -3,29 +3,36 @@ function [Fig, ch] = sNoise_RNP(dataPath, FIGPATH)
 narginchk(1, 2);
 %% Load data
 mWaitbar = waitbar(0, 'Data loading ...');
-load(dataPath);
-%     data = TDT2mat(dataPath, 'CHANNEL', 1);
+try
+    load(dataPath);
+    sortData.spikeTimeAll = data.sortdata(:,1);
+    sortData.channelIdx = data.sortdata(:,2);
+catch
+    data = TDTbin2mat(dataPath);
+    sortData.spikeTimeAll = data.snips.eNeu.ts;
+    sortData.channelIdx = data.snips.eNeu.chan;
+end
 waitbar(1/4, mWaitbar, 'Data loaded');
 
 %% Parameter Settings
-windowParams.window = [0 100]; % ms
+windowParams.window = [0 150]; % ms
 
 %% Process
 
 result.windowParams = windowParams;
 %     result.data = FRAProcess(data, windowParams);
 %     Fig = plotTuning(result, "on");
-sortData.spikeTimeAll = data.sortdata(:,1);
-sortData.channelIdx = data.sortdata(:,2);
+
 
 chNum = length(unique(sortData.channelIdx)');
 chN = 0;
 fIdx = 0;
 ch = unique(sortData.channelIdx)';
-
+nFig = 0;
 for cIndex = 1:length(ch)
     if mod(cIndex, 100) == 1
-        Fig = figure;
+        nFig = nFig + 1;
+        Fig= figure;
         maximizeFig(Fig);
         fIdx = fIdx + 1;
     end
@@ -37,7 +44,7 @@ for cIndex = 1:length(ch)
     catch
         toPlot = [];
     end
-    waitbar(chN / chNum, mWaitbar, ['Plotting process result ...  Neuron' num2str(cIndex) ]);
+    waitbar(chN / chNum, mWaitbar, ['Plotting process result ...  Neuron' num2str(ch(cIndex)) ]);
     if mod(cIndex, 100) > 0
         mSubplot(10, 10, mod(cIndex, 100));
     else
@@ -47,8 +54,8 @@ for cIndex = 1:length(ch)
         scatter(toPlot(:, 1), toPlot(: ,2), 10, "red", "filled"); hold on
     end
     plot([0, 0], [0, length(result)], "Color", "k", "LineStyle", ":"); hold on;
-    xlim([0, 100]);
-    title(['Idx=', num2str(ch(cIndex))]);
+    xlim([windowParams.window(1), windowParams.window(2)]);
+    title(['CH=', num2str(ch(cIndex))]);
     drawnow;
     if mod(cIndex, 100) == 0 || cIndex == length(ch)
         mkdir(FIGPATH);

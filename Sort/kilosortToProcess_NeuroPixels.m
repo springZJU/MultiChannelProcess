@@ -1,16 +1,14 @@
 close all; clc; clear;
 cd(fileparts(mfilename("fullpath")));
 for mIndex = 1
-%% load data
-MERGEPATH = strcat("I:\neuroPixels\TDTTank\Rat2_SPR\Rat2SPR20230708\Merge", num2str(mIndex));
+%% TODO
+MERGEPATH = strcat("I:\neuroPixels\TDTTank\Rat2_SPR\Rat2SPR20230722\Merge", num2str(mIndex));
 binFile = strcat(MERGEPATH, "\Wave.bin");
 
 %% kilosort
-run('config\configFile385.m');
-
+run('config\configFileMulti.m');
 % treated as linear probe if no chanMap file
 ops.chanMap = 'config\neuropix385_kilosortChanMap.mat';
-
 % total number of channels in your recording
 ops.NchanTOT = 385; %384 CHs + 1 sync
 % sample rate, Hz 

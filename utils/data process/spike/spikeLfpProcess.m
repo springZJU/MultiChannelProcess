@@ -3,21 +3,16 @@ function [trialAll, spikeDataset, lfpDataset, soundFold] = spikeLfpProcess(DATAP
 % Input:
 %     DATAPATH: full path of *.mat or TDT block path
 %     params:
-%         - choiceWin: choice window, in ms
-%         - processFcn: behavior processing function handle
+%         - DATAPATH: the path of TDT data or exported mat file
+%         - params: struct that contains behavior processing function handle
 
 % Output:
 %     trialAll: n*1 struct of trial information
-%     ECOGDataset: TDT dataset of [streams.(posStr(posIndex))]
-
-
+%     spikeDataset: m*1 struct that contains spiketime, realCh(for lfp) and ch(k*1000+realCh)
+%     lfpDataset: TDT dataset of [streams.(posStr(posIndex))]
 
 %% Parameter settings
-
-paramsNames = fieldnames(params);
-for index = 1:size(paramsNames, 1)
-    eval([paramsNames{index}, '=params.', paramsNames{index}, ';']);
-end
+parseStruct(params);
 
 %% Validation
 if isempty(processFcn)
@@ -40,10 +35,10 @@ catch e
     epocs = temp.epocs;
     trialAll = processFcn(epocs);
 
-    temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams'});
+    temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams', 'snips'});
     streams = temp.streams;
     spikeDataset = spikeByCh(sortrows([temp.snips.eNeu.ts double(temp.snips.eNeu.chan)], 2));
-    lfpDataset = streams.Llfp;
+    lfpDataset.lfp = streams.Llfp;
     soundFold = [];
 end
 
