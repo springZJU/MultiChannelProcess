@@ -1,9 +1,3 @@
-clear ; clc
-addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
-
-%% TODO
-recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR_RNP_TBOffset_Recording.xlsx");
 
 %% load excel
 [~, opts] = getTableValType(recordPath, "0");
@@ -22,7 +16,10 @@ for i = selIdx'
     recordInfo = table2cell(readtable(recordPath, opts));
     recordInfo(1, cell2mat(cellfun(@(x) isequaln(x, NaN), recordInfo(1, :), "uni", false))) = {["double"]};
     recordInfo = cell2struct(recordInfo, opts.SelectedVariableNames, 2);
-
-    saveXlsxRecordingData_RatNP("I:\neuroPixels", recordInfo, i, recordPath);
+    if matches(animal, ["MLA", "RLA"])
+        saveXlsxRecordingData_MonkeyLA(MATPATH, recordInfo, i, recordPath);
+    elseif matches(animal, "RNP")
+        saveXlsxRecordingData_RatNP(MATPATH, recordInfo, i, recordPath);
+    end
 
 end

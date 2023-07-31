@@ -1,4 +1,4 @@
-function [waveLength, MERGEPATH] = TDT2binMerge(BLOCKPATH, MergeFolder, CHANNEL, FORMAT, SCALE_FACTOR)
+function [waveLength, MERGEPATH] = TDT2binMerge(BLOCKPATH, MERGEFILE, CHANNEL, FORMAT, SCALE_FACTOR)
 %% Export Continuous Data To Binary File
 %
 %  Import continuous data into Matlab using TDTbin2mat
@@ -38,10 +38,6 @@ if ~iscell(BLOCKPATH)
 end
 
 
-blockName = regexpi(BLOCKPATH{1},'Block-\d+','match');
-TANKPATH = erase(BLOCKPATH{1},blockName);
-SAVEPATH = check_mkdir(TANKPATH,MergeFolder);
-MERGEFILE = fullfile(SAVEPATH, 'Wave.bin');
 fid2 = fopen(MERGEFILE, 'wb');
 
 for blk = 1:length(BLOCKPATH)
@@ -118,7 +114,8 @@ for blk = 1:length(BLOCKPATH)
     end
 end
 fclose(fid2);
-save([SAVEPATH '\mergePara.mat'],'waveLength','BLOCKPATH','SAVEPATH');
+
+save(strrep(MERGEFILE, 'Wave.bin', 'mergePara.mat'),'waveLength','BLOCKPATH');
 
 end
 

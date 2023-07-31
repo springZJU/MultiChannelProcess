@@ -1,4 +1,4 @@
-filename = fullfile(NPYPATH, 'cluster_info.tsv');
+filename = fullfile(npypath, 'cluster_info.tsv');
 
 % 打开.tsv文件进行读取
 fileID = fopen(filename, 'r');

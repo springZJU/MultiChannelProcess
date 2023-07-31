@@ -1,8 +1,6 @@
 % waveform length
 ops.nt0 = 61;
 
-% sample rate
-ops.fs = 30000;  
 % time range to sort
 
 ops.trange = [0 Inf];
@@ -32,7 +30,7 @@ ops.ThPre = 8;
 ops.sig = 20;
 
 % type of data shifting (0 = none, 1 = rigid, 2 = nonrigid)
-ops.nblocks = 5;
+ops.nblocks = 0;
 
 
 %% danger, changing these settings can lead to fatal errors

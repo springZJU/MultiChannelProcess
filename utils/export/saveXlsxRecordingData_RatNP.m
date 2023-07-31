@@ -85,7 +85,7 @@ params.dateStr = dateStr;
 data.params = params;
 
 %% export result
-SAVEPATH = strcat(ROOTPATH, "\MAT Data\", animalID, "\CTL_New\", paradigm, "\", dateStr, "_", sitePos);
+SAVEPATH = strcat(ROOTPATH, "\", animalID, "\CTL_New\", paradigm, "\", dateStr, "_", sitePos);
 
 mkdir(SAVEPATH);
 save(fullfile(SAVEPATH, "data.mat"), "data", "-v7.3");

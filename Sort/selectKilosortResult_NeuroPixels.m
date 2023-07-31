@@ -1,15 +1,14 @@
-clear; clc
-cd(fileparts(mfilename("fullpath")));
 
-%%
-for mIndex = 1
+for mIndex = 1:2
     clearvars -except mIndex
 
     %% TODO
-    MERGEPATH = strcat("I:\neuroPixels\TDTTank\Rat2_SPR\Rat2SPR20230722\Merge", num2str(mIndex));
+    MERGEPATH = strcat("H:\MGB\DDZ\ddz20230725\Merge", num2str(mIndex));
     load(fullfile(MERGEPATH,'mergePara.mat'));
-    chAll = 384;
-    fs = 30000;
+%     % NP
+%     fs = 30000;
+    % MLA
+    fs = 12207.03125;
     NPYPATH = char(fullfile(MERGEPATH, "th9_7")); % the path including ks_result
     [spikeIdx, clusterIdx, templates, spikeTemplateIdx] = parseNPY(NPYPATH);
 
@@ -21,9 +20,6 @@ for mIndex = 1
     ch = idCh(:, 2);
 
     %% split sort data into different blocks
-    % ch =  [0 1 4 7 8 1008 9 10 12 13 14 16 17 20 21 23 24 25 26 27 28 29 30]+1; % channels index of kilosort, that means chKs = chTDT - 1;
-    % idx = [25 24 23 22 19 20 18 21 16 17 15 13 14 12 11 9 8 7 10 6  3 2 0]; % the corresponding id
-
 
     %%
     kiloSpikeAll = cellfun(@(x) [double(spikeIdx(clusterIdx == x))/fs, ch(idx == x)*ones(sum(clusterIdx == x), 1)], num2cell(idx), "UniformOutput", false);
@@ -31,6 +27,9 @@ for mIndex = 1
 
     if ~exist("BLOCKPATH", "var")
         BLOCKPATH = BLOCKPATHTEMP;
+    end
+    if exist("waveLength", "var")
+        segPoint = cumsum(cell2mat(cellfun(@(x) sum(x), waveLength, "UniformOutput", false)));
     end
     
     for blks = 1:length(BLOCKPATH)
@@ -42,16 +41,16 @@ for mIndex = 1
         end
 
         sortdataBuffer = cell2mat(kiloSpikeAll);
-        [~,selectIdx] = findWithinInterval(sortdataBuffer(:,1),t);
+        [~,selectIdx] = findWithinInterval(sortdataBuffer(:,1), t);
         sortdata = sortdataBuffer(selectIdx,:);
         sortdata(:,1) = sortdata(:,1) - t(1);
 
         %% export waveform
-%         onsetIdx = ceil(t(1) * fs);
-%         wfWin = [-30, 30];
-%         IDandCHANNEL = [idx, zeros(length(idx), 1), ch];
-%         disp(strcat("Processing blocks (", num2str(blks), "/", num2str(length(BLOCKPATH)), ") ..."));
-%         spkWave = getWaveForm_singleID_v2(fs, BLOCKPATH{blks}, NPYPATH, idx, IDandCHANNEL, wfWin, onsetIdx);
+        onsetIdx = ceil(t(1) * fs);
+        wfWin = [-30, 30];
+        IDandCHANNEL = [idx, zeros(length(idx), 1), ch];
+        disp(strcat("Processing blocks (", num2str(blks), "/", num2str(length(BLOCKPATH)), ") ..."));
+        spkWave = getWaveForm_singleID_v2(fs, BLOCKPATH{blks}, NPYPATH, idx, IDandCHANNEL, wfWin, onsetIdx);
 
         %%
         if exist("spkWave", "var")
@@ -64,7 +63,4 @@ end
 
 
 
-function [resVal,idx] = findWithinInterval(value,range)
-idx = find(value>range(1) & value<range(2));
-resVal = value(idx);
-end
+

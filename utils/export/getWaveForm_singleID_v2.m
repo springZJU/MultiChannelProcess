@@ -39,7 +39,7 @@ spikeClusters = readNPY([NPYPATH, '\spike_clusters.npy']); % Vector of cluster I
 chMap = readNPY([NPYPATH, '\channel_map.npy'])';               % Order in which data was streamed to disk; must be 1-indexed for Matlab
 
 %% get corresponding channel
-MChInID = IDandCHANNEL(ismember(IDandCHANNEL(:,1), unitID), 3) + 1;
+MChInID = IDandCHANNEL(ismember(IDandCHANNEL(:,1), unitID), 3);
 
 %% read data via memory map
 fileName = fullfile(dataPath, 'Wave.bin');% .dat file containing the raw
@@ -62,7 +62,7 @@ for idIndex= 1 : length(1 : length(unitID))
         spkSegIdx(spkSegIdx(: ,1) + wfWin(1) < 0 | spkSegIdx(: ,2) + wfWin(2) > size(data, 2), :) = [];
 
         % Read spike time-centered waveforms
-        chDataSel = data(MChInID(idIndex), :);
+        chDataSel = data(mod(MChInID(idIndex), 1000), :);
         waveForms = double(cell2mat(cellfun(@(x) chDataSel(x(1) : x(2)), num2cell(spkSegIdx, 2) , "UniformOutput", false)));
         wfSmooth = smoothdata(waveForms','gaussian', 10)';
         waveFormsMean = mean(waveForms);

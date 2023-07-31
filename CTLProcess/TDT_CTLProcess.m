@@ -1,4 +1,4 @@
-MATPATH = 'H:\MGB\DDZ\ddz20230727\Block-8';
+MATPATH = 'H:\MGB\DDZ\ddz20230731\Block-20';
 FIGPATH = MATPATH;
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainRNP;
@@ -6,9 +6,9 @@ params.processFcn = @PassiveProcess_clickTrainRNP;
 
 % dateStr = temp(end - 1);
 % protStr = "TB_BaseICI_4_8_16";
-% protStr = "TB_Ratio_4_4.04";
+protStr = "TB_Ratio_4_4.04";
 % protStr = "Offset_1_64_4s_MGB";
-protStr = "Offset_Duration_Effect_4ms_Reg_New";
+% protStr = "Offset_Duration_Effect_4ms_Reg_New";
 % protStr = "Offset_Variance_Last_N4_8_16";
 
 
