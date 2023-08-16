@@ -8,6 +8,8 @@ BLOCKPATH = recordInfo(idx).BLOCKPATH;
 sitePos = recordInfo(idx).sitePos;
 depth = recordInfo(idx).depth;
 paradigm = recordInfo(idx).paradigm;
+spkExported = logical(recordInfo(idx).spkExported);
+lfpExported = logical(recordInfo(idx).lfpExported);
 temp = strsplit(BLOCKPATH, "\");
 animalID = temp(end - 2);
 dateStr = temp(end - 1);
@@ -16,8 +18,8 @@ buffer=TDTbin2mat(char(BLOCKPATH));  %spike store name should be changed accordi
 %% TTL synchronization
 SR_AP = recordInfo(idx).SR_AP;
 SR_LFP = recordInfo(idx).SR_LFP;
-NP_Path = strcat(recordInfo(idx).datPath, "\", recordInfo(idx).hardware, "-AP");
-LFP_Path = strcat(recordInfo(idx).datPath, "\", recordInfo(idx).hardware, "-LFP");
+NP_Path = strcat(recordInfo(idx).datPath, "-AP");
+LFP_Path = strcat(recordInfo(idx).datPath, "-LFP");
 sample_numbers = readNPY(strcat(NP_Path, "\sample_numbers.npy"));
 sample_times = (1:length(sample_numbers))'/SR_AP;
 mmf = memmapfile(strcat(NP_Path, "\continuous.dat"),'Format', {"int16", [385 length(sample_numbers)], 'x'});
@@ -39,6 +41,7 @@ end
 try
     data.epocs  = rewriteEpocsTime(buffer.epocs, delta_T);
 catch e
+    data.epocs = [];
     disp(e.message);
 end
 
@@ -49,6 +52,7 @@ try
     load(SORTPATH);
     data.sortdata = sortdata;
 catch e
+    data.sortdata = [];
     disp(e.message);
 end
 
@@ -56,12 +60,14 @@ end
 try
     data.spkWave = spkWave;
 catch e
+    data.spkWave = [];
     disp(e.message);
 end
 %% try to get lfp data
 try
    data.lfp = NP2TDT_LFP(LFP_Path, SR_LFP, fd_lfp);
 catch e
+    data.lfp = [];
     disp(e.message);
 end
 
@@ -70,8 +76,11 @@ if contains(paradigm, 'CSD')
     try 
         data.Wave = buffer.streams.Wave;
     catch e
+        data.Wave = [];
         disp(e.message);
     end
+else
+    data.Wave = [];
 end
 
 
@@ -88,8 +97,17 @@ data.params = params;
 SAVEPATH = strcat(ROOTPATH, "\", animalID, "\CTL_New\", paradigm, "\", dateStr, "_", sitePos);
 
 mkdir(SAVEPATH);
-save(fullfile(SAVEPATH, "data.mat"), "data", "-v7.3");
-recordInfo(idx).exported = 1;
+dataCopy = data;
+if ~spkExported
+    data = rmfield(dataCopy, ["lfp", "Wave"]);
+    save(fullfile(SAVEPATH, "spkData.mat"), "data", "-v7.3");
+    recordInfo(idx).spkExported = 1;
+end
+if ~lfpExported
+    data = rmfield(dataCopy, ["sortdata", "spkWave"]);
+    save(fullfile(SAVEPATH, "lfpData.mat"), "data", "-v7.3");
+    recordInfo(idx).lfpExported = 1;
+end
 
 writetable(struct2table(recordInfo), recordPath);
 

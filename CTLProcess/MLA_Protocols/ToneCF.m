@@ -1,4 +1,4 @@
-function RNP_ToneCF(MATPATH, FIGPATH)
+function ToneCF(MATPATH, FIGPATH)
 %% Parameter setting
 
 if exist(FIGPATH, "dir")

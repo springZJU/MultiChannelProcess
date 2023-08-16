@@ -1,14 +1,15 @@
 function [res, sampleinfo] = selectSpike(spikeDataset, trials, CTLParams, segOption)
-narginchk(3, 4);
+narginchk(2, 4);
+
+if nargin < 3
+    CTLParams.temp = [];
+end
 
 if nargin < 4
     segOption = "trial onset";
 end
 
-CTLFields = string(fields(CTLParams));
-for fIndex = 1 : length(CTLFields)
-    eval(strcat(CTLFields(fIndex), "= CTLParams.", CTLFields(fIndex), ";"));
-end
+parseStruct(CTLParams);
 
 windowIndex = Window;
 
@@ -19,11 +20,11 @@ switch segOption
         segIndex = fix([trials.devOnset]');
     case "push onset" % make sure pushing time of all trials not empty
 
-        if length(trials) ~= length([trials.firstPush])
-            error("Pushing time of all trials should not be empty");
-        end
+%         if length(trials) ~= length([trials.firstPush])
+%             error("Pushing time of all trials should not be empty");
+%         end
 
-        segIndex = fix([trials.firstPush]');
+        segIndex = fix(cell2mat(cellfun(@(x, y) max([x, y]), {trials.firstPush}', {trials.devOnset}', "UniformOutput", false)));
     case "last std"
         segIndex = cellfun(@(x) fix(x(end - 1)), {trials.soundOnsetSeq}');
 end

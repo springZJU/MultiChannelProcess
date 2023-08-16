@@ -6,8 +6,8 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 monkeyName = "DDZ"; % required
 ROOTPATH = "E:\MonkeyLinearArray"; % required
 project = "CTL_New"; % project, required
-dateSel = "ddz20230725"; % blank for all
-protSel = "Noise"; % blank for all
+dateSel = "MGB"; % blank for all
+protSel = ["TB_BaseICI_4_8_16", "TB_Ratio_4_4.04", "Offset_1_64_4s_MGB", "Offset_Variance_Last_N4_8_16", "Offset_Duration_Effect_4ms_Reg_New"]; % blank for all
 
 %% load protocols
 rootPathMat = strcat(ROOTPATH, "\MAT Data\", monkeyName, "\", project, "\");
@@ -31,8 +31,8 @@ for rIndex = 1 : length(protocols)
             mFcn = eval(['@', char(protocolStr), ';']);
             mFcn(MATPATH{mIndex}, FIGPATH{mIndex});
         catch % temporal binding protocols
-            if RNP_IsCTLProt(protocolStr)
-                RNP_ClickTrainProcess(MATPATH{mIndex}, FIGPATH{mIndex});
+            if MLA_IsCTLProt(protocolStr)
+                MLA_ClickTrainProcess(MATPATH{mIndex}, FIGPATH{mIndex});
             end
         end
     end

@@ -1,9 +1,15 @@
-function saveXlsxRecordingData_MonkeyLA(ROOTPATH, recordInfo, idx, recordPath)
+function saveXlsxRecordingData_MonkeyLA(ROOTPATH, recordInfo, idx, recordPath, fd_lfp)
 e = [];
+narginchk(4, 5);
+if nargin < 5
+    fd_lfp = 1200;
+end
 BLOCKPATH = char(recordInfo(idx).BLOCKPATH);
 sitePos = recordInfo(idx).sitePos;
 depth = recordInfo(idx).depth;
 paradigm = recordInfo(idx).paradigm;
+spkExported = logical(recordInfo(idx).spkExported);
+lfpExported = logical(recordInfo(idx).lfpExported);
 temp = strsplit(BLOCKPATH, "\");
 animalID = temp{end - 2};
 dateStr = temp{end - 1};
@@ -13,6 +19,7 @@ buffer=TDTbin2mat(char(BLOCKPATH));  %spike store name should be changed accordi
 try
     data.epocs = buffer.epocs;
 catch e
+    data.epocs = [];
     disp(e.message);
 end
 
@@ -20,6 +27,7 @@ end
 try
     data.spikeRaw.snips = buffer.snips;
 catch e
+    data.spikeRaw = [];
     disp(e.message);
 end
 
@@ -30,6 +38,7 @@ try
     load(SORTPATH);
     data.sortdata = sortdata;
 catch e
+    data.sortdata = [];
     disp(e.message);
 end
 
@@ -37,12 +46,14 @@ end
 try
     data.spkWave = spkWave;
 catch e
+    data.spkWave = [];
     disp(e.message);
 end
 %% try to get lfp data
 try
-    data.lfp = ECOGResample(buffer.streams.Llfp, 1200);
+    data.lfp = ECOGResample(buffer.streams.Llfp, fd_lfp);
 catch e
+    data.lfp = [];
     disp(e.message);
 end
 
@@ -51,8 +62,11 @@ if contains(paradigm, 'CSD')
     try 
         data.Wave = buffer.streams.Wave;
     catch e
+        data.Wave = [];
         disp(e.message);
     end
+else
+    data.Wave = [];
 end
 
 
@@ -72,8 +86,18 @@ else
     SAVEPATH = strcat(ROOTPATH, animalID, "\CTL_New\", paradigm, "\", dateStr, "_", sitePos);
 end
 mkdir(SAVEPATH);
-save(fullfile(SAVEPATH, "data.mat"), "data", "-mat");
-recordInfo(idx).exported = 1;
-writetable(struct2table(recordInfo), recordPath);
+dataCopy = data;
+if ~spkExported
+    data = rmfield(dataCopy, ["lfp", "Wave"]);
+    save(fullfile(SAVEPATH, "spkData.mat"), "data", "-mat");
+    recordInfo(idx).spkExported = 1;
+end
+if ~lfpExported
+    data = rmfield(dataCopy, ["spikeRaw", "sortdata", "spkWave"]);
+    save(fullfile(SAVEPATH, "lfpData.mat"), "data", "-mat");
+    recordInfo(idx).lfpExported = 1;
+end
+    writetable(struct2table(recordInfo), recordPath);
+
 
 end

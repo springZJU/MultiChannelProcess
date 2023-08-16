@@ -17,8 +17,8 @@ if ~toPlotFFT
 end
 
 for cIndex = 1 : chNum
-    Fig(cIndex) = figure;
-    maximizeFig(Fig(cIndex));
+    Fig = figure;
+    maximizeFig(Fig);
     margins = [0.05, 0.05, 0.12, 0.1];
     paddings = [0.01, 0.03, 0.05, 0.01];
 
@@ -28,7 +28,7 @@ for cIndex = 1 : chNum
         chStr = chSpikeLfp(dIndex).chLFP(cIndex).info;
         %% ROW1: whole time raster plot
         pIndex = dIndex;
-        Axes(dIndex, 1) = mSubplot(Fig(cIndex), plotRows, colMax, pIndex, [1, 1], margins, paddings);
+        Axes(dIndex, 1) = mSubplot(Fig, plotRows, colMax, pIndex, [1, 1], margins, paddings);
         temp = chSpikeLfp(dIndex).chSPK(cIndex).spikePlot;
         t =temp(:, 1);
         trialN = arrayRep(temp(:, 2), unique(temp(:, 2)), 1 : length(unique(temp(:, 2))));
@@ -37,7 +37,7 @@ for cIndex = 1 : chNum
 
         %% ROW2: whole time psth
         pIndex = colMax + dIndex;
-        Axes(dIndex, 2) = mSubplot(Fig(cIndex), plotRows, colMax, pIndex, [1, 1], margins, paddings);
+        Axes(dIndex, 2) = mSubplot(Fig, plotRows, colMax, pIndex, [1, 1], margins, paddings);
         temp = chSpikeLfp(dIndex).chSPK(cIndex).PSTH;
         t =temp(:, 1);
         PSTH = smoothdata(temp(: ,2),'gaussian',25);
@@ -47,7 +47,7 @@ for cIndex = 1 : chNum
 
         %% ROW3: whole time lfp
         pIndex = 2 * colMax + dIndex;
-        Axes(dIndex, 3) = mSubplot(Fig(cIndex), plotRows, colMax, pIndex, [1, 1], margins, paddings);
+        Axes(dIndex, 3) = mSubplot(Fig, plotRows, colMax, pIndex, [1, 1], margins, paddings);
         lfpTemp{dIndex, 1} = chSpikeLfp(dIndex).chLFP(cIndex).Wave;
         plot(lfpTemp{dIndex, 1}(:, 1), lfpTemp{dIndex, 1}(:, 2), "Color", "red", "LineStyle", "-", "LineWidth", 1); hold on;
 
@@ -55,7 +55,7 @@ for cIndex = 1 : chNum
         %% ROW4: FFT
         if toPlotFFT
             pIndex = (nGeneral-1) * colMax + dIndex;
-            Axes(dIndex, nGeneral) = mSubplot(Fig(cIndex), plotRows, colMax, pIndex, [1, 1], margins, paddings);
+            Axes(dIndex, nGeneral) = mSubplot(Fig, plotRows, colMax, pIndex, [1, 1], margins, paddings);
             temp = chSpikeLfp(dIndex).chLFP(cIndex).FFT(:, 2);
             t = chSpikeLfp(dIndex).chLFP(cIndex).FFT(:, 1);
             plot(t, temp, "Color", "red", "LineStyle", "-", "LineWidth", 1.5); hold on;
@@ -68,7 +68,7 @@ for cIndex = 1 : chNum
     compareGroupN = length(Compare_Index);
     for pIndex = 1 : compareGroupN
         posIndex = nGeneral * compareCol + pIndex;
-        AxesPSTH(pIndex) = mSubplot(Fig(cIndex), plotRows, compareCol, posIndex, PSTH_CompareSize, margins, paddings, "alignment", "top-left");
+        AxesPSTH(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, PSTH_CompareSize, margins, paddings, "alignment", "top-left");
         idxs = Compare_Index{pIndex, 1};
         for dIndex = 1 : length(idxs)
             X = psthTemp{idxs(dIndex), 1}(:, 1);
@@ -78,7 +78,7 @@ for cIndex = 1 : chNum
         title(strjoin(stimStr(idxs), "-"));
 
         % legend
-        AxesLegend = mSubplot(Fig(cIndex), legendRows, compareCol, (legendRows-1) * compareCol + pIndex, [1, 1], [0, 0, 0.01, 0], [paddings(1), paddings(2), 0, 0]); 
+        AxesLegend = mSubplot(Fig, legendRows, compareCol, (legendRows-1) * compareCol + pIndex, [1, 1], [0, 0, 0.01, 0], [paddings(1), paddings(2), 0, 0]); 
         set(AxesLegend, "Visible", "off");
         legend(AxesLegend, flip(AxesPSTH(pIndex).Children), "NumColumns", ceil(length(idxs)/2), "FontSize", legendFontSize);
     end
@@ -87,7 +87,7 @@ for cIndex = 1 : chNum
     for pIndex = 1 : compareGroupN
         compareIdx = pIndex + compareGroupN * PSTH_CompareSize(1);
         posIndex = nGeneral * compareCol + compareIdx;
-        AxesLFP(pIndex) = mSubplot(Fig(cIndex), plotRows, compareCol, posIndex, LFP_CompareSize, margins, paddings, "alignment", "top-left");
+        AxesLFP(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, LFP_CompareSize, margins, paddings, "alignment", "top-left");
         idxs = Compare_Index{pIndex, 1};
         for dIndex = 1 : length(idxs)
             X = lfpTemp{idxs(dIndex), 1}(:, 1);
@@ -96,7 +96,7 @@ for cIndex = 1 : chNum
         end
         title(strjoin(stimStr(idxs), "-"));
         % legend
-        AxesLegend = mSubplot(Fig(cIndex), legendRows, compareCol, (legendRows-1) * compareCol + compareIdx, [1, 1], [0, 0, 0, 0], [paddings(1), paddings(2), 0, 0]); 
+        AxesLegend = mSubplot(Fig, legendRows, compareCol, (legendRows-1) * compareCol + compareIdx, [1, 1], [0, 0, 0, 0], [paddings(1), paddings(2), 0, 0]); 
         set(AxesLegend, "Visible", "off");
         legend(AxesLegend, flip(AxesLFP(pIndex).Children), "NumColumns", ceil(length(idxs)/2), "FontSize", legendFontSize);
     end
@@ -130,16 +130,18 @@ for cIndex = 1 : chNum
         RS(dIndex, 1) = chSpikeLfp(dIndex).chSPK(cIndex).chRS;
     end
     posIndex = nGeneral * compareCol + compareIdx;
-    AxesRS(pIndex) = mSubplot(Fig(cIndex), plotRows, compareCol, posIndex, [compareCol-compareIdx+ 1, LFP_CompareSize(2)], margins, paddings, "alignment", "top-left");
+    AxesRS(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, [compareCol-compareIdx+ 1, LFP_CompareSize(2)], margins, paddings, "alignment", "top-left");
     plot(1 : colMax, RS, "r-", "LineWidth", 2); hold on;
     scatter(1 : colMax, RS, 20, "red", "filled"); hold on
     plot([1, colMax], [13.8, 13.8], "b--"); hold on
     set(AxesRS(pIndex), "XTick", 1 : colMax)
     set(AxesRS(pIndex), "XTickLabel", stimStr);
     title("Rayleigh statistics");
-
-
     drawnow;
+    FIGPATH = evalin("caller", "FIGPATH");
+    spikeDataset = evalin("caller", "spikeDataset");
+    print(Fig, strcat(FIGPATH, "CH", num2str(spikeDataset(cIndex).ch)), "-djpeg", "-r300");
+    close(Fig);
 end
 
 end

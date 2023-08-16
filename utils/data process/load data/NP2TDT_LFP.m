@@ -6,5 +6,5 @@ function data = NP2TDT_LFP(LFP_Path, SR_LFP, fd_lfp)
     temp.lfp.channels = 1:385;
     temp.lfp.name = 'Llfp';
     temp.lfp.startTime = 0;
-    data.lfp = ECOGResample(temp.lfp, fd_lfp);
+    data = ECOGResample(temp.lfp, fd_lfp);
 end

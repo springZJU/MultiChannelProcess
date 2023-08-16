@@ -22,9 +22,17 @@ end
 %% Loading data
 try
     disp("Try loading data from MAT");
-    load(DATAPATH);
+    load(strrep(DATAPATH, "data.mat", "spkData.mat"));
+    if size(data.sortdata, 2) == 1
+        data.sortdata(:, 2) = 1;
+    end
     spikeDataset = spikeByCh(sortrows(data.sortdata, 2));
-    lfpDataset = data.lfp;
+    load(strrep(DATAPATH, "data.mat", "lfpData.mat"));
+    try
+        lfpDataset = data.lfp;
+    catch
+        lfpDataset = data.streams.Llfp;
+    end
     epocs = data.epocs;
     trialAll = processFcn(epocs);
 

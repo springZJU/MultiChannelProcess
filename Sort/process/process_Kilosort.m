@@ -1,5 +1,5 @@
     parseStruct(selInfo, rIndex);
-    MERGEPATH = strcat(TANKNAME, "Merge", num2str(rIndex));
+    MERGEPATH = strcat(TANKNAME, "Merge", num2str(selInfo(rIndex).ID));
     binFile = strcat(MERGEPATH, "\Wave.bin");
 
     %% kilosort
@@ -24,7 +24,7 @@
             ops.fs = 30000;
     end
 
-    for tIndex = 1 : size(thr)
+    for tIndex = 1 : size(thr , 1)
         ops.Th = thr(tIndex, :);
         savePath = fullfile(MERGEPATH, ['th', num2str(ops.Th(1))  , '_', num2str(ops.Th(2))]);
         if ~exist(strcat(savePath, "\params.py"), "file")

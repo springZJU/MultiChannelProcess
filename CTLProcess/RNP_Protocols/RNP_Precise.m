@@ -1,8 +1,8 @@
 function RNP_Precise(MATPATH, FIGPATH)
 
-if exist(FIGPATH, "dir")
-    return
-end
+% if exist(FIGPATH, "dir")
+%     return
+% end
 %% plot FRA
 sPrecise(MATPATH, FIGPATH);
 

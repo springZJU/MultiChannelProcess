@@ -33,15 +33,14 @@ for fIndex = 1:size(plotData, 1)
         end
 
         % Raster
-        y = sum(cell2mat(cellfun(@(x) length(x), cellData.data(fIndex).trials.spikes, "UniformOutput", false)));
-        if y > 0
-            y_fr = length(findWithinInterval(cell2mat(cellData.data(fIndex).trials.spikes), frWin));
-            y_frEarly = length(findWithinInterval(cell2mat(cellData.data(fIndex).trials.spikes), frWinEarly));
-            y_frLate = length(findWithinInterval(cell2mat(cellData.data(fIndex).trials.spikes), frWinLate));
-        else
-            y_fr = 0;
-            y_frEarly = 0;
-            y_frLate = 0;
+        temp = cellData.data(fIndex).trials.spikes;
+        for wIndex = 1 : length(winStr)
+            eval(['y_fr(', num2str(wIndex), ').label = "', char(labelStr(wIndex)), '";']);
+            eval(['y_fr(', num2str(wIndex), ').win = ', char(winStr(wIndex)), ';']);
+            y_fr(wIndex).count{fIndex, 1} = cell2mat(cellfun(@(x) length(findWithinInterval(x, y_fr(wIndex).win)), temp, "UniformOutput", false));
+            eval(['y_fr(wIndex).frRaw{fIndex, 1} = y_fr(wIndex).count{fIndex, 1} * 1000 / diff(', char(winStr(wIndex)), ');']);
+            y_fr(wIndex).frMean(fIndex, 1) =  mean(y_fr(wIndex).frRaw{fIndex, 1});
+            y_fr(wIndex).frSE(fIndex, 1) =  SE(y_fr(wIndex).frRaw{fIndex, 1});
         end
 
         for tIndex = 1:size(trials(aIndex).spikes, 1)
@@ -49,9 +48,7 @@ for fIndex = 1:size(plotData, 1)
             Y = ones(length(X), 1) * tIndex;
             plot(X, Y, "r.", "MarkerSize", 10); hold on;
         end
-        YFR(fIndex)=y_fr*1000/diff(frWin)/tIndex;
-        YFR_Early(fIndex)=y_frEarly*1000/diff(frWinEarly)/tIndex;
-        YFR_Late(fIndex)=y_frLate*1000/diff(frWinLate)/tIndex;
+
         ylim([0, tIndex + 1]);
         xlim([Window(1), Window(2)])
 
@@ -69,31 +66,39 @@ for fIndex = 1:size(plotData, 1)
             title(num2str(plotData(fIndex).ICI));
         end
 
-        % Rate
-        %             FR(aIndex, fIndex) = length(cell2mat(trials(aIndex).spikes)) / size(trials(aIndex).spikes, 1) / ((Window(2) - Window(1)) / 1000);
     end
 
 end
-mAxe = axes("Position", [0.05 + rasterWidth *0, 0.08, rasterWidth*8, 0.8-rasterHeight*8], "Box", "on");
-% Total
-h1 = plot(X1, YFR, "r-", "DisplayName", "Entire Resp [0 1000]");  hold on
-h2 = plot(X1, YFR_Early, "b-", "DisplayName", "Early Resp [0 200]");  hold on
-h3 = plot(X1, YFR_Late, "k-", "DisplayName", "Late Resp [200 1000]");  hold on
 
-plot(X1, YFR, "r.", "MarkerSize", 10);  hold on
-plot(X1, YFR_Early, "b.", "MarkerSize", 10);  hold on
-plot(X1, YFR_Late, "k.", "MarkerSize", 10);  hold on
+%% plot fr tuning
+mAxe = axes("Position", [0.05 + rasterWidth *0, 0.08, rasterWidth*8, 0.8-rasterHeight*8], "Box", "on");
+
+
+for wIndex = 1 : length(y_fr)-2
+    % firing rate tuning
+    h(wIndex) = plot(X1, [y_fr(wIndex).frMean], "Color", colors(wIndex), "LineStyle", "-", "DisplayName", y_fr(wIndex).label);  hold on
+    frMean = [y_fr(wIndex).frMean(1:end-1)];
+    % significance
+    [~, temp] = cellfun(@(x, y) ttest2(x, y), y_fr(wIndex).frRaw(1:end-1), y_fr(wIndex).frRaw(2:end), "UniformOutput", false);
+    temp = cell2mat(temp);
+    temp(isnan(temp)) = 1;
+    y_fr(wIndex).p = temp;
+    sigIdx = temp < 0.05;
+    X_Test = 1 : length(temp);
+    scatter(X_Test(sigIdx), frMean(sigIdx), 25, colorDec{wIndex}, "filled");  hold on
+    scatter(X_Test(~sigIdx), frMean(~sigIdx), 40, colorDec{wIndex});  hold on
+end
+% temp = y_fr(6).frMean ./ y_fr(5).frMean;
+% [~, p] = cellfun(@(x, y) ttest2(x, y), y_fr(5).frRaw, y_fr(6).frRaw, "UniformOutput", false);
+
 xlim([X1(1), X1(end)]);
 xlabel("ICI (ms)");
 xticks(1:61);
 xticklabels(cellfun(@(x) num2str(x), {plotData.ICI}', "UniformOutput", false))
 ylabel("Firing Rate (Hz)");
 title("firing rate tuning")
-legend([h1, h2, h3]);
-%     axes('Position', [0.05, 0.05, 0.9, 0.4]);
-%     image(FR, 'CDataMapping', 'scaled');
-%     colorbar("Position", [0.96, 0.05, 0.02, 0.4]);
-%     drawnow;
+legend(h);
+
 
 return;
 end

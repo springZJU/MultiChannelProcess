@@ -12,6 +12,13 @@ windowParams.Window = [-300 1300]; % ms
 windowParams.frWin = [0, 1000]; % ms
 windowParams.frWinEarly = [0, 200]; % ms
 windowParams.frWinLate = [200, 1000]; % ms
+windowParams.frWinOffset = [1000, 1200]; % ms
+windowParams.frWinEarlyStable = [200, 600]; % ms
+windowParams.frWinLateStable = [600, 1000]; % ms
+windowParams.labelStr = ["Entire Resp [0 1000]", "Early Resp [0 200]", "Late Resp [200 1000]", "Offset Resp [1000 1200]", "Early Stable Resp", "Late Stable Resp"];
+windowParams.winStr = ["frWin", "frWinEarly", "frWinLate", "frWinOffset", "frWinEarlyStable", "frWinLateStable"];
+windowParams.colors = ["#FF0000", "#0000FF", "#000000", "#FFA500"];
+windowParams.colorDec = {[1, 0, 0], [0, 0, 1], [0, 0, 0], [1, 0.5, 0]};
 %% Process;
 
 result.windowParams = windowParams;

@@ -6,20 +6,22 @@
     recTech = unique([recData.recTech]');
     selInfo(rIndex).fs = fs;
     selInfo(rIndex).chNum = unique([recData.chNum]');
+    selInfo(rIndex).ID = unique([recData.ID]');
     selInfo(rIndex).TANKNAME = TANKNAME;
-
+    
     selIdx = find(contains([recordInfo.BLOCKPATH]', dateSel) & ismember([recordInfo.ID]', recID(rIndex)) & ~logical([1, recordInfo(2:end).sort]'));
     selData = recordInfo(selIdx);
     selInfo(rIndex).selIdx = selIdx;
     
    
 
-    if isfield(selData, "datPath")
-        DATAPATH = cellstr([selData.datPath]');
-    end
+%     if isfield(selData, "datPath")
+%         DATAPATH = cellstr([selData.datPath]');
+%     end
     try
         BLOCKPATH = cellstr([selData.BLOCKPATH]');
+        DATAPATH = cellstr([selData.datPath]');
     end
-    MERGEPATH = strcat(TANKNAME, "Merge", num2str(rIndex));
+    MERGEPATH = strcat(TANKNAME, "Merge", num2str(selInfo(rIndex).ID));
     MERGEFILE = strcat(MERGEPATH, "\Wave.bin");
     

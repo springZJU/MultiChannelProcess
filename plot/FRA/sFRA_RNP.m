@@ -6,7 +6,11 @@ mWaitbar = waitbar(0, 'Data loading ...');
 try
     load(dataPath);
     sortData.spikeTimeAll = data.sortdata(:,1);
-    sortData.channelIdx = data.sortdata(:,2);
+    if size(data.sortdata, 2) == 2
+        sortData.channelIdx = data.sortdata(:, 2);
+    else
+        sortData.channelIdx = 1;
+    end
 catch
     data = TDTbin2mat(dataPath, 'TYPE', [1, 2, 3]);
     sortData.spikeTimeAll = data.snips.eNeu.ts;

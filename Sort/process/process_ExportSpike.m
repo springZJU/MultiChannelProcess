@@ -24,7 +24,7 @@ if ~exist("BLOCKPATH", "var")
     BLOCKPATH = BLOCKPATHTEMP;
 end
 if exist("waveLength", "var")
-    segPoint = cumsum(cell2mat(cellfun(@(x) sum(x), waveLength, "UniformOutput", false)));
+    segPoint = [0, cumsum(cell2mat(cellfun(@(x) sum(x), waveLength, "UniformOutput", false)))];
 end
 
 for blks = 1:length(BLOCKPATH)

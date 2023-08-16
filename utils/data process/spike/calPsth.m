@@ -1,15 +1,16 @@
-function resPsth = calPsth(data,binpara,scaleFactor,varargin)
-NTRIAL = 1;
-for i = 1:2:length(varargin)
-    eval([ upper(varargin{i}) '=varargin{i+1};']);
-end
-binsize = binpara.binsize;
-binstep = binpara.binstep;
+function resPsth = calPsth(data,binpara, scaleFactor, varargin)
+mIp = inputParser;
+mIp.addRequired("data", @isnumeric);
+mIp.addRequired("binpara", @isstruct);
+mIp.addOptional("scaleFactor", 1, @isnumeric);
+mIp.addParameter("NTRIAL", 1, @isnumeric);
+mIp.addParameter("EDGE", [min(data) max(data)], @isnumeric);
 
+mIp.parse(data,binpara,scaleFactor, varargin{:});
+NTRIAL = mIp.Results.NTRIAL;
+EDGE = mIp.Results.EDGE;
+parseStruct(binpara);
 
-if ~exist('EDGE', 'var') %if WIN is a variable?
-    EDGE = [min(data) max(data)];
-end
 edgeBuffer = EDGE(1):binstep:EDGE(2)-binsize;
 
 

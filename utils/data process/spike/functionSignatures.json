@@ -1,0 +1,22 @@
+{
+    "_schemaVersion": "1.0.0",
+
+    "spikeDiffWinTest": {
+        "inputs": [
+            {"name": "spike", "kind": "required", "type": ["numeric", "2d"]},
+            {"name": "win1", "kind": "required", "type": ["numeric", "2d"]},
+            {"name": "win2", "kind": "required", "type": ["numeric", "2d"]},
+            {"name": "trials", "kind": "required", "type": ["numeric", "vector"]},
+            {"name": "Tail", "kind": "namevalue", "type":["choices={'both', 'left', 'right'}"]},
+            {"name": "Alpha", "kind": "namevalue", "type": ["numeric", "vector"]}
+        ]},
+
+    "calPsth": {
+        "inputs": [
+            {"name": "data", "kind": "required", "type": ["numeric", "vector"]},
+            {"name": "binpara", "kind": "required", "type": ["struct"]},
+            {"name": "scaleFactor", "kind": "ordered", "type": ["numeric", "2d"]},
+            {"name": "NTRIAL", "kind": "namevalue", "type":["numeric"]},
+            {"name": "EDGE", "kind": "namevalue", "type": ["numeric", "vector"]}
+        ]}
+}

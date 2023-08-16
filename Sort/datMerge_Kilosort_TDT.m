@@ -2,11 +2,11 @@ clc; clear
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR_MLA_Recording.xlsx");
+    "XHX_MLA_Recording.xlsx");
 customInfo.dateSel = "";
 customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
 customInfo.animal = "MLA"; % MLA/RNP/RLA
-customInfo.thr = [7, 6];
+customInfo.thr = [9, 7];
 customInfo.exportSpkWave = true;
 customInfo.ReSaveMAT = false;
 customInfo.reExportSpk = false;
@@ -45,7 +45,7 @@ parseStruct(customInfo);
 tankSel = unique([selInfo.TANKNAME]');
 folders = cellfun(@(x) dir(x), tankSel, "uni", false);
 mergeFolder = cell2mat(cellfun(@(x) x(contains({x.name}', "Merge")), folders, "UniformOutput", false));
-NPYPATH = string(cellfun(@(x, y) fullfile(x, y, 'th7_6\'), {mergeFolder.folder}', {mergeFolder.name}', "uni", false));
+NPYPATH = string(cellfun(@(x, y) fullfile(x, y, ['th', num2str(thr(1)), '_', num2str(thr(2)), '\']), {mergeFolder.folder}', {mergeFolder.name}', "uni", false));
 for nIndex = 1 : length(NPYPATH)
     cd(NPYPATH(nIndex));
     if ~exist("cluster_info.tsv", "file")
