@@ -3,8 +3,8 @@ clc; clear
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR_RNP_TBOffset_Recording.xlsx");
-dateSel = "Rat2SPR20230722";
+    "ZYY_RNP_TBOffset_Recording.xlsx");
+dateSel = "";
 run("process_LoadExcel.m");
 
 %%%%%%%%%%%%%%%%%%%%%%%% datMerge_NP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

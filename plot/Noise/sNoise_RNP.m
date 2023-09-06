@@ -8,7 +8,7 @@ try
     sortData.spikeTimeAll = data.sortdata(:,1);
     sortData.channelIdx = data.sortdata(:,2);
 catch
-    data = TDTbin2mat(dataPath);
+    data = TDTbin2mat(char(dataPath));
     sortData.spikeTimeAll = data.snips.eNeu.ts;
     sortData.channelIdx = data.snips.eNeu.chan;
 end

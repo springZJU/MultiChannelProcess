@@ -1,4 +1,4 @@
-function NP_TDT_Merge(BLOCKPATH, DATAPATH, MERGEPATH, fs)
+function NP_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
 narginchk(3, 4);
 if nargin < 4
     fs = 30000;
@@ -7,8 +7,6 @@ if iscell(DATAPATH)
     DATAPATH = string(DATAPATH);
 end
 
-mkdir(MERGEPATH);
-MERGEFILE = strcat(MERGEPATH, "\Wave.bin");
 
 dataType = "int16";
 binSec = 10; % sec per segment
@@ -39,5 +37,5 @@ fidOut = fopen(MERGEFILE, 'wb');
     end
     fclose(fidOut);
     BLOCKPATHTEMP = BLOCKPATH;
-    save(strcat(MERGEPATH, "\mergePara.mat"),'segPoint','BLOCKPATHTEMP');
+    save(strrep(MERGEFILE, 'Wave.bin', 'mergePara.mat'),'segPoint','BLOCKPATHTEMP');
 end

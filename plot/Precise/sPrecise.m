@@ -3,7 +3,7 @@ function [Fig, ch] = sPrecise(dataPath, FIGPATH)
 
 %% Load data
 mWaitbar = waitbar(0, 'Data loading ...');
-load(dataPath);
+load(strrep(dataPath, "data.mat", "spkData.mat"));
 %     data = TDT2mat(dataPath, 'CHANNEL', 1);
 waitbar(1/4, mWaitbar, 'Data loaded');
 

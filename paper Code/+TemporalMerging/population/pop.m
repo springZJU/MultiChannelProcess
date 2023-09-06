@@ -1,7 +1,7 @@
 %% DDZ MGB
 ROOTPATH = "E:\MonkeyLinearArray\Figure\CTL_New";
 protStr = "TB_BaseICI_4_8_16";
-popRes = loadDailyData(ROOTPATH, "MATNAME", "spkRes.mat", "protocols", protStr, "DATE", ["ddz", "MGB"]);
+popRes = loadDailyData(ROOTPATH, "MATNAME", "spkRes.mat", "protocols", protStr, "DATE", ["cm", "MGB"]);
 
 % parameters
 CTLParams = MLA_ParseCTLParams(protStr);
@@ -25,7 +25,7 @@ sigOnChangeRes.DDZ_MGB = changeRes([onsetRes.H]' == 1 & changeOnsetIdx);
 
 %% DDZ AC
 clearvars -except sigOnChangeRes sigOnsetRes ROOTPATH protStr
-popRes = loadDailyData(ROOTPATH, "MATNAME", "spkRes.mat", "protocols", protStr, "DATE", ["ddz", "AC"]);
+popRes = loadDailyData(ROOTPATH, "MATNAME", "spkRes.mat", "protocols", protStr, "DATE", ["cm", "AC"]);
 
 % parameters
 CTLParams = MLA_ParseCTLParams(protStr);

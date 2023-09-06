@@ -1,13 +1,16 @@
-clc; clear
+ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "XHX_MLA_Recording.xlsx");
-customInfo.dateSel = "";
-customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
+         "SPR_MLA_Recording.xlsx");
+%         "XHX_MLA_Recording.xlsx");
+%       "ZYY_RNP_TBOffset_Recording.xlsx");  
+
+customInfo.dateSel = "0905";
+customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
 customInfo.animal = "MLA"; % MLA/RNP/RLA
-customInfo.thr = [9, 7];
-customInfo.exportSpkWave = true;
+customInfo.thr = [9, 4];
+customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = false;
 customInfo.reExportSpk = false;
 
@@ -48,7 +51,7 @@ mergeFolder = cell2mat(cellfun(@(x) x(contains({x.name}', "Merge")), folders, "U
 NPYPATH = string(cellfun(@(x, y) fullfile(x, y, ['th', num2str(thr(1)), '_', num2str(thr(2)), '\']), {mergeFolder.folder}', {mergeFolder.name}', "uni", false));
 for nIndex = 1 : length(NPYPATH)
     cd(NPYPATH(nIndex));
-    if ~exist("cluster_info.tsv", "file")
+    if ~isfile("cluster_info.tsv")%~exist("cluster_info.tsv", "file")
         system("phy template-gui params.py");
     end
 end

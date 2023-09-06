@@ -23,11 +23,13 @@ mIp.parse(spike, win1, win2, trials, varargin{:});
 Tail = mIp.Results.Tail;
 Alpha = mIp.Results.Alpha;
 
-[frRes.frMean_0, frRes.frSE_0, frRes.countRaw_0] = calFR(spike, win1, trials);
-[frRes.frMean_1, frRes.frSE_1, frRes.countRaw_1] = calFR(spike, win2, trials);
-[H, frRes.P] = ttest(frRes.countRaw_0(:, 1), frRes.countRaw_1(:, 1), "Tail", Tail, "Alpha", Alpha);
+[frRes.frMean_Resp, frRes.frSE_Resp, frRes.countRaw_Resp] = calFR(spike, win1, trials);
+[frRes.frMean_Base, frRes.frSE_Base, frRes.countRaw_Base] = calFR(spike, win2, trials);
+[H, frRes.P] = ttest(frRes.countRaw_Resp(:, 1), frRes.countRaw_Base(:, 1), "Tail", Tail, "Alpha", Alpha);
 if isnan(H)
     H = 0;
 end
-frRes.H = H & frRes.frMean_0>1000/diff(win1) & frRes.frMean_0 > frRes.frMean_1 + 3*std(frRes.countRaw_1(:, 1));
+frRes.H = H & frRes.frMean_Resp>1000/diff(win1);
+% frRes.H = H & frRes.frMean_Resp>1000/diff(win1) & frRes.frMean_Resp > frRes.frMean_Base + 3*std(frRes.countRaw_Base(:, 1)*1000/diff(win1));
+
 end

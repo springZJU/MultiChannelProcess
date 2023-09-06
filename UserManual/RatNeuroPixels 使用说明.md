@@ -14,198 +14,190 @@
 | Sort        | 从OpenEphys/TDT导出数据、kilosort及转存成.mat的工具包        |
 | config      | 必要的刺激/画图参数的填写（excel文件）和读取（MLA_ParseCTLParams.m) |
 | Preprocess  | 计算CSD和MUA需要用到的预处理函数                             |
-| CTLProcess  | 除RNP_CTLProcess为框架（筛选mat文件并调用protocol对应处理函数），其他函数每个对应一种protocol，其命名与mat文件夹相同 |
+| CTLProcess  | 在线处理（TDT_\*.m）和离线处理（RNP/MLA \*.m)的脚本及对应protocol需要调用的函数 |
 | plot        | 每种具体protocol下要用到的画图函数                           |
 | utils       | 一些零碎处理项，如实验记录（recordingExcel）、补丁（patch）、统计工具（statistics）等 |
+| Paper Code  | 若有些重名函数，根据不同文章处理要求不一样，可以放在此文件夹，用“+name”的形式建立 |
 
 ## 2.填写实验记录
 
 新建/找到实验记录Excel，命名规则为“Name_Project_Protocol_Recording.xlsx"，如”SPR_RNP_TB_Offset_Recording.xlsx"，路径为：
 
-<u>*RatNeuroPixles/utils/recordingExcel/SPR_RNP_TBOffset_Recording.xlsx*</u>
+<u>*MultiChannelProcess/utils/recordingExcel/SPR_RNP_TBOffset_Recording.xlsx*</u>
 
 其中，Excel的标签和内容为：
 
-| ID   |                BLOCKPATH                | paradigm  | datPath                                                      | hardware                | SR_AP  | SR_LFP | sitePos | depth  | sort   | exported |
-| ---- | :-------------------------------------: | --------- | :----------------------------------------------------------- | ----------------------- | ------ | ------ | ------- | ------ | ------ | -------- |
-| 0    |                 string                  | string    | string                                                       | string                  | double | double | string  | double | double | double   |
-| 1    | F:\RNP\Rat1_SPR\Rat1SPR20230505\Block-1 | RNP_Noise | F:\RNP\RNPDATA\20230505\Rat1\Record Node  121\experiment3\recording1\continuous | Neuropix-PXI-122.ProbeA | 30000  | 2500   | AC1     | 2400   | 1      | 1        |
+| ID   |                BLOCKPATH                | paradigm  | datPath                                                      | hardware                | SR_AP  | SR_LFP | sitePos | depth  | sort   | lfpExported | spkExported | recTech    | chNum  | badChannel |
+| ---- | :-------------------------------------: | --------- | :----------------------------------------------------------- | ----------------------- | ------ | ------ | ------- | ------ | ------ | ----------- | ----------- | ---------- | ------ | ---------- |
+| 0    |                 string                  | string    | string                                                       | string                  | double | double | string  | double | double | double      | double      | string     | double |            |
+| 1    | F:\RNP\Rat1_SPR\Rat1SPR20230505\Block-1 | RNP_Noise | F:\RNP\RNPDATA\20230505\Rat1\Record Node  121\experiment3\recording1\continuous\Neuropix-PXI-122.ProbeA | Neuropix-PXI-122.ProbeA | 30000  | 2500   | AC1     | 2400   | 1      | 1           | 1           | NeuroPixel | 385    |            |
 
 其中，第一行的ID为0，其定义了每一列内容读取时的数据类型（如**BLOCKPATH**读取时的数据类型为string，**SR_AP**的数据类型为30000；ID为1的条目是可读取的条目。
 
-进一步的，不同的标签意义为：
+进一步的，不同的标签意义为（标*的标签为neuroPixel数据独有的）：
 
-| 标签          | 解释                                                         |
-| ------------- | ------------------------------------------------------------ |
-| **BLOCKPATH** | TDT的blockpath                                               |
-| **Paradigm**  | 范式名称                                                     |
-| **datPath**   | neuropixel的路径，注意文件夹层级至continuous                 |
-| **hardware**  | neuropixel的记录Node名称，一般为“Neuropix-PXI-122.ProbeA”    |
-| **SR_AP**     | 默认值：30000                                                |
-| **SR_LFP**    | 默认值：2500                                                 |
-| **sitePos**   | 电极位置，若可以明确距离前囟的坐标位点，则写位点（A/P,V/D)，A:anterior;P:posterior;V:ventral;D:dorsal；否则填“position+No.”，如“AC1” |
-| **depth**     | 电极进入的深度                                               |
-| **sort**      | 是否sort，若没有，则填0。注意，若sort=0，则该记录的数据不会导出为mat文件 |
-| **exported**  | 该记录的数据是否导出，若没有，则填0；当exported=1时，不会再进行导出处理 |
+| 标签            | 解释                                                         |
+| --------------- | ------------------------------------------------------------ |
+| **ID**          | 用于分割连续记录，sort前的data merging步骤只会合并具有相同ID的条目。 |
+| **BLOCKPATH**   | TDT的blockpath                                               |
+| **Paradigm**    | 范式名称                                                     |
+| **datPath***    | neuropixel数据的存储路径                                     |
+| **SR_AP***      | 默认值：30000                                                |
+| **SR_LFP***     | 默认值：2500                                                 |
+| **sitePos**     | 电极位置，若可以明确距离前囟的坐标位点，则写位点（A/P,V/D)，A:anterior;P:posterior;V:ventral;D:dorsal；否则填“position+No.”，如“AC1” |
+| **depth**       | 电极进入的深度                                               |
+| **sort**        | 是否sort，若没有，则填0。注意，若sort=0，则该记录的数据不会导出为mat文件 |
+| **lfpExported** | 该记录的LFP数据是否导出，若没有，则填0；当lfpExported=1时，不会再进行导出处理 |
+| **spkExported** | 该记录的spike数据是否导出，若没有，则填0；当spkExported=1时，不会再进行导出处理 |
+| **recTech**     | 记录手段，用于后续的处理分流                                 |
+| **chNum**       | 使用电极的通道数，用于选择channel map                        |
 
-## 3.使用kilosort进行神经元分类
+## 3.使用kilosort进行神经元分类并导出mat文件
 
-#### 第一步：数据合并
+#### <font color=red>现已将下列所有步骤合并到*<u>MultiChannelProcess/Sort/datMerge_Kilosort.m</u>*中</font>
 
-##### 情况一：neuropixel记录
-
-打开数据合并的脚本*<u>RatNeuroPixles/Sort/datMerge_NP.m</u>*
-
-##### 情况二：TDT记录
-
-打开数据合并的脚本*<u>RatNeuroPixles/Sort/datMerge_TDT.m</u>*
-
-##### 通用流程
+#### 第一步：配置参数
 
 在“TODO”小节下，修改excel文件名、tank名和block序号：
 
 ~~~matlab
 %% TODO:
-xlsxPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR_RNP_TBOffset_Recording.xlsx");
-tankSel = "Rat2SPR20230708"; %% TDT tank name
-blockGroup = {[1:4, 6:11]};
-%%
+customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
+      "ZYY_RNP_TBOffset_Recording.xlsx");    
+%         "SPR_MLA_Recording.xlsx");
+%         "XHX_MLA_Recording.xlsx");
+
+customInfo.dateSel = "0903"; % date
+customInfo.MATPATH = "I:\neuroPixels\MAT Data\"; % export root path
+customInfo.thr = [9, 4]; % threshold for kilosort
+customInfo.exportSpkWave = false; % 是否导出spike波形
+customInfo.ReSaveMAT = false; % redo
+customInfo.reExportSpk = false; % redo
 ~~~
 
 随后运行脚本，在tank路径下会产生“Merge1”文件夹，若tankSel为n*1的cell，会产生n个Merge(n)文件夹。
 
 
 
-#### 第二步：运行kilosort
+#### 第二步：合并数据
 
-打开sort的脚本*<u>RatNeuroPixles/Sort/kilosortToProcess_NeuroPixels.m</u>*
+“datMerge”小节将根据excel的数据寻找原始数据所在路径，并合并到一个二进制文件中，该文件默认放在tank文件夹中，命名为“Merge+ID”：
 
-在“TODO”小节下，修改Merge路径：
+![image-20230906130722102](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20230906130722102.png)
+
+**注意：若有新的记录手段，需新写一个merge函数，并加入到下面的if语句中：**
 
 ~~~matlab
-MERGEPATH = strcat("I:\neuroPixels\TDTTank\Rat2_SPR\Rat2SPR20230708\Merge", num2str(mIndex));
+        if strcmpi(recTech, "TDT")
+            TDT2binMerge(BLOCKPATH,MERGEFILE);
+        elseif strcmpi(recTech, "NeuroPixel")
+            NP_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
+%         elseif strcmpi(recTech, "newTech") % 新的记录手段
+%             newTech_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
+        end
 ~~~
 
-加载电极模板,模板及配置文件在*<u>RatNeuroPixels/Sort/config</u>*文件夹内
+**其中，recTech在记录的Excel文件中定义。**
+
+
+
+#### 第三步：运行kilosort
+
+这一步是运行kilosort，会在第二步生成的Merge文件夹中生成Th(x)_(y)的文件夹，其中(x)和(y)分别为第一步中设置的阈值。
+
+![image-20230906130818191](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20230906130818191.png)
+
+**注意：若记录的电极位点及排布有变化，需新建一个电极位点分布模板，加入到<u>*MultiChannelProcess\Sort\process\config*</u>文件夹中，并在*<u>MultiChannelProcess\Sort\process\process_Kilosort.m</u>*的下列代码中加入新的情况：**
 
 ~~~matlab
-run('config\configFileMulti.m');
-% treated as linear probe if no chanMap file
-ops.chanMap = 'config\neuropix385_kilosortChanMap.mat';
-% total number of channels in your recording
-ops.NchanTOT = 385; %384 CHs + 1 sync
-% sample rate, Hz 
-ops.fs = 30000; 
-~~~
+        switch chNum
+        case 16
+            % treated as linear probe if no chanMap file
+            ops.chanMap = [fileparts(mfilename("fullpath")), '\config\chan16_1_kilosortChanMap.mat'];  %16*1 linear array
+            % total number of channels in your recording
+            ops.NchanTOT = 16; %16*1 linear array
+            % sample rate, Hz
+            ops.fs = 12207.03125;
 
-若是使用TDT记录，采样率为12207.03125，使用16×1/16×2/32×1的电极，则需修改相应参数为
-
-~~~matlab
-run('config\configFileMulti.m');
-% treated as linear probe if no chanMap file
-ops.chanMap = 'config\chan16_1_kilosortChanMap.mat';  %16*1 linear array
-% ops.chanMap = 'config\chan16_2_kilosortChanMap.mat'; %16*2 linear array
-% ops.chanMap = 'config\chan32_1_kilosortChanMap.mat'; %32*1 linear array
-
-% total number of channels in your recording
-ops.NchanTOT = 16; %16*1 linear array
-% ops.NchanTOT = 32; %16*2 / 32*1 linear array
-% sample rate, Hz 
-ops.fs = 12207.03125; 
-~~~
-
-找到设置kilosort阈值的地方,设置th1和th2，示例中th1为9，th2为7。
-
-~~~matlab
-for th2 = [7 ]
-    ops.Th = [9 th2];
-    savePath = fullfile(MERGEPATH, ['th', num2str(ops.Th(1))  , '_', num2str(ops.Th(2))]);
-    if ~exist(strcat(savePath, "\params.py"), "file")
-        mKilosort(binFile, ops, savePath);
+        case 32
+            % ops.chanMap = 'config\chan16_2_kilosortChanMap.mat'; %16*2 linear array
+            ops.chanMap = [fileparts(mfilename("fullpath")), '\config\chan32_1_kilosortChanMap.mat']; %32*1 linear array
+            ops.NchanTOT = 32; %16*2 / 32*1 linear array
+            ops.fs = 12207.03125;
+        case 385
+            ops.chanMap = [fileparts(mfilename("fullpath")), '\config\neuropix385_kilosortChanMap.mat'];
+            ops.NchanTOT = 385; %384 CHs + 1 sync
+            ops.fs = 30000;
+%         case newCH % 新的电极位点数目及分布
+%             ops.chanMap = [];
+%             ops.NchanTOT = []; %384 CHs + 1 sync
+%             ops.fs = [];
     end
-end
 ~~~
 
-运行之后，在*<u>Merge1</u>*文件夹中会创建*<u>th9_7</u>*文件夹，其中为kilosort之后产生的结果文件。
 
-#### 第三步：运行GUI并保存
 
-进入*<u>TANKPATH/Merge1/th9_7</u>*文件夹
+#### 第四步：运行GUI并保存
 
-在路径栏输入
+运行完第三步后，会自动打开kilosort的结果GUI，在GUI界面内按**ctrl+s**或**保存键**保存，关闭后确认文件夹中是否新增了*<u>cluster_info.tsv</u>*文件。
 
-~~~
-cmd
-~~~
-
-进入命令提示符窗口后，输入
-
-~~~
-phy template-gui params.py
-~~~
-
-打开GUI界面后按**ctrl+s**或**保存键**保存，关闭后确认文件夹中是否新增了*<u>cluster_info.tsv</u>*文件。
+![image-20230906130851469](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20230906130851469.png)
 
 一般为了看所有可能存在的细胞结果，先不进行挑选，而是直接将所有的cluster（无论是否是有效的sort）批量导出，因此可以根据*<u>cluster_info.tsv</u>*文件读取id和ch信息并导出。
 
-#### 第四步：导出sort数据至相应block中
+![image-20230906130930567](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20230906130930567.png)
 
-首先找到**TODO**小节，做出相应修改
+**注意：只有完成第四步后MATLAB才会进入到第五步的流程中**
 
-~~~matlab
-%% TODO
-MERGEPATH = strcat("I:\neuroPixels\TDTTank\Rat2_SPR\Rat2SPR20230708\Merge", num2str(mIndex)); % merge的路径
-load(fullfile(MERGEPATH,'mergePara.mat'));
-chAll = 384; % 有效的通道
-fs = 30000; % 采样率
-NPYPATH = char(fullfile(MERGEPATH, "th9_7")); % the path including ks_result
-~~~
 
-若是使用*<u>cluster_info.tsv</u>*看所有的cluster结果，则选择下列代码
 
-~~~matlab
-%% cluster_info.tsv, for preview and selection
-IDs = tabulate(clusterIdx);
-idToDel = IDs(IDs(:, 2) < 1000, 1);
-run("alignIdCh.m");
-idx = idCh(:, 1);
-ch = idCh(:, 2);
-~~~
+#### 第五步：导出sort数据至相应block中
 
-若是后续根据所有cluster的结果挑选特定的细胞，则选择下列代码
+这一步会在excel中填写的每个block中都生成一个“sortdata.mat”，加载后，变量sortdata的第一列为spike的时刻，与TDT记录的该block的时刻对齐，第二列为spike所在的通道数，若有通道大于1000，则其为kilosort在同一通道中sort出的多个神经元，其真实通道数为该数除以1000后取余，如1005实际通道为5。
+
+![image-20230906131530915](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20230906131530915.png)
+
+**注意：第一步中若定义：**
 
 ~~~matlab
-ch =  [0 1 4 7 8 1008 9 10 12 13 14 16 17 20 21 23 24 25 26 27 28 29 30]+1; % channels index of kilosort, that means chKs = chTDT - 1;
-idx = [25 24 23 22 19 20 18 21 16 17 15 13 14 12 11 9 8 7 10 6  3 2 0]; % the corresponding id
-
+customInfo.exportSpkWave = true; % 是否导出spike波形
 ~~~
 
-此外，若是要导出细胞的波形，则在最后部分选择导出波形的代码，建议选择好细胞后再做这一步，不然过于耗时。
+**则sortdata.mat中还有一个变量为spkWave，其包含每个spike的波形。**
+
+
+
+#### 第六步：将刺激参数和神经元数据导出成mat文件
+
+这一步将lfp、spike数据按照<u>*MATPATH\animalName\Project\Protocol\Date\\(spkData|lfpData).mat*</u>的格式导出，其中，MATPATH在第一步中定义。
 
 ~~~matlab
-%% export waveform
-onsetIdx = ceil(t(1) * fs);
-wfWin = [-30, 30];
-IDandCHANNEL = [idx, zeros(length(idx), 1), ch];
-disp(strcat("Processing blocks (", num2str(blks), "/", num2str(length(BLOCKPATH)), ") ..."));
-spkWave = getWaveForm_singleID_v2(fs, BLOCKPATH{blks}, NPYPATH, idx, IDandCHANNEL, wfWin, onsetIdx);
+customInfo.MATPATH = "I:\neuroPixels\MAT Data\"; % export root path
 ~~~
 
-随后开始运行，运行之后会在选择的block中生成**sortdata.mat**。
-
-#### 第五步：将刺激参数和神经元数据导出成mat文件
-
-首先找到**TODO**小节，将excel名称修改。
+**注意：若有新的记录手段，需新写一个export函数，并加入到*<u>MultiChannelProcess\Sort\process\process_SaveMAT.m</u>*的下列if语句中：**
 
 ~~~matlab
-recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-            "SPR_RNP_TBOffset_Recording.xlsx");
+    if matches(animal, ["MLA", "RLA"])
+        saveXlsxRecordingData_MonkeyLA(MATPATH, recordInfo, i, recordPath);
+    elseif matches(animal, "RNP")
+        saveXlsxRecordingData_RatNP(MATPATH, recordInfo, i, recordPath);
+%     elseif matches(recTech, "custom")
+%         % custom
+    end
 ~~~
 
-随后开始运行，运行之后会在RatNeuropixles文件夹所在根目录下产生一个同级的文件夹MAT Data，根据*<u>MATData\Name\Project\Protocol\Date\data.mat</u>*的格式存储数据，如*<u>I:\neuroPixels\MATData\Rat2_SPR\CTL_New\RNP_Click_Tuning\Rat2SPR20230708_IC1\data.mat</u>*
+**其中，recTech在记录的Excel文件中定义。**
 
-## 4.批量处理数据
+最终导出结果如图：
+
+![image-20230906133313461](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20230906133313461.png)
+
+![image-20230906144652968](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20230906144652968.png)
+
+
+
+## 4. BATCH处理（因人而异，仅供参考）
 
 #### 第一步：填写Protocol对应的参数（主要针对temporal binding/Offset的protocol，若是新的，可以跳过本步骤）
 

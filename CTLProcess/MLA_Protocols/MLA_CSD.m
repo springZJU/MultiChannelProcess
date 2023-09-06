@@ -1,21 +1,24 @@
-function RNP_CSD(MATPATH, FIGPATH)
+function MLA_CSD(MATPATH, FIGPATH)
 
 % csd paramters config
-temp = string(strsplit(MATPATH, "\"));
+temp = fullfile(MATPATH, "temp");
+temp = string(strsplit(temp, "\"));
 if contains(MATPATH, "Block")
-    dateStr = temp(end - 2);
+    dateStr = fullfile(temp(end - 3), temp(end - 2), temp(end -1));
 else
-    dateStr = temp(end - 1);
+    dateStr = fullfile(temp(end - 2), temp(end - 1));
 end
 
 
 
 
 CSD_Methods = ["three point", "five point", "kCSD"];
-if all(cellfun(@(x) exist(strcat(FIGPATH, dateStr, "\", x, '.jpg'), "file"), CSD_Methods, "uni", false))
+if all(cell2mat(cellfun(@(x) exist(strcat(FIGPATH, dateStr, "\", x, '.jpg'), "file"), CSD_Methods, "uni", false)))
     return
 end
-[badCh, dz] = MLA_CSD_Config(MATPATH);
+% [badCh, dz] = MLA_CSD_Config(MATPATH);
+badCh = [13, 16];
+dz = 150;
 
 % get lfp and wave data
 [trialAll, LFPDataset] = CSD_Preprocess(MATPATH);
@@ -46,5 +49,9 @@ for mIndex = 1 : length(CSD_Methods)
 
     close all;
 end
+save(fullfile(FIGPATH, dateStr, "MUARes.mat"), "MUA", "trialsWAVE", "-mat");
+
+spikeRes = sNoise_RNP(MATPATH, strcat(FIGPATH, dateStr));
+save(fullfile(FIGPATH, dateStr, "spikeRes.mat"), "spikeRes", "-mat");
 
 end

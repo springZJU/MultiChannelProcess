@@ -17,7 +17,12 @@ try
 catch e
     disp(e.message);
     disp("Try loading data from TDT BLOCK...");
-    BLOCKPATH = MLA_GetMatBlock(MATPATH);
+    rmpath("D:\LAB\RatNeuroPixels\utils\data process\load data");
+    try
+        BLOCKPATH = MLA_GetMatBlock(MATPATH);
+    catch
+        BLOCKPATH = MATPATH;
+    end
     temp = TDTbin2mat(char(BLOCKPATH), 'TYPE', {'epocs'});
     epocs = temp.epocs;
     trialAll = processFcn(epocs);

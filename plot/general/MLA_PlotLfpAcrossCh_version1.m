@@ -1,4 +1,4 @@
-function Fig = MLA_PlotLfpAcrossCh(chAll, CTLParams)
+function Fig = MLA_PlotLfpAcrossCh_version1(chAll, CTLParams)
 
 CTLFields = string(fields(CTLParams));
 for fIndex = 1 : length(CTLFields)
@@ -15,7 +15,7 @@ margins = [0.05, 0.05, 0.1, 0.1];
 paddings = [0.01, 0.03, 0.01, 0.05];
 Fig = figure;
 maximizeFig(Fig);
-plotRows = 3;
+plotRows = numel(stimStrs);
 ymin = 0; 
 ymax = 0;
 for dIndex = 1 : length(chAll)

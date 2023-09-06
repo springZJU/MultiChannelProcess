@@ -6,7 +6,7 @@ end
 %% plot Noise
 % sNoise_RNP(MATPATH, FIGPATH);
 try
-    load(MATPATH);
+    load(strrep(MATPATH, "data.mat", "spkData.mat"));
     spikeTimeAll = data.sortdata(:,1)*1000;
     channelIdx = data.sortdata(:,2);
 catch

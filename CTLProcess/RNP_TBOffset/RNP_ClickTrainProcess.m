@@ -28,10 +28,8 @@ CTLParams = RNP_ParseCTLParams(protStr);
 parseStruct(CTLParams);
 fd = fs;
 
-if isequal(lfpDataset.lfp.fs, fd)
-    lfpDataset = ECOGResample(lfpDataset.lfp, fd);
-else
-    lfpDataset = lfpDataset.lfp;
+if isequal(lfpDataset.fs, fd)
+    lfpDataset = ECOGResample(lfpDataset, fd);
 end
 %% set trialAll
 trialAll([trialAll.devOrdr] == 0) = [];

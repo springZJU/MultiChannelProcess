@@ -9,7 +9,7 @@ sort = {recordInfo.sort}';
 lfpExported = {recordInfo.lfpExported}';
 spkExported = {recordInfo.spkExported}';
 selIdx = find(cell2mat(cellfun(@(x, y, z) isequal(x, 1) & (isequal(y, 0) | isequal(z, 0)), sort, lfpExported, spkExported, "uni", false)));
-
+recTech = recordInfo(selIdx).recTech;
 %% export sorted and unprocessed spike data
 for i = selIdx'
     disp(strcat("processing ", recordInfo(i).BLOCKPATH, "... (", num2str(i), "/", num2str(max(selIdx)), ")"));
@@ -17,10 +17,12 @@ for i = selIdx'
     recordInfo = table2cell(readtable(recordPath, opts));
     recordInfo(1, cell2mat(cellfun(@(x) isequaln(x, NaN), recordInfo(1, :), "uni", false))) = {["double"]};
     recordInfo = cell2struct(recordInfo, opts.SelectedVariableNames, 2);
-    if matches(animal, ["MLA", "RLA"])
+    if matches(recTech, "TDT")
         saveXlsxRecordingData_MonkeyLA(MATPATH, recordInfo, i, recordPath);
-    elseif matches(animal, "RNP")
+    elseif matches(recTech, "NeuroPixel")
         saveXlsxRecordingData_RatNP(MATPATH, recordInfo, i, recordPath);
+%     elseif matches(recTech, "custom")
+%         % custom
     end
 
 end

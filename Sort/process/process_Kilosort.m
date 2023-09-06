@@ -22,6 +22,10 @@
             ops.chanMap = [fileparts(mfilename("fullpath")), '\config\neuropix385_kilosortChanMap.mat'];
             ops.NchanTOT = 385; %384 CHs + 1 sync
             ops.fs = 30000;
+%         case newCH
+%             ops.chanMap = [];
+%             ops.NchanTOT = []; %384 CHs + 1 sync
+%             ops.fs = [];
     end
 
     for tIndex = 1 : size(thr , 1)

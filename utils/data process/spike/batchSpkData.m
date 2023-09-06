@@ -26,12 +26,11 @@ for sIndex = 1 : length(frBasic)
     temp = frBasic(sIndex).spikeStim;
     tempRes{sIndex, 1} = cell2mat(cellfun(@(x, y) spikeDiffWinTest(x, winOnset1, winOnset2, y, "Tail", "right", "Alpha", 0.05), {temp.spikePlot}', {temp.trialsRaw}', "UniformOutput", false));
     tempOnset{sIndex, 1} = cell2mat(cellfun(@(x, y, z) spikeDiffWinTest(x, winOnset1+z, winOnset2+z, y, "Tail", "right", "Alpha", 0.05), {temp.spikePlot}', {temp.trialsRaw}', num2cell(S1Duration)', "UniformOutput", false));
-    calPsth()
 end
-tempFR = cellfun(@(x) cell2mat({x.frMean_1}'), tempRes, "UniformOutput", false);
-onsetFR = cellfun(@(x) cell2mat({x.frMean_1}'), tempOnset, "UniformOutput", false);
-tempSE = cellfun(@(x) cell2mat({x.frSE_1}'), tempRes, "UniformOutput", false);
-changeOnRatio = cellfun(@(x, y) cell2mat({x.frMean_1}') ./  cell2mat({y.frMean_1}'), tempRes, tempOnset, "UniformOutput", false);
+tempFR = cellfun(@(x) cell2mat({x.frMean_Resp}'), tempRes, "UniformOutput", false);
+onsetFR = cellfun(@(x) cell2mat({x.frMean_Resp}'), tempOnset, "UniformOutput", false);
+tempSE = cellfun(@(x) cell2mat({x.frSE_Resp}'), tempRes, "UniformOutput", false);
+changeOnRatio = cellfun(@(x, y) cell2mat({x.frMean_Resp}') ./  cell2mat({y.frMean_Resp}'), tempRes, tempOnset, "UniformOutput", false);
 frResChange = cell2struct([tempRes, onsetFR, tempFR, tempSE, tempOnset, changeOnRatio], ["stimRes"; "onsetFR"; "stimFR"; "stimSE"; "onsetRes"; "changeOnRatio"], 2);
 res.Change = structcat(frBasic, frResChange);
 end

@@ -12,8 +12,8 @@ psthPara.binsize = 3; % ms
 psthPara.binstep = 0.3; % ms
 % change window
 calWinRaw = calWin;
-calWin(1) = calWin(1)-psthPara.binsize;
-calWin(2) = calWin(2)+psthPara.binsize;
+calWin(1) = calWin(1) - psthPara.binsize;
+calWin(2) = calWin(2) + psthPara.binsize;
 PSTH = calPsth(spikes(:, 1), psthPara, 1e3, 'EDGE', calWin, 'NTRIAL', length(trials));
 PSTH = findWithinInterval(PSTH, calWinRaw, 1);
 smthPSTH = PSTH(:, 2);
@@ -38,7 +38,7 @@ else
 end
 
 %% latency
-thr = max([frMean + 2*frSD, 200/psthPara.binsize]);
+thr = max([(frMean + 2*frSD)*baseWin / psthPara.binsize, 200/psthPara.binsize]);
 evokeIdx = find(smthPSTH >= thr & PSTH(:, 1) > 0);
 if ~isempty(evokeIdx)
     firstIdx = mConsecutive(evokeIdx, 3);

@@ -3,13 +3,13 @@ clc; close all
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 %% TODO: configuration
-ratName = "Rat2_SPR"; % required
+ratName = "Rat1_ZYY"; % required
 ROOTPATH = "I:\neuroPixels"; % required
 project = "CTL_New"; % project, required
-dateSel = ""; % blank for all
+dateSel = "20230824"; % blank for all
 protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_TB_Ratio", "RNP_TB_Basic_2_3"...
-    "RNP_TB_BaseICI_2_3", "RNP_TB_Ratio_4", "RNP_Precise"]; % blank for all
-
+    "RNP_TB_BaseICI_2_3", "RNP_Precise", "RNP_ToneCF_Late"]; % blank for all
+% protSel = ["RNP_Precise"]; % blank for all
 %% load protocols
 temp = strsplit(ratName, "_");
 humanName = temp(2);

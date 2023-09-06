@@ -110,8 +110,6 @@ for cIndex = 1 : chNum
         Y = psthTemp{Odd_Std_Index, 1}(:, 2);
         plot(AxesPSTH(sIndex, pIndex), X, Y, "Color", colors(2), "LineWidth", 1, "LineStyle", "-", "DisplayName", legendStr(3)); hold on
         
-
-
         % significance test
         % Odd Dev vs Odd Std
         if strcmpi(sigTestMethod, "ranksum")

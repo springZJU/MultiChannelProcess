@@ -42,12 +42,12 @@ chMap = readNPY([NPYPATH, '\channel_map.npy'])';               % Order in which 
 MChInID = IDandCHANNEL(ismember(IDandCHANNEL(:,1), unitID), 3);
 
 %% read data via memory map
-fileName = fullfile(dataPath, 'Wave.bin');% .dat file containing the raw
+fileName = fullfile(getRootDirPath(NPYPATH, 2), 'Wave.bin');% .dat file containing the raw
 dataInfo = dir(fileName);
 dataType = 'int16';            % Data type of .dat file (this should be BP filtered)
 dataTypeNBytes = numel(typecast(cast(0, dataType), 'uint8')); % determine number of bytes per sample
 nCh = length(unique(chMap));
-nSamp = dataInfo.bytes/(nCh * dataTypeNBytes);  % Number of samples per channel
+nSamp = fix(dataInfo.bytes/(nCh * dataTypeNBytes));  % Number of samples per channel
 mmf = memmapfile(fileName,'Format', {dataType, [nCh nSamp], 'x'});
 data = mmf.Data(1).x;
 

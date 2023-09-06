@@ -10,23 +10,20 @@ if nargin < 4
 end
 
 parseStruct(CTLParams);
-
 windowIndex = Window;
 
 switch segOption
     case "trial onset"
-        segIndex = cellfun(@(x) fix(x(1)), {trials.soundOnsetSeq}');
+        segIndex = cellfun(@(x) x(1), {trials.soundOnsetSeq}');
     case "dev onset"
-        segIndex = fix([trials.devOnset]');
+        segIndex = [trials.devOnset]';
     case "push onset" % make sure pushing time of all trials not empty
-
 %         if length(trials) ~= length([trials.firstPush])
 %             error("Pushing time of all trials should not be empty");
 %         end
-
-        segIndex = fix(cell2mat(cellfun(@(x, y) max([x, y]), {trials.firstPush}', {trials.devOnset}', "UniformOutput", false)));
+        segIndex = cell2mat(cellfun(@(x, y) max([x, y]), {trials.firstPush}', {trials.devOnset}', "UniformOutput", false));
     case "last std"
-        segIndex = cellfun(@(x) fix(x(end - 1)), {trials.soundOnsetSeq}');
+        segIndex = cellfun(@(x) x(end - 1), {trials.soundOnsetSeq}');
 end
 
 if isempty(segIndex)
@@ -52,11 +49,10 @@ else
                 trialSpike{tIndex, cIndex}(:, 1) = temp(temp > sampleinfo(tIndex, 1) & temp < sampleinfo(tIndex, 2)) - segIndex(tIndex);
                 trialSpike{tIndex, cIndex}(:, 2) = ones(length(trialSpike{tIndex, cIndex}), 1) * tIndex;
             else
-                trialSpike{tIndex, cIndex}(1, 1) = windowIndex(1);
-                trialSpike{tIndex, cIndex}(1, 2) = tIndex;
+                trialSpike{tIndex, cIndex} = [windowIndex(1), tIndex];
+
             end
         end
-        %         PSTH{tIndex, cIndex} = calPsth(spikePlot{cIndex, 1}(:, 1), psthPara, scaleFactor, 'EDGE', Window, 'NTRIAL', length(trials));
     end
     res= cell2struct(trialSpike, string(cellfun(@(x) strcat("CH", string(num2str(x))), {spikeDataset.ch}', "uni", false)), 2);
     return;

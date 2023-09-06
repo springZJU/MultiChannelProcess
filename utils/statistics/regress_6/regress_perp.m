@@ -21,11 +21,11 @@ function [ b, a, bint, aint, r, p]=regress_perp(x,y,alpha,option)
 % method which minimizes the vertical offset. (See function regress.m)
 disp('***** b--slope; a--intercept; bint--slope confidence int; aint--inter confidence int *****')
 disp('***** 1--free intercept (default); 2--set intercept 0*****')
-if  nargin < 2,              
+if  nargin < 2              
     error('REGRESS_PERP requires at least two input arguments.');      
 end 
 
-if nargin == 2, 
+if nargin == 2
     alpha = 0.05;
     option = 1;
 end
@@ -44,7 +44,7 @@ else
     a=0;
 end
     
-if isnan(b) | isnan(a)
+if isnan(b) || isnan(a)
     error('The program failed to extact slope and intercept from the data set via least square');
 end
 

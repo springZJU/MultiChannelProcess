@@ -12,8 +12,11 @@ recordInfo(1, cell2mat(cellfun(@(x) isequaln(x, NaN), recordInfo(1, :), "uni", f
 recordInfo = cell2struct(recordInfo, opts.SelectedVariableNames, 2);
 
 sort = {recordInfo.sort}';
-exported = {recordInfo.exported}';
-selIdx = find(cell2mat(cellfun(@(x, y) isequal(x, 1) & isequal(y, 0), sort, exported, "uni", false)));
+% exported = {recordInfo.exported}';
+% selIdx = find(cell2mat(cellfun(@(x, y) isequal(x, 1) & isequal(y, 0), sort, exported, "uni", false)));
+lfpexported = {recordInfo.lfpExported}';
+spkexported = {recordInfo.spkExported}';
+selIdx = find(cell2mat(cellfun(@(x, y, z) (isequal(y, 0) | isequal(z, 0)) & isequal(x, 1), sort, lfpexported, spkexported, "uni", false)));
 
 %% export sorted and unprocessed spike data
 for i = selIdx'
