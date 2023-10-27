@@ -14,7 +14,7 @@ if ~toPlotFFT
 end
 
 for cIndex = 1 : chNum
-    Fig = figure;
+    Fig = figure("Visible","off");
     maximizeFig(Fig);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.1, 0.01];

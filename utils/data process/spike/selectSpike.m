@@ -46,7 +46,7 @@ else
         for tIndex = 1:length(segIndex)
             sampleinfo(tIndex, :) = segIndex(tIndex) + windowIndex;
             if any(temp > sampleinfo(tIndex, 1) & temp < sampleinfo(tIndex, 2))
-                trialSpike{tIndex, cIndex}(:, 1) = temp(temp > sampleinfo(tIndex, 1) & temp < sampleinfo(tIndex, 2)) - segIndex(tIndex);
+                trialSpike{tIndex, cIndex}(:, 1) = temp(temp >= sampleinfo(tIndex, 1) & temp <= sampleinfo(tIndex, 2)) - segIndex(tIndex);
                 trialSpike{tIndex, cIndex}(:, 2) = ones(length(trialSpike{tIndex, cIndex}), 1) * tIndex;
             else
                 trialSpike{tIndex, cIndex} = [windowIndex(1), tIndex];

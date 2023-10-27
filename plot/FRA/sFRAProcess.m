@@ -27,7 +27,12 @@ end
 if nargin == 3
     spikeTimeAll = sortData.spikeTimeAll * 1000; % ms
 elseif nargin == 4
-    spikeTimeAll = sortData.spikeTimeAll(sortData.channelIdx == chIndex) * 1000; % ms
+    try
+        spikeTimeAll = sortData.spikeTimeAll(sortData.channelIdx == chIndex) * 1000; % ms
+    catch
+        spikeTimeAll = sortData.spikeTimeAll(sortData.clusterIdx == chIndex) * 1000; % ms
+    end
+
 end
 
 %% Categorizations

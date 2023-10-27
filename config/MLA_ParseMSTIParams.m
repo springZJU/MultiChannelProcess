@@ -21,12 +21,12 @@ MSTIparamsAll(idx).Duration = string(DurationInfo(1) * 1000);
 MSTIparamsAll(idx).cursor1 = join(string(1000 ./ BaseICI(2:3)), ",");%Std-Si,Std-Sii
 MSTIparamsAll(idx).cursor2 = join(string(1000 ./ [BaseICI(1), BaseICI(1)]), ",");%BG
 MSTIparamsAll(idx).cursor3 = string(1 / DurationInfo(1));
-writetable(struct2table(MSTIparamsAll), ConfigExcelPATH);
+writetable(struct2table(MSTIparamsAll), ConfigExcelPATH, "Sheet", "MSTI");
 
 %% get params
 MSTIparams.Protocol = string(MSTIparamsAll(idx).ProtocolType);
 MSTIparams.stimStrs = cellfun(@(x) strrep(x, ".", "o"), stimStrs);
-MSTIparams.Colors = regexpi(string(MSTIparamsAll(idx).colors), ",", "split");
+MSTIparams.Colors = regexpi(string(MSTIparamsAll(idx).Colors), ",", "split");
 MSTIparams.GroupTypes = cellfun(@double, ...
                                 rowFcn(@(x) regexpi(x, ",", "split"), ...
                                 regexpi(string(MSTIparamsAll(idx).GroupTypes), ";", "split")', "UniformOutput", false),...

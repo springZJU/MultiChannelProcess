@@ -1,28 +1,29 @@
-function [frMean, frSE, countRaw, frSD, trials] = calFR(spikes, window, trials)
-if ~iscolumn(trials)
-    trials = trials';
-end
-trialN = length(trials);
-spikes(~(spikes(:,1) >= window(1) & spikes(:,1) <= window(2)),:) = [];
-if size(spikes, 2) == 1
-    temp = tabulate(spikes(:, 1));
-elseif size(spikes, 2) == 2
-    temp = tabulate(spikes(:, 2));
+function [frMean, frSE, countRaw, frSD, trials] = calFR(spikes, window, varargin)
+mIp = inputParser;
+mIp.addRequired("spikes", @(x) isnumeric(x) | iscell(x));
+mIp.addRequired("window", @isnumeric);
+mIp.addOptional("trials", [], @isnumeric);
+
+mIp.parse(spikes,window, varargin{:});
+trials = mIp.Results.trials;
+
+if isnumeric(spikes)
+    if isempty(trials)
+        error("Please supply trial info !");
+    elseif ~iscolumn(trials)
+        trials = trials';
+    end
+    spikesTemp = findWithinInterval(spikes, window, 1);
+    spikeCell = rowFcn(@(x) spikesTemp(spikesTemp(:, 2) == x), trials, "UniformOutput", false);
+    countRaw = [cellfun(@length, spikeCell), trials];
+    frRaw = countRaw(:, 1)*1000 / diff(window);
+elseif iscell(spikes)
+    spikeCell = cellfun(@(x) findWithinInterval(x, window, 1), spikes, "UniformOutput", false);
+    countRaw = cellfun(@length, spikeCell);
+    frRaw = countRaw*1000 / diff(window);
 end
 
-if ~isempty(spikes)
-    temp(temp(:, 2)==0,:) = [];
-    countRaw = sortrows([[temp(:, 2); zeros(trialN-size(temp,1), 1)], [temp(:,1); trials(~ismember(trials, temp(:,1)))]], 2);
-%     trials = countRaw(:, 2);
-%     countRaw = countRaw(:, 1);
-    frMean = mean(countRaw(:, 1))*1000 / diff(window);
-    frSE = std(countRaw(:, 1))*1000 / (diff(window)*sqrt(trialN));
-    frSD = std(countRaw(:, 1))*1000 / diff(window);
-else
-    countRaw = [zeros(trialN, 1), trials] ;
-    frMean = 0;
-    frSE = 0;
-    frSD = 0;
-end
-
+frMean = mean(frRaw);
+frSE = SE(frRaw);
+frSD = std(frRaw);
 end

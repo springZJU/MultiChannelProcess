@@ -1,5 +1,8 @@
-function RNP_Noise(MATPATH, FIGPATH)
-
+function RNP_Noise(MATPATH, FIGPATH, plotWin)
+narginchk(2, 3);
+if nargin < 3
+    plotWin = [-50, 150];
+end
 if exist(FIGPATH, "dir")
     return
 end
@@ -18,12 +21,12 @@ spikesAll = double([spikeTimeAll, channelIdx]);
 ch = unique(channelIdx);
 
 for cIndex = 1 : length(ch)
-Window = [-200, 200];
+Window = [-100, 100] + plotWin;
 segWin = num2cell(Window + data.epocs.Swep.onset*1000, 2);
 trialN = num2cell(1 : length(data.epocs.Swep.onset))';
 spikes = spikesAll(channelIdx == ch(cIndex), 1);
 noiseSpike = cell2mat(cellfun(@(x, y) [findWithinInterval(spikes, x) - x(1) + Window(1), fix(y)*ones(length(findWithinInterval(spikes, x)), 1)], segWin, trialN, "UniformOutput", false));
-[~, ~, ~, Fig] = peakWidthLatency(noiseSpike, [-100, 0], [-50, 150], 1 : length(trialN), true);
+[~, ~, ~, Fig] = peakWidthLatency(noiseSpike, [-100, 0], plotWin, [], 1 : length(trialN), "toPlot", true);
 mkdir(FIGPATH);
 mPrint(Fig, strcat(FIGPATH, "\CH", num2str(ch(cIndex))), "-djpeg", "-r300");
 close(Fig);

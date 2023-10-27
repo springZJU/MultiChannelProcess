@@ -22,11 +22,8 @@ end
 %% Loading data
 try
     disp("Try loading data from MAT");
-    load(strrep(DATAPATH, "data.mat", "spkData.mat"));
-    if size(data.sortdata, 2) == 1
-        data.sortdata(:, 2) = 1;
-    end
-    spikeDataset = spikeByCh(sortrows(data.sortdata, 2));
+
+    % lfp
     load(strrep(DATAPATH, "data.mat", "lfpData.mat"));
     try
         lfpDataset = data.lfp;
@@ -35,7 +32,18 @@ try
     end
     epocs = data.epocs;
     trialAll = processFcn(epocs);
+    chs = size(lfpDataset.data, 1);
 
+    % spike
+    load(strrep(DATAPATH, "data.mat", "spkData.mat"));
+    if any(data.sortdata(:, 2) == 0)
+        data.sortdata(:, 2) = data.sortdata(:, 2) + 1;
+    end
+    if size(data.sortdata, 2) == 1
+        data.sortdata(:, 2) = 1;
+    end
+    spikeDataset = spikeByCh(sortrows(data.sortdata, 2));
+    
 catch e
     disp(e.message);
     disp("Try loading data from TDT BLOCK...");

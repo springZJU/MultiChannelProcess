@@ -13,7 +13,7 @@ InsertNum = double(strsplit(strrep(temp(4), "N", ""), "-"));
 stimStrs = ["N0", rowFcn(@(x) strcat("N", x), string(InsertNum'))'];
 
 MSTIparamsAll(idx).stimStrs = join(stimStrs, ",");
-writetable(struct2table(MSTIparamsAll), ConfigExcelPATH);
+writetable(struct2table(MSTIparamsAll), ConfigExcelPATH, "Sheet", "Insert");
 
 %% get params
 MSTIparams.Protocol = string(MSTIparamsAll(idx).ProtocolType);

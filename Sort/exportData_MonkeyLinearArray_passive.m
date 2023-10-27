@@ -1,8 +1,8 @@
 clear ; clc
 %% DDZ
-ROOTPATH = "E:\MonkeyLinearArray\MAT Data\";
+ROOTPATH = "H:\MLA_A1补充\MAT Data\";
 recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR_MLA_Recording.xlsx");
+    "XHX_MLA_Recording.xlsx");
 
 
 %% load excel

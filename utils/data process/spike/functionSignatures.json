@@ -3,20 +3,99 @@
 
     "spikeDiffWinTest": {
         "inputs": [
-            {"name": "spike", "kind": "required", "type": ["numeric", "2d"]},
-            {"name": "win1", "kind": "required", "type": ["numeric", "2d"]},
-            {"name": "win2", "kind": "required", "type": ["numeric", "2d"]},
-            {"name": "trials", "kind": "required", "type": ["numeric", "vector"]},
-            {"name": "Tail", "kind": "namevalue", "type":["choices={'both', 'left', 'right'}"]},
-            {"name": "Alpha", "kind": "namevalue", "type": ["numeric", "vector"]}
+            {"mutuallyExclusiveGroup": [
+                [
+                {"name": "spike", "kind": "required", "type": ["numeric", "2d"]},
+                {"name": "winResp", "kind": "required", "type": ["numeric", "2d"]},
+                {"name": "winBase", "kind": "required", "type": ["numeric", "2d"]},
+                {"name": "trials", "kind": "required", "type": ["numeric", "vector"]},
+                {"name": "Tail", "kind": "namevalue", "type":["choices={'both', 'left', 'right'}"]},
+                {"name": "Alpha", "kind": "namevalue", "type": ["numeric", "vector"]},
+                {"name": "absThr", "kind": "namevalue", "type": ["numeric", "vector"]},
+                {"name": "sdThr", "kind": "namevalue", "type": ["numeric", "vector"]}
+            ],
+             [
+             {"name": "spike", "kind": "required", "type": ["cell"]},
+             {"name": "winResp", "kind": "required", "type": ["numeric", "2d"]},
+             {"name": "winBase", "kind": "required", "type": ["numeric", "2d"]},
+             {"name": "Tail", "kind": "namevalue", "type":["choices={'both', 'left', 'right'}"]},
+             {"name": "Alpha", "kind": "namevalue", "type": ["numeric", "vector"]},
+             {"name": "absThr", "kind": "namevalue", "type": ["numeric", "vector"]},
+             {"name": "sdThr", "kind": "namevalue", "type": ["numeric", "vector"]}
+             ]
+             ]}
         ]},
 
     "calPsth": {
         "inputs": [
-            {"name": "data", "kind": "required", "type": ["numeric", "vector"]},
+            {"name": "data", "kind": "required", "type": ["numeric", "vector", "cell"]},
             {"name": "binpara", "kind": "required", "type": ["struct"]},
             {"name": "scaleFactor", "kind": "ordered", "type": ["numeric", "2d"]},
             {"name": "NTRIAL", "kind": "namevalue", "type":["numeric"]},
             {"name": "EDGE", "kind": "namevalue", "type": ["numeric", "vector"]}
-        ]}
+        ]},
+
+    "calFR": {
+        "inputs": [
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "spikes", "kind": "required", "type": ["numeric"]},
+                    {"name": "window", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "trials", "kind": "ordered", "type": ["numeric"]}
+                ],
+                [
+                    {"name": "spikes", "kind": "required", "type": ["cell"]},
+                    {"name": "window", "kind": "ordered", "type": ["numeric"]}
+                ]
+            ]}
+        ]
+    },
+
+    "peakWidthLatency": {
+        "inputs": [
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "spikes", "kind": "required", "type": ["numeric"]},
+                    {"name": "baseWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "respWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "psthPara", "kind": "ordered"},
+                    {"name": "trials", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "toPlot", "kind": "namevalue", "type": ["numeric"]},
+                    {"name": "returnVal", "kind": "namevalue", "type": ["choices={'peak', 'width'}"]}
+                ],
+                                [
+                    {"name": "spikes", "kind": "required", "type": ["numeric"]},
+                    {"name": "baseWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "respWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "psthPara", "kind": "ordered"},
+                    {"name": "trials", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "toPlot", "kind": "namevalue", "type": ["numeric"]},
+                    {"name": "returnVal", "kind": "namevalue", "type": ["choices={'all', 'latency'}"]},
+                    {"name": "latencyMethod", "kind": "namevalue", "type": ["choices={'threshold', 'firstSpike', 'halfPeak', 'peak', 'halfArea'}"]},
+                    {"name": "firstSpkWin", "kind": "namevalue", "type": ["numeric"]},
+                    {"name": "peakRatio", "kind": "namevalue", "type": ["numeric"]}
+                ],
+                [
+                    {"name": "spikes", "kind": "required", "type": ["cell"]},
+                    {"name": "baseWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "respWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "psthPara", "kind": "ordered"},
+                    {"name": "toPlot", "kind": "namevalue", "type": ["numeric"]},
+                    {"name": "returnVal", "kind": "namevalue", "type": ["choices={'peak', 'width'}"]}
+                ],
+                [
+                    {"name": "spikes", "kind": "required", "type": ["cell"]},
+                    {"name": "baseWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "respWin", "kind": "ordered", "type": ["numeric"]},
+                    {"name": "psthPara", "kind": "ordered"},
+                    {"name": "toPlot", "kind": "namevalue", "type": ["numeric"]},
+                    {"name": "returnVal", "kind": "namevalue", "type": ["choices={'all', 'latency'}"]},
+                    {"name": "latencyMethod", "kind": "namevalue", "type": ["choices={'threshold', 'firstSpike', 'halfPeak', 'peak', 'halfArea'}"]},
+                    {"name": "firstSpkWin", "kind": "namevalue", "type": ["numeric"]},
+                    {"name": "peakRatio", "kind": "namevalue", "type": ["numeric"]}
+                ]
+            ]}
+        ]
+    }
 }
+

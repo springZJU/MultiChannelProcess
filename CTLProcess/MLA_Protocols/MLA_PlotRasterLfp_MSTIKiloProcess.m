@@ -9,10 +9,12 @@ idchNum = length(chSpikeLfp(1).chSPK);
 chNum = length(chSpikeLfp(1).chLFP);
 
 temp = dir(FIGPATH);
-Exist_Single = any(contains(string({temp.name}), "kilo"));
+% Exist_Single = any(contains(string({temp.name}), "kilo"));
 Exist_CH = any(contains(string({temp.name}), "CH"));
+Exist_Single = 0;
+% Exist_CH = 0;
 Exist_CSD_MUA = 1;
-Exist_LFP_By_Ch = 1;
+Exist_LFP_By_Ch = 0;
 Exist_LFP_Acorss_Ch = 1;
 if all([Exist_LFP_Acorss_Ch, Exist_LFP_By_Ch, Exist_CSD_MUA, Exist_Single, Exist_CH])
     return
@@ -172,12 +174,12 @@ if ~Exist_CH
             %% ROW3: cwt
             temp = chSpikeLfp(dIndex).chLFP(cIndex).cwt;
             t = chSpikeLfp(dIndex).chLFP(cIndex).cwt_time(:, 1);
-            f = chSpikeLfp(dIndex).chLFP(cIndex).cwt_f(:, 1);
+            f{dIndex} = chSpikeLfp(dIndex).chLFP(cIndex).cwt_f(:, 1);
             t_idx = find(t > CWTplotWindow(1) & t < CWTplotWindow(2));
             t_fsD_win = t(t_idx);
             pIndex = 2 * colMax + dIndex;   
             Axes(dIndex, 4) = mSubplot(CH_Fig(cIndex), plotRows, colMax, pIndex, [1, 1], margins, paddings);
-            imagesc('XData', t_fsD_win, 'YData', f, 'CData', temp);
+            imagesc('XData', t_fsD_win, 'YData', f{dIndex}, 'CData', temp);
             colormap("jet");
             hold on;
         end
@@ -214,6 +216,7 @@ if ~Exist_CH
         scaleAxes(Axes(:, 1), "y", "on");
         scaleAxes(Axes(:, 2), "y", "on");
         scaleAxes(Axes(:, 3), "y", "on");
+        scaleAxes(Axes(:, 4), "y", [0 max(cell2mat(f'))]);
         scaleAxes(AxesLFP, "x", compareWin);
         scaleAxes(AxesLFP, "y", "on");
         % add vertical line

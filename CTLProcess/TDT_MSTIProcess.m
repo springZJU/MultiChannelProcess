@@ -1,12 +1,12 @@
 clear;clc;
-MATPATH = 'H:\AC\DDZ\ddz20230904\Block-12';
+MATPATH = 'H:\AC\DDZ\ddz20230906\Block-23';
 % MATPATH = 'H:\AC\CM\cm20230905\Block-9';
 FIGPATH = MATPATH;
 
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainRNP;
-protStr = "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s";
-% protStr = "Insert_ICI15.2_ratio1.02_N1-2-4-8";
+% protStr = "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s";
+protStr = "Insert_ICI15.2_ratio1.02_N1-2-4-8";
 
 DATAPATH = MATPATH;
 FIGPATH = strcat(FIGPATH, "\");
@@ -46,7 +46,11 @@ devType = unique([trialAll.devOrdr]);
 OnsetTemp = {trialAll.devOnset}';
 [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
 ordTemp = num2cell(ordTemp);
-temp = cellfun(@(x) S1Duration + x, OnsetTemp, "UniformOutput", false);
+if contains(protStr, "MSTI")
+    temp = cellfun(@(x, y) MSTIsoundinfo(x).Std_Dev_Onset(end) + y, ordTemp, OnsetTemp, "UniformOutput", false);
+elseif contains(protStr, "Insert")
+    temp = cellfun(@(x) S1Duration + x, OnsetTemp, "UniformOutput", false);
+end
 trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 trialAll(1) = [];
 
@@ -119,9 +123,18 @@ for dIndex = 1:length(devType)
     
     %% spike
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
-    for chIdx = 1 : numel(spikePlot)
-        chRS{chIdx}(1) = RayleighStatistic(spikePlot{chIdx}(:, 1), BaseICI);
-        chRS{chIdx}(2) = BaseICI;
+    if contains(protStr, "MSTI")
+        for ICIidx = 1 : size(BaseICI, 2)
+            for chIdx = 1 : numel(spikePlot)
+                chRS{chIdx}(ICIidx, 1) = RayleighStatistic(spikePlot{chIdx}(:, 1), BaseICI(dIndex, ICIidx));
+                chRS{chIdx}(ICIidx, 2) = BaseICI(dIndex, ICIidx);
+            end
+        end
+    elseif contains(protStr, "Insert")
+        for chIdx = 1 : numel(spikePlot)
+            chRS{chIdx}(1) = RayleighStatistic(spikePlot{chIdx}(:, 1), BaseICI);
+            chRS{chIdx}(2) = BaseICI;
+        end
     end
     psthPara.binsize = 30; % ms
     psthPara.binstep = 1; % ms

@@ -28,7 +28,7 @@ CTLParams = MLA_ParseCTLParams(protStr);
 parseStruct(CTLParams);
 fd = fs;
 
-if isequal(lfpDataset.fs, fd)
+if ~isequal(lfpDataset.fs, fd)
     lfpDataset = ECOGResample(lfpDataset, fd);
 end
 %% set trialAll
@@ -42,6 +42,9 @@ trialAll(1) = [];
 
 %% split data
 [trialsLFPRaw, ~, ~] = selectEcog(lfpDataset, trialAll, "dev onset", Window); % "dev onset"; "trial onset"
+if length(trialsLFPRaw) < length(trialAll)
+    trialAll(end) = [];
+end
 trialsLFPFiltered = ECOGFilter(trialsLFPRaw, 0.1, 200, fd);
 tIdx = excludeTrials(trialsLFPFiltered, 0.1);
 trialsLFPFiltered(tIdx) = [];
@@ -55,7 +58,6 @@ end
 
 % spike
 chSelect = [spikeDataset.realCh]';
-find(chSelect == 0)
 trialsSpike = selectSpike(spikeDataset, trialAllRaw, CTLParams, "dev onset");
 
 

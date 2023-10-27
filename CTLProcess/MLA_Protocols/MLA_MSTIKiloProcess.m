@@ -1,6 +1,5 @@
 function MLA_MSTIKiloProcess(BLOCKPATH, MATPATH, FIGPATH)
-addpath("K:\Program\ECOGProcess");
-addpath("K:\Program\MATLAB Utils\data processing\time-frequency analysis");
+addpath(genpath('K:\Program'), '-begin');
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainRNP;
 fdMUA = 1000;
@@ -14,7 +13,8 @@ catch
 end
 
 temp = dir(FIGPATH);
-Exist_Single = any(contains(string({temp.name}), "CH"));
+% Exist_Single = any(contains(string({temp.name}), "CH"));
+Exist_Single = 0;
 Exist_CSD_MUA = 1;
 Exist_LFP_By_Ch = 1;
 Exist_LFP_Acorss_Ch = 1;
@@ -132,10 +132,11 @@ for dIndex = 1:length(devType)
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
     for ICIidx = 1 : size(BaseICI, 2)
         for chIdx = 1 : numel(spikePlot)
-            chRS{chIdx}(ICIidx, 1) = RayleighStatistic(spikePlot{chIdx}(:, 1), BaseICI(dIndex, ICIidx));
+            chRS{chIdx}(ICIidx, 1) = RayleighStatistic(spikePlot{chIdx}(:, 1), BaseICI(dIndex, ICIidx), numel(trialsSPK));
             chRS{chIdx}(ICIidx, 2) = BaseICI(dIndex, ICIidx);
         end
     end
+%     minBaseICI = min(BaseICI, [], "all");
     psthPara.binsize = 30; % ms
     psthPara.binstep = 1; % ms
     chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);

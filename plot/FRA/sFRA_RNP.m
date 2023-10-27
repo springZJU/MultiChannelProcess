@@ -27,6 +27,10 @@ result.windowParams = windowParams;
 chNum = length(unique(sortData.channelIdx)');
 chN = 0;
 ch = unique(sortData.channelIdx)';
+if any(ch == 0)
+    sortData.channelIdx = sortData.channelIdx + 1;
+    ch = unique(sortData.channelIdx)';
+end
 for cIndex = 1:length(ch)
     chN = chN + 1;
     waitbar(chN / chNum, mWaitbar, ['Processing ...  Ch' num2str(cIndex+1) ]);

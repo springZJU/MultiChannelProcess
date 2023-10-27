@@ -87,12 +87,13 @@ else
 end
 mkdir(SAVEPATH);
 dataCopy = data;
-if ~spkExported
+customInfo = evalin("base", "customInfo");
+if ~spkExported || customInfo.ReSaveMAT
     data = rmfield(dataCopy, ["lfp", "Wave"]);
     save(fullfile(SAVEPATH, "spkData.mat"), "data", "-mat");
     recordInfo(idx).spkExported = 1;
 end
-if ~lfpExported
+if ~lfpExported || customInfo.ReSaveMAT
     data = rmfield(dataCopy, ["spikeRaw", "sortdata", "spkWave"]);
     save(fullfile(SAVEPATH, "lfpData.mat"), "data", "-mat");
     recordInfo(idx).lfpExported = 1;

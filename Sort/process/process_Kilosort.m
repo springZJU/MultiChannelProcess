@@ -1,7 +1,9 @@
     parseStruct(selInfo, rIndex);
     MERGEPATH = strcat(TANKNAME, "Merge", num2str(selInfo(rIndex).ID));
     binFile = strcat(MERGEPATH, "\Wave.bin");
-
+    if all([recordInfo(selIdx).sort]')
+        return
+    end
     %% kilosort
     run([fileparts(mfilename("fullpath")), '\config\configFileMulti.m']);
     switch chNum
@@ -11,17 +13,17 @@
             % total number of channels in your recording
             ops.NchanTOT = 16; %16*1 linear array
             % sample rate, Hz
-            ops.fs = 12207.03125;
+            ops.fs = fs;
 
         case 32
-            % ops.chanMap = 'config\chan16_2_kilosortChanMap.mat'; %16*2 linear array
-            ops.chanMap = [fileparts(mfilename("fullpath")), '\config\chan32_1_kilosortChanMap.mat']; %32*1 linear array
+            ops.chanMap = 'config\chan16_2_kilosortChanMap.mat'; %16*2 linear array
+%             ops.chanMap = [fileparts(mfilename("fullpath")), '\config\chan32_1_kilosortChanMap.mat']; %32*1 linear array
             ops.NchanTOT = 32; %16*2 / 32*1 linear array
-            ops.fs = 12207.03125;
+            ops.fs = fs;
         case 385
-            ops.chanMap = [fileparts(mfilename("fullpath")), '\config\neuropix385_kilosortChanMap.mat'];
+            ops.chanMap = [fileparts(mfilename("fullpath")), '\config\neuropixPhase3B1_kilosortChanMap.mat'];
             ops.NchanTOT = 385; %384 CHs + 1 sync
-            ops.fs = 30000;
+            ops.fs = fs;
 %         case newCH
 %             ops.chanMap = [];
 %             ops.NchanTOT = []; %384 CHs + 1 sync
@@ -40,3 +42,7 @@
         recordInfo(selIdx(sIndex)).sort = 1;
     end
     writetable(struct2table(recordInfo), recordPath);
+
+
+
+    

@@ -2,17 +2,27 @@ clc; close all
 % add the folder 'RatNeuroPixels' to the top of matlab path
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
-%% TODO: configuration
-ratName = "Rat1_ZYY"; % required
+%% TODO: configuration -- data select
+ratName = "Rat3_SPR"; % required
 ROOTPATH = "I:\neuroPixels"; % required
 project = "CTL_New"; % project, required
-dateSel = "20230824"; % blank for all
-protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_TB_Ratio", "RNP_TB_Basic_2_3"...
-    "RNP_TB_BaseICI_2_3", "RNP_Precise", "RNP_ToneCF_Late"]; % blank for all
-% protSel = ["RNP_Precise"]; % blank for all
+dateSel = ""; % blank for all
+% protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_TB_Ratio", "RNP_TB_Basic_2_3"...
+%     "RNP_TB_BaseICI_2_3", "RNP_Precise", "RNP_ToneCF_Late"]; % blank for all
+protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_Precise"]; % blank for all
+% protSel = ["RNP_ToneCF"]; % blank for all
+% protSel = [ "NewBaseICI","TrainDurTBChange S1","TrainDurTBChange S2",...
+%     "LocalChangeReg2-3 N0-16","LocalChangeReg2-4 N0-16","TrainDurToneChange S1","TrainDurToneChange S2"]; % blank for all
+% protSel = ["RNP_ToneCF", "RNP_Noise","LocalChange_Ratio1","LocalChange_Ratio5",...
+%     "LocalChange_Ratio10","LocalChange_Ratio25"]; % blank for all
+
+%% TODO : configuration -- process parameters
+psthPara.binsize = 20; % ms
+psthPara.binstep = 1; % ms
+
 %% load protocols
 temp = strsplit(ratName, "_");
-humanName = temp(2);
+% humanName = temp(2);
 rootPathMat = strcat(ROOTPATH, "\MAT Data\", ratName, "\", project, "\");
 rootPathFig = strcat(ROOTPATH, "\Figure\", project, "\");
 temp = dir(rootPathMat);

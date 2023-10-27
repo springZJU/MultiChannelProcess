@@ -4,7 +4,7 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 %% TODO: configuration
 recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR_MLA_Recording.xlsx");
+        "XHX_MLA_Recording.xlsx");
 [~, opts] = getTableValType(recordPath, "0");
 recordInfo = table2cell(readtable(recordPath, opts));
 recordInfo(1, cell2mat(cellfun(@(x) isequaln(x, NaN), recordInfo(1, :), "uni", false))) = {["double"]};

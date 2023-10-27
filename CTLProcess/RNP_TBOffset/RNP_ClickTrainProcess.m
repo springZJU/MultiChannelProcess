@@ -28,7 +28,7 @@ CTLParams = RNP_ParseCTLParams(protStr);
 parseStruct(CTLParams);
 fd = fs;
 
-if isequal(lfpDataset.fs, fd)
+if ~isequal(lfpDataset.fs, fd)
     lfpDataset = ECOGResample(lfpDataset, fd);
 end
 %% set trialAll
@@ -122,9 +122,8 @@ for dIndex = 1:length(devType)
 
     %% spike
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
-    chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex)), spikePlot, "UniformOutput", false);
-    psthPara.binsize = 30; % ms
-    psthPara.binstep = 1; % ms
+    chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex),sum(tIndexRaw)), spikePlot, "UniformOutput", false);
+    psthPara = evalin("base", "psthPara");
     chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);
     chStr = fields(trialsSPK)';
     chSPK = cell2struct([chStr; spikePlot; chPSTH; chRS], ["info", "spikePlot", "PSTH", "chRS"]);

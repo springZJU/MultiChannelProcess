@@ -18,8 +18,13 @@ buffer=TDTbin2mat(char(BLOCKPATH));  %spike store name should be changed accordi
 %% TTL synchronization
 SR_AP = recordInfo(idx).SR_AP;
 SR_LFP = recordInfo(idx).SR_LFP;
-NP_Path = strcat(recordInfo(idx).datPath, "-AP");
-LFP_Path = strcat(recordInfo(idx).datPath, "-LFP");
+if contains(recordInfo(idx).datPath, ".ProbeA")
+    NP_Path = strcat(recordInfo(idx).datPath, "-AP");
+    LFP_Path = strcat(recordInfo(idx).datPath, "-LFP");
+else
+    NP_Path = strcat(recordInfo(idx).datPath, ".0");
+    LFP_Path = strcat(recordInfo(idx).datPath, ".1");
+end
 sample_numbers = readNPY(strcat(NP_Path, "\sample_numbers.npy"));
 sample_times = (1:length(sample_numbers))'/SR_AP;
 mmf = memmapfile(strcat(NP_Path, "\continuous.dat"),'Format', {"int16", [385 length(sample_numbers)], 'x'});
@@ -27,13 +32,15 @@ TTL = mmf.Data.x(end, :);
 TTL_Onset = sample_times([0, diff(TTL)] > 0);
 if length(TTL_Onset) == length(buffer.epocs.Swep.onset)
     delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset], 1, 2));
+elseif length(TTL_Onset) == length(buffer.epocs.ordr.onset)
+    delta_T = mean(diff([buffer.epocs.ordr.onset, TTL_Onset], 1, 2));
 else
     keyboard;
     isContinue = input('continue? y/n \n', 's');
     if strcmpi(isContinue, "n")
         error("the TTL sync signal does not match the TDT epocs [Swep] store!");
     else %% custom
-        delta_T = mean(diff([buffer.epocs.ordr.onset, TTL_Onset], 1, 2));
+        delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset], 1, 2));
     end
 end
 
@@ -65,7 +72,7 @@ catch e
 end
 %% try to get lfp data
 try
-   data.lfp = NP2TDT_LFP(LFP_Path, SR_LFP, fd_lfp);
+    data.lfp = NP2TDT_LFP(LFP_Path, SR_LFP, fd_lfp);
 catch e
     data.lfp = [];
     disp(e.message);
@@ -73,7 +80,7 @@ end
 
 %% try to get Wave data for CSD
 if contains(paradigm, 'CSD')
-    try 
+    try
         data.Wave = buffer.streams.Wave;
     catch e
         data.Wave = [];

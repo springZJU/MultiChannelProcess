@@ -2,19 +2,24 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-         "SPR_MLA_Recording.xlsx");
-%         "XHX_MLA_Recording.xlsx");
-%       "ZYY_RNP_TBOffset_Recording.xlsx");  
+    "SPR_RNP_TBOffset_Recording.xlsx");
+% "XHX_MLA_Recording.xlsx"); 
 
-customInfo.dateSel = "0905";
-customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
-customInfo.animal = "MLA"; % MLA/RNP/RLA
-customInfo.thr = [9, 4];
-customInfo.exportSpkWave = false;
-customInfo.ReSaveMAT = false;
+customInfo.idSel = [3:8];
+% customInfo.MATPATH = "D:\BXH\MAT Data\";
+customInfo.MATPATH = "I:\neuroPixels\MAT Data";
+% customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
+
+% "H:\MLA_A1补充\MAT DATA\";
+                        
+customInfo.thr = [7, 4];
+
 customInfo.reExportSpk = false;
+customInfo.exportSpkWave = false;
+customInfo.ReSaveMAT = true;
 
-%% %%%%%%%%%%%%%%%%%%%%%%%% datMerge_TDT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 parseStruct(customInfo);
 run("process_LoadExcel.m");
 for rIndex = 1 : length(recID)
@@ -30,13 +35,15 @@ for rIndex = 1 : length(recID)
             TDT2binMerge(BLOCKPATH,MERGEFILE);
         elseif strcmpi(recTech, "NeuroPixel")
             NP_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
+%         elseif strcmpi(recTech, "newTech")
+%             newTech_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
         end
     end
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%% kilosortToProcess_TDT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 close all; clc;
-clearvars -except selInfo recordInfo customInfo    
+clearvars -except selInfo recordInfo customInfo MERGEFILE 
 parseStruct(customInfo);
 for rIndex = 1 : length(selInfo)
     run("process_Kilosort.m");
@@ -47,7 +54,8 @@ clearvars -except selInfo customInfo
 parseStruct(customInfo);
 tankSel = unique([selInfo.TANKNAME]');
 folders = cellfun(@(x) dir(x), tankSel, "uni", false);
-mergeFolder = cell2mat(cellfun(@(x) x(contains({x.name}', "Merge")), folders, "UniformOutput", false));
+strTemp = cellfun(@(x) char(strcat("Merge", num2str(x))), num2cell(customInfo.idSel)', "UniformOutput", false);
+mergeFolder = cell2mat(cellfun(@(x) x(matches({x.name}', strTemp)), folders, "UniformOutput", false));
 NPYPATH = string(cellfun(@(x, y) fullfile(x, y, ['th', num2str(thr(1)), '_', num2str(thr(2)), '\']), {mergeFolder.folder}', {mergeFolder.name}', "uni", false));
 for nIndex = 1 : length(NPYPATH)
     cd(NPYPATH(nIndex));
@@ -65,3 +73,9 @@ end
 clearvars -except  customInfo
 parseStruct(customInfo);
 run("process_SaveMAT.m");
+
+%% %%%%%%%%%%%%%%%%%%%%%% delete merged file %%%%%%%%%%%%%%%%%%%%%%%%%%%
+for rIndex = 1 : length(customInfo.MERGEFILE)
+    deleteItem(customInfo.MERGEFILE(rIndex));
+    deleteItem(strrep(customInfo.MERGEFILE(rIndex), "Wave.bin", "temp_wh.dat"));
+end
