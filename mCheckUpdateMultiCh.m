@@ -26,10 +26,10 @@ function mCheckUpdateMultiCh(logstr, syncOpt)
         system(strcat("git commit -m """, logstr, """"));
     end
 
-    system("git pull origin master");
+    system("git pull origin main");
 
     if syncOpt
-        system("git push origin master");
+        system("git push origin main");
     end
     
     cd(currentPath);
