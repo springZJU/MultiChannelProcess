@@ -2,19 +2,17 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR_RNP_TBOffset_Recording.xlsx");
-% "XHX_MLA_Recording.xlsx"); 
+"SPR_MLA_Recording.xlsx"); 
+%     "SPR_RNP_TBOffset_Recording.xlsx");
 
-customInfo.idSel = [3:8];
+customInfo.idSel = [42:61];
 % customInfo.MATPATH = "D:\BXH\MAT Data\";
-customInfo.MATPATH = "I:\neuroPixels\MAT Data";
-% customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
-
-% "H:\MLA_A1补充\MAT DATA\";
+% customInfo.MATPATH = "I:\neuroPixels\MAT Data";
+customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
                         
-customInfo.thr = [7, 4];
+customInfo.thr = [10, 9];
 
-customInfo.reExportSpk = false;
+customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;
 
@@ -58,15 +56,19 @@ strTemp = cellfun(@(x) char(strcat("Merge", num2str(x))), num2cell(customInfo.id
 mergeFolder = cell2mat(cellfun(@(x) x(matches({x.name}', strTemp)), folders, "UniformOutput", false));
 NPYPATH = string(cellfun(@(x, y) fullfile(x, y, ['th', num2str(thr(1)), '_', num2str(thr(2)), '\']), {mergeFolder.folder}', {mergeFolder.name}', "uni", false));
 for nIndex = 1 : length(NPYPATH)
+    if isfolder(NPYPATH(nIndex))
     cd(NPYPATH(nIndex));
-    if ~isfile("cluster_info.tsv")%~exist("cluster_info.tsv", "file")
-        system("phy template-gui params.py");
+    if ~isfile("cluster_info.tsv") % ~exist("cluster_info.tsv", "file")
+        run("process_TemplateGUI");
+    end
     end
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%% selectKilosortResult %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for nIndex = 1 : length(NPYPATH)
+    if isfolder(NPYPATH(nIndex))
     run("process_ExportSpike.m");
+    end
 end
  
 %% %%%%%%%%%%%%%%%%%%%%%% save MAT file %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -50,11 +50,11 @@ for SettingParamIdx = 1 : numel(SettingParams)
                     % calculate FFT Power
                     MeanFFTFreq = ProcessPsthFFTData.PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx).MeanFFT(:, 1);                    
                     MeanFFTAmp = ProcessPsthFFTData.PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx).MeanFFT(:, 2);       
-                    [MeanInterestAmp, ~]  = MSTI.calFFTAmp(InterestFreq, MeanFFTAmp, MeanFFTFreq);
+                    [MeanInterestAmp, ~]  = MSTI.tool.calFFTAmp(InterestFreq, MeanFFTAmp, MeanFFTFreq);
                     PsthFFTAmpData(n).MeanTargetFFTAmp(trialTypeIdx, 1).value = MeanInterestAmp;
 
                     FFTTemp_EachTrial = ProcessPsthFFTData.PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx).FFT;                    
-                    [EachTrialInterestAmp, Ampinfo] = cellfun(@(x) MSTI.calFFTAmp(InterestFreq, x(:, 2), x(:, 1)), FFTTemp_EachTrial, "UniformOutput", false);
+                    [EachTrialInterestAmp, Ampinfo] = cellfun(@(x) MSTI.tool.calFFTAmp(InterestFreq, x(:, 2), x(:, 1)), FFTTemp_EachTrial, "UniformOutput", false);
                     PsthFFTAmpData(n).EachTrialTargetFFTAmp(trialTypeIdx, 1).value = Ampinfo;
 
                 end 

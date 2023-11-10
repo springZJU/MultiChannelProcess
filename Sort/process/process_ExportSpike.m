@@ -5,20 +5,20 @@ MERGEPATH = strjoin(temp(1:end-2), "\");
 load(fullfile(MERGEPATH,'mergePara.mat'));
 fs = selInfo(nIndex).fs;
 npypath = char(NPYPATH(nIndex));
-[spikeIdx, clusterIdx, templates, spikeTemplateIdx] = parseNPY(npypath);
+
+% if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATH)) && ~reExportSpk
+if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATHTEMP)) && ~reExportSpk
+    return
+end
 
 %% cluster_info.tsv, for preview and selection
-IDs = tabulate(clusterIdx);
-idToDel = IDs(IDs(:, 2) < 1000, 1);
-run("alignIdCh.m");
-idx = idCh(:, 1);
-ch = idCh(:, 2);
+run("process_PostMerge.m");
+clusterIdx = idCh(:, 1);
+chIdx = idCh(:, 2);
 
 %% split sort data into different blocks
-
-%%
-kiloSpikeAll = cellfun(@(x) [double(spikeIdx(clusterIdx == x))/fs, ch(idx == x)*ones(sum(clusterIdx == x), 1)], num2cell(idx), "UniformOutput", false);
-save([npypath, '\selectCh.mat'], 'ch', 'idx', '-mat');
+kiloSpikeAll = cellfun(@(x) [spikeTime(clusterAll == x), chIdx(clusterIdx == x)*ones(sum(clusterAll == x), 1)], num2cell(clusterIdx), "UniformOutput", false);
+save([npypath, '\selectCh.mat'], 'chIdx', 'clusterIdx', '-mat');
 
 if ~exist("BLOCKPATH", "var")
     BLOCKPATH = BLOCKPATHTEMP;
@@ -40,10 +40,13 @@ for blks = 1:length(BLOCKPATH)
     end
 
     sortdataBuffer = cell2mat(kiloSpikeAll);
-    [~,selectIdx] = findWithinInterval(sortdataBuffer(:,1), t);
-    sortdata = sortdataBuffer(selectIdx,:);
-    sortdata(:,1) = sortdata(:,1) - t(1);
-
+    if isempty(sortdataBuffer)
+        sortdata = [];
+    else
+        [~,selectIdx] = findWithinInterval(sortdataBuffer(:,1), t);
+        sortdata = sortdataBuffer(selectIdx,:);
+        sortdata(:,1) = sortdata(:,1) - t(1);
+    end
     %% export waveform
     if exportSpkWave
         onsetIdx = ceil(t(1) * fs);
@@ -53,12 +56,12 @@ for blks = 1:length(BLOCKPATH)
         spkWave = getWaveForm_singleID_v2(fs, BLOCKPATH{blks}, npypath, idx, IDandCHANNEL, wfWin, onsetIdx);
     end
 
-        %%
-        if exist("spkWave", "var")
-            save([BLOCKPATH{blks} '\sortdata.mat'], 'sortdata', 'spkWave', '-v7.3');
-        else
-            save([BLOCKPATH{blks} '\sortdata.mat'], 'sortdata', '-v7.3');
-        end
+    %%
+    if exist("spkWave", "var")
+        save([BLOCKPATH{blks} '\sortdata.mat'], 'sortdata', 'spkWave', '-v7.3');
+    else
+        save([BLOCKPATH{blks} '\sortdata.mat'], 'sortdata', '-v7.3');
+    end
 
 end
 

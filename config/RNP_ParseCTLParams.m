@@ -1,7 +1,14 @@
-function CTLParams = RNP_ParseCTLParams(protStr)
-
+function CTLParams = RNP_ParseCTLParams(protStr, excelName)
+narginchk(1, 2)
+if nargin < 2
+    excelName = "RNP_CTLConfig.xlsx";
+end
+if ~contains(excelName, ".xlsx")
+    excelName = strcat(excelName, ".xlsx");
+end
 % load excel
-configPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\config\RNP_CTLConfig.xlsx");
+    configPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\config\", excelName);
+
 configTable = table2struct(readtable(configPath));
 mProtocol = configTable(matches({configTable.paradigm}', protStr));
 
@@ -25,7 +32,7 @@ CTLParams.legendFontSize = mProtocol.legendFontSize;
 eval(strcat("CTLParams.chPlotFcn = ", string(mProtocol.chPlotFcn), ";"));
 
 Compare_Index =  string(strsplit(mProtocol.Compare_Index, ";"));
-for cIndex = 1 : length(Compare_Index) 
+for cIndex = 1 : length(Compare_Index)
     CTLParams.Compare_Index{cIndex, 1} = str2double(strsplit(Compare_Index(cIndex), ","))';
 end
 

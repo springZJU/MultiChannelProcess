@@ -11,6 +11,9 @@ spkExported = {recordInfo.spkExported}';
 idSel = num2cell(ismember([recordInfo.ID]', customInfo.idSel));
 
 selIdx = find(cell2mat(cellfun(@(x, y, z, w) isequal(x, 1) & (isequal(y, 0) | isequal(z, 0) | customInfo.ReSaveMAT) & isequal(w, 1), sort, lfpExported, spkExported, idSel, "uni", false)));
+if isempty(selIdx)
+    return
+end
 recTech = recordInfo(selIdx).recTech;
 %% export sorted and unprocessed spike data
 for i = selIdx'
@@ -23,8 +26,8 @@ for i = selIdx'
         saveXlsxRecordingData_MonkeyLA(MATPATH, recordInfo, i, recordPath);
     elseif matches(recTech, "NeuroPixel")
         saveXlsxRecordingData_RatNP(MATPATH, recordInfo, i, recordPath);
-%     elseif matches(recTech, "custom")
-%         % custom
+        %     elseif matches(recTech, "custom")
+        %         % custom
     end
 
 end

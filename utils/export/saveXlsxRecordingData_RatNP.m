@@ -32,8 +32,10 @@ TTL = mmf.Data.x(end, :);
 TTL_Onset = sample_times([0, diff(TTL)] > 0);
 if length(TTL_Onset) == length(buffer.epocs.Swep.onset)
     delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset], 1, 2));
-elseif length(TTL_Onset) == length(buffer.epocs.ordr.onset)
-    delta_T = mean(diff([buffer.epocs.ordr.onset, TTL_Onset], 1, 2));
+elseif isfield(buffer.epocs, "ordr") 
+    if length(TTL_Onset) == length(buffer.epocs.ordr.onset)
+        delta_T = mean(diff([buffer.epocs.ordr.onset, TTL_Onset], 1, 2));
+    end
 else
     keyboard;
     isContinue = input('continue? y/n \n', 's');

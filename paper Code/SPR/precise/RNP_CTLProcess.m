@@ -1,17 +1,21 @@
-clc; close all
+ccc
 % add the folder 'RatNeuroPixels' to the top of matlab path
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
-%% TODO: configuration
-monkeyName = "DDZ"; % required
-ROOTPATH = "E:\MonkeyLinearArray"; % required
+%% TODO: configuration -- data select
+ratName = "Rat3_SPR"; % required
+ROOTPATH = "I:\neuroPixels"; % required
 project = "CTL_New"; % project, required
-dateSel = "AC"; % blank for all
-% protSel = ["TB_BaseICI_4_8_16", "TB_Ratio_4_4.04", "Offset_1_64_4s_MGB", "Offset_Variance_Last_N4_8_16", "Offset_Duration_Effect_4ms_Reg_New"]; % blank for all
-protSel = ["Tone_CF"]; % blank for all
+dateSel = ""; % blank for all
+protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_Precise"]; % blank for all
+
+
+%% TODO : configuration -- process parameters
+psthPara.binsize = 20; % ms
+psthPara.binstep = 1; % ms
 
 %% load protocols
-rootPathMat = strcat(ROOTPATH, "\MAT Data\", monkeyName, "\", project, "\");
+rootPathMat = strcat(ROOTPATH, "\MAT Data\", ratName, "\", project, "\");
 rootPathFig = strcat(ROOTPATH, "\Figure\", project, "\");
 temp = dir(rootPathMat);
 temp(ismember(string({temp.name}'), [".", ".."])) = [];
@@ -26,14 +30,14 @@ for rIndex = 1 : length(protocols)
 
     MATPATH = cellfun(@(x) string([char(protPathMat), x, '\data.mat']), {temp.name}', "UniformOutput", false);
     MATPATH = MATPATH( contains(string(MATPATH), dateSel) & contains(string(MATPATH), protSel) );
-    FIGPATH = cellfun(@(x) strcat(rootPathFig, protocolStr, "\", string(x{end-1})), cellfun(@(y) strsplit(y, "\"), MATPATH, "UniformOutput", false), "UniformOutput", false);
+    FIGPATH = cellfun(@(x) strcat(rootPathFig, string(x{end-1}), "\", protocolStr), cellfun(@(y) strsplit(y, "\"), MATPATH, "UniformOutput", false), "UniformOutput", false);
     for mIndex = 1 : length(MATPATH)
         try % the function name equals the protocol name
             mFcn = eval(['@', char(protocolStr), ';']);
             mFcn(MATPATH{mIndex}, FIGPATH{mIndex});
         catch % temporal binding protocols
-            if MLA_IsCTLProt(protocolStr)
-                MLA_ClickTrainProcess(MATPATH{mIndex}, FIGPATH{mIndex});
+            if RNP_IsCTLProt(protocolStr)
+                RNP_ClickTrainProcess(MATPATH{mIndex}, FIGPATH{mIndex});
             end
         end
     end

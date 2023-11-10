@@ -25,20 +25,25 @@ for SettingIdx = 1 : numel(SettingParams)
         AreaInfo = NameTemp{3};
         MatPath = strcat(MatRootPath, SonDirName, "\");
         load(strcat(MatPath, "spkRes.mat"), "chSpikeLfp");
-
+        load(strcat(MatPath, "ProcessData_ReDoPsthFFT.mat"), "PsthFFTData");
         for IDIdx = 1 : numel(chSpikeLfp(1).chSPK)
             n = n + 1;
             PsthData(n).Date = Date;
             PsthData(n).Position = Position;
-            PsthData(n).AreaInfo = AreaInfo;
+            PsthData(n).Area = AreaInfo;
             for trialTypeIdx = 1 : numel(chSpikeLfp)
                 trialTypeStr = chSpikeLfp(trialTypeIdx).stimStr;
                 KiloSpkData = chSpikeLfp(trialTypeIdx).chSPK;
+                FFTPsthData = PsthFFTData(trialTypeIdx).PsthFFTEachTrial;
+
                 PsthData(n).ID = KiloSpkData(IDIdx).info;
                 PsthData(n).rawPsth(trialTypeIdx).Trialtype = trialTypeStr;
                 PsthData(n).rawPsth(trialTypeIdx).RawPsth = KiloSpkData(IDIdx).PSTH;
+                PsthData(n).fftPsth(trialTypeIdx).Trialtype = trialTypeStr;
+                PsthData(n).fftPsth(trialTypeIdx).MeanFFTPsth = FFTPsthData(IDIdx).MeanFFT;
+                
             end
         end
     end
-    save(strcat(MatRootPath, "popData_RawPsth.mat"), "PsthData");
+    save(strcat(MatRootPath, "popData_RawPsthAndFFT.mat"), "PsthData");
 end

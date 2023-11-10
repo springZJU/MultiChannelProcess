@@ -11,18 +11,18 @@ ColNum = 7;
 Colors_fft = ["#000000", "#999999"]; %black;gray;
 
 %%
-for SettingParamIdx = 1 : numel(SettingParams)
+for SettingParamIdx = 1%1 : numel(SettingParams)
     % load .mat 
     MatRootPath = strcat(DataRootPath, SettingParams(SettingParamIdx), "\");
     MatDirsInfo = dir(MatRootPath);
     MatDirsInfo(~(contains(string({MatDirsInfo.name}'), "cm") | contains(string({MatDirsInfo.name}'), "ddz"))) = [];
-    for AreaIdx = 1 : numel(Area)
+    for AreaIdx = 2%1 : numel(Area)
         TargetDirIdx = find(contains(string({MatDirsInfo.name}'), Area(AreaIdx)));
         % load params
         MSTIParams = MLA_ParseMSTIParams(SettingParams(SettingParamIdx));
         parseStruct(MSTIParams);
     
-        for MatDirIdx = 1 : numel(TargetDirIdx)
+        for MatDirIdx = 4%1 : numel(TargetDirIdx)
             clear KiloSpkData LfpData ProcessPsthFFTData;
             MatPath = strcat(MatRootPath, MatDirsInfo(TargetDirIdx(MatDirIdx)).name, "\");
             %kiloSpike
@@ -30,7 +30,7 @@ for SettingParamIdx = 1 : numel(SettingParams)
             LfpData = load(strcat(MatPath, "lfpRes.mat"), "chSpikeLfp");        
             ProcessPsthFFTData = load(strcat(MatPath, "ProcessData_ReDoPsthFFT.mat"), "PsthFFTData");
     
-            for IDIdx = 1 : numel(KiloSpkData.chSpikeLfp(1).chSPK)
+            for IDIdx = 20%1 : numel(KiloSpkData.chSpikeLfp(1).chSPK)
                 Fig(IDIdx) = figure;
                 maximizeFig(Fig(IDIdx));
                 IDNum = double(string(regexpi(string(KiloSpkData.chSpikeLfp(1).chSPK(IDIdx).info), "CH(\d+)", "tokens")));

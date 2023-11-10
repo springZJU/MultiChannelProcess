@@ -1,10 +1,10 @@
 %%
 ccc;
-DATAPATH = "N:\openEphys\Ratspr3_20231024 (1)\Record Node 121\experiment1\recording2\continuous\Neuropix-PXI-122.ProbeA-AP\continuous.dat";
-BLOCKPATH = "I:\neuroPixels\TDTTank\Rat3_SPR\Rat3_SPR\Block-15";
+DATAPATH = "S:\neuropixels\openEphys\Ratzyy3_20231103\Record Node 121\experiment2\recording2\continuous\Neuropix-PXI-122.ProbeA-AP\continuous.dat";
+BLOCKPATH = "I:\neuroPixels\TDTTank\Rat3_ZYY\Rat3ZYY20231103\Block-19";
 fs = 30e3; % Hz
 
-ch = 255;
+ch = 112;
 
 dataInfo = dir(DATAPATH);
 dataType = 'int16';            % Data type of .dat file (this should be BP filtered)

@@ -26,10 +26,10 @@ for fIndex = 1:size(plotData, 1)
     for aIndex = 1:size(trials, 1)
 
         if flag ==0
-            mAxe = axes("Position", [0.05 + rasterWidth *7, 0.9- (n-1)*rasterHeight, rasterWidth, rasterHeight], "Box", "on");
+            mAxe = axes("Position", [0.05 + rasterWidth *7, 0.9- (n-1)*rasterHeight, rasterWidth*0.9, rasterHeight*0.9], "Box", "on");
 
         else
-            mAxe = axes("Position", [0.05 + rasterWidth *(flag-1), 0.9 - n*rasterHeight, rasterWidth, rasterHeight], "Box", "on");
+            mAxe = axes("Position", [0.05 + rasterWidth *(flag-1), 0.9 - n*rasterHeight, rasterWidth*0.9, rasterHeight*0.9], "Box", "on");
         end
 
         % Raster
@@ -46,7 +46,7 @@ for fIndex = 1:size(plotData, 1)
         for tIndex = 1:size(trials(aIndex).spikes, 1)
             X = trials(aIndex).spikes{tIndex};
             Y = ones(length(X), 1) * tIndex;
-            plot(X, Y, "r.", "MarkerSize", 10); hold on;
+            plot(X, Y, "r.", "MarkerSize", 5); hold on;
         end
 
         ylim([0, tIndex + 1]);
@@ -71,7 +71,7 @@ for fIndex = 1:size(plotData, 1)
 end
 
 %% plot fr tuning
-mAxe = axes("Position", [0.05 + rasterWidth *0, 0.08, rasterWidth*8, 0.8-rasterHeight*8], "Box", "on");
+mAxe = axes("Position", [0.05 + rasterWidth *0, 0.08, rasterWidth*6.5, 0.8-rasterHeight*8], "Box", "on");
 
 
 for wIndex = 1 : length(y_fr)-2
@@ -91,9 +91,10 @@ end
 % temp = y_fr(6).frMean ./ y_fr(5).frMean;
 % [~, p] = cellfun(@(x, y) ttest2(x, y), y_fr(5).frRaw, y_fr(6).frRaw, "UniformOutput", false);
 
-xlim([X1(1), X1(end)]);
+
 xlabel("ICI (ms)");
-xticks(1:61);
+xticks(1:length(plotData));
+xlim([X1(1), 51]);
 xticklabels(cellfun(@(x) num2str(x), {plotData.ICI}', "UniformOutput", false))
 ylabel("Firing Rate (Hz)");
 title("firing rate tuning")

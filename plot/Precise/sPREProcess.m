@@ -43,7 +43,7 @@ for trialIndex = 1:length(onsetTimeAll)
     trialAll(trialIndex, 1).spike = spikeTimeAll(spikeTimeAll >= onsetTimeAll(trialIndex) + Window(1) & spikeTimeAll < onsetTimeAll(trialIndex) + Window(2)) - onsetTimeAll(trialIndex);
 end
 
-trialAll = trialAll([trialAll.type]==1);
+% trialAll = trialAll([trialAll.type]==1);
 
 % By freq
 ICIUnique = unique([trialAll.ICI]);
