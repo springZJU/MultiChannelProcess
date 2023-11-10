@@ -1,7 +1,8 @@
 simThr = 0.7;
 QThr = 0.15;
 RThr = 0.05;
-frThrMean = 1; frThr0 = 0.5;
+frThrMean = 1; 
+frThr0 = 0.5;
 
 cd(npypath);
 

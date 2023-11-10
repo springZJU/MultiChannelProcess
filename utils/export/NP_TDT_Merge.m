@@ -41,6 +41,5 @@ for bIndex = 1 : length(BLOCKPATH)
     timer = timer + length(sample_numbers);
 end
 fclose(fidOut);
-BLOCKPATHTEMP = BLOCKPATH;
-save(strrep(MERGEFILE, 'Wave.bin', 'mergePara.mat'),'segPoint','BLOCKPATHTEMP');
+save(strrep(MERGEFILE, 'Wave.bin', 'mergePara.mat'),'segPoint','BLOCKPATH');
 end

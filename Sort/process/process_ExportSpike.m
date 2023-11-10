@@ -6,8 +6,12 @@ load(fullfile(MERGEPATH,'mergePara.mat'));
 fs = selInfo(nIndex).fs;
 npypath = char(NPYPATH(nIndex));
 
-% if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATH)) && ~reExportSpk
-if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATHTEMP)) && ~reExportSpk
+try
+    BLOCKPATH = BLOCKPATHTEMP;
+catch
+    BLOCKPATHTEMP = BLOCKPATH;
+end
+if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATH)) && ~reExportSpk
     return
 end
 
@@ -20,9 +24,6 @@ chIdx = idCh(:, 2);
 kiloSpikeAll = cellfun(@(x) [spikeTime(clusterAll == x), chIdx(clusterIdx == x)*ones(sum(clusterAll == x), 1)], num2cell(clusterIdx), "UniformOutput", false);
 save([npypath, '\selectCh.mat'], 'chIdx', 'clusterIdx', '-mat');
 
-if ~exist("BLOCKPATH", "var")
-    BLOCKPATH = BLOCKPATHTEMP;
-end
 if exist("waveLength", "var")
     segPoint = [0, cumsum(cell2mat(cellfun(@(x) sum(x), waveLength, "UniformOutput", false)))];
 end

@@ -6,15 +6,14 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 %     "SPR_RNP_TBOffset_Recording.xlsx");
 
 customInfo.idSel = [42:61];
-% customInfo.MATPATH = "D:\BXH\MAT Data\";
 % customInfo.MATPATH = "I:\neuroPixels\MAT Data";
 customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
                         
 customInfo.thr = [10, 9];
 
-customInfo.reExportSpk = true;
+customInfo.reExportSpk = false;
 customInfo.exportSpkWave = false;
-customInfo.ReSaveMAT = true;
+customInfo.ReSaveMAT = false;
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
