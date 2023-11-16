@@ -1,15 +1,15 @@
 % MATPATH = 'H:\MGB\DDZ\ddz20230731\Block-20';
-MATPATH = 'H:\AC\CM\cm20230828\Block-5';
+MATPATH = 'H:\MGB\CM\cm20231116\Block-22';
 FIGPATH = MATPATH;
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainRNP;
 
 % dateStr = temp(end - 1);
-% protStr = "TB_BaseICI_4_8_16";
+protStr = "TB_BaseICI_4_8_16";
 % protStr = "TB_Ratio_4_4.04";
 % protStr = "Offset_1_64_4s_MGB";
 % protStr = "Offset_Duration_Effect_4ms_Reg_New";
-protStr = "Offset_Variance_Last_N4_8_16";
+% protStr = "Offset_Variance_Last_N4_8_16";
 
 DATAPATH = MATPATH;
 FIGPATH = strcat(FIGPATH, "\");
@@ -32,11 +32,13 @@ end
 CTLParams = MLA_ParseCTLParams(protStr);
 parseStruct(CTLParams);
 fd = fs;
-
-if isequal(lfpDataset.lfp.fs, fd)
-    lfpDataset = ECOGResample(lfpDataset.lfp, fd);
-else
+try
     lfpDataset = lfpDataset.lfp;
+catch ME
+    
+end
+if isequal(lfpDataset.fs, fd)
+    lfpDataset = ECOGResample(lfpDataset, fd);
 end
 %% set trialAll
 trialAll([trialAll.devOrdr] == 0) = [];
@@ -131,7 +133,7 @@ for dIndex = 1:length(devType)
 
     %% spike
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
-    chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex)), spikePlot, "UniformOutput", false);
+    chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex), length(trialsSPK)), spikePlot, "UniformOutput", false);
     psthPara.binsize = 30; % ms
     psthPara.binstep = 1; % ms
     chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);

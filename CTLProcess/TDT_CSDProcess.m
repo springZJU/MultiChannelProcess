@@ -1,3 +1,4 @@
-BLOCKPATH = 'H:\AC\DDZ\ddz20230908\Block-13';
-FIGPATH = "M:\Monkey_LA\CSD_Result\";
-MLA_CSD(BLOCKPATH, FIGPATH);
+badCh = [16];   dz = 150;
+MATPATH = 'H:\AC\DDZ\ddz20231115\Block-32';
+FIGPATH = fullfile(MATPATH, "Figure");
+MLA_CSD(MATPATH, FIGPATH);

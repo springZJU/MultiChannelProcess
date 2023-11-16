@@ -2,7 +2,8 @@ clear; clc;
 
 DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
 SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
-                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s"];
+                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s",...
+                "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
 Area = ["AC", "MGB"];
 
 % Plot
@@ -11,18 +12,18 @@ ColNum = 7;
 Colors_fft = ["#000000", "#999999"]; %black;gray;
 
 %%
-for SettingParamIdx = 1%1 : numel(SettingParams)
+for SettingParamIdx = [1, 3]%1 : numel(SettingParams)
     % load .mat 
     MatRootPath = strcat(DataRootPath, SettingParams(SettingParamIdx), "\");
     MatDirsInfo = dir(MatRootPath);
     MatDirsInfo(~(contains(string({MatDirsInfo.name}'), "cm") | contains(string({MatDirsInfo.name}'), "ddz"))) = [];
-    for AreaIdx = 2%1 : numel(Area)
+    for AreaIdx = 1%1 : numel(Area)
         TargetDirIdx = find(contains(string({MatDirsInfo.name}'), Area(AreaIdx)));
         % load params
         MSTIParams = MLA_ParseMSTIParams(SettingParams(SettingParamIdx));
         parseStruct(MSTIParams);
     
-        for MatDirIdx = 4%1 : numel(TargetDirIdx)
+        for MatDirIdx = 1 : numel(TargetDirIdx)
             clear KiloSpkData LfpData ProcessPsthFFTData;
             MatPath = strcat(MatRootPath, MatDirsInfo(TargetDirIdx(MatDirIdx)).name, "\");
             %kiloSpike
@@ -30,7 +31,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
             LfpData = load(strcat(MatPath, "lfpRes.mat"), "chSpikeLfp");        
             ProcessPsthFFTData = load(strcat(MatPath, "ProcessData_ReDoPsthFFT.mat"), "PsthFFTData");
     
-            for IDIdx = 20%1 : numel(KiloSpkData.chSpikeLfp(1).chSPK)
+            for IDIdx = 1 : numel(KiloSpkData.chSpikeLfp(1).chSPK)
                 Fig(IDIdx) = figure;
                 maximizeFig(Fig(IDIdx));
                 IDNum = double(string(regexpi(string(KiloSpkData.chSpikeLfp(1).chSPK(IDIdx).info), "CH(\d+)", "tokens")));
@@ -46,7 +47,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         LFPAxesCount = LFPAxesCount + 1;
                         LFPAxes(LFPAxesCount) = mSubplot(RowNum, ColNum, 1 + (subAxesNum - 1) * ColNum, [1, 1]);
                         if IDNum >= 1000; ID_CH = mod(IDNum, 1000); else; ID_CH = IDNum; end
-                        CHidx = find(ID_CH == CHNum);
+                        CHidx = find(ID_CH == unique(CHNum));
                         if ~isempty(CHidx)
                             CHidx_plot = CHidx;
                         else
@@ -80,6 +81,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         end
     
                     elseif subAxesNum == 3 %raw---PSTH
+                        clear X Y;
                         PSTHAxesCount = PSTHAxesCount + 1;
                         PSTHAxes(PSTHAxesCount) = mSubplot(RowNum, ColNum, 3, [3, 1]);
                         TrialTypeStr = KiloSpkData.chSpikeLfp(1).stimStr;
@@ -101,6 +103,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         CdrPlot(IDIdx).SmoothRawPSTH(1).Plot = [X Y];
     
                     elseif subAxesNum == 4 %raw---PSTH
+                        clear X Y;
                         PSTHAxesCount = PSTHAxesCount + 1;
                         PSTHAxes(PSTHAxesCount) = mSubplot(RowNum, ColNum, 10, [3, 1]);
                         TrialTypeStr = KiloSpkData.chSpikeLfp(2).stimStr;
@@ -121,6 +124,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         CdrPlot(IDIdx).SmoothRawPSTH(2).Plot = [X Y];
     
                     elseif subAxesNum == 5 %fft---PSTH
+                        clear X Y;
                         PSTHFFTAxesCount = PSTHFFTAxesCount + 1;
                         PSTHFFTAxes(PSTHFFTAxesCount) = mSubplot(RowNum, ColNum, 5, [1, 1]);
                         TrialTypeStr = ProcessPsthFFTData.PsthFFTData(1).trialType;
@@ -139,6 +143,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         CdrPlot(IDIdx).RawPSTHFFT(1).Plot = [X Y];
     
                     elseif subAxesNum == 6 %fft---PSTH
+                        clear X Y;
                         PSTHFFTAxesCount = PSTHFFTAxesCount + 1;
                         PSTHFFTAxes(PSTHFFTAxesCount) = mSubplot(RowNum, ColNum, 12, [1, 1]);
                         TrialTypeStr = ProcessPsthFFTData.PsthFFTData(2).trialType;
@@ -156,6 +161,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         CdrPlot(IDIdx).RawPSTHFFT(2).Plot = [X Y];
     
                     elseif subAxesNum == 7 %fft---PSTH
+                        clear X Y;
                         PSTHFFTAxesCount = PSTHFFTAxesCount + 1;
                         PSTHFFTAxes(PSTHFFTAxesCount) = mSubplot(RowNum, ColNum, 6, [1, 1]);
                         TrialTypeStr = ProcessPsthFFTData.PsthFFTData(1).trialType;
@@ -170,6 +176,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         addLines2Axes(PSTHFFTAxes(PSTHFFTAxesCount), line);
     
                     elseif subAxesNum == 8 %fft---PSTH
+                        clear X Y;
                         PSTHFFTAxesCount = PSTHFFTAxesCount + 1;
                         PSTHFFTAxes(PSTHFFTAxesCount) = mSubplot(RowNum, ColNum, 13, [1, 1]);
                         TrialTypeStr = ProcessPsthFFTData.PsthFFTData(2).trialType;
@@ -183,6 +190,7 @@ for SettingParamIdx = 1%1 : numel(SettingParams)
                         addLines2Axes(PSTHFFTAxes(PSTHFFTAxesCount), line);
     
                     elseif subAxesNum == 9 || subAxesNum == 10 %Compare raw---PSTH
+                        clear X_Std Y_Std X_Dev Y_Dev
                         PSTHAxesCount = PSTHAxesCount + 1;
                         if subAxesNum == 9
                             PSTHAxes(PSTHAxesCount) = mSubplot(RowNum, ColNum, 7, [1, 1]);

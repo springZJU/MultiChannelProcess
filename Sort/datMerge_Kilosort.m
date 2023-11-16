@@ -2,21 +2,21 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-        "Bao_RNP_TBOffset_Recording.xlsx");
+        "YHT_MLA_Recording.xlsx");
 %               "SPR_MLA_Recording.xlsx"); 
 %     "ZYY_RNP_TBOffset_Recording.xlsx");  
-
+%     "Bao_RNP_TBOffset_Recording.xlsx");
 %         "YHT_RNP_Recording.xlsx");        
 %           "SPR_MLA_Recording.xlsx");   
 %         "XHX_MLA_Recording.xlsx");
 
 
-customInfo.idSel = [11];
-customInfo.MATPATH = "E:\BXH\MAT Data\";
+customInfo.idSel = [1];
+% customInfo.MATPATH = "E:\BXH\MAT Data\";
 % customInfo.MATPATH = "I:\neuroPixels\MAT Data";
 % customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
 
-% customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
+customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
 
 customInfo.thr = [9, 4];                        
 % customInfo.thr = [7, 3];

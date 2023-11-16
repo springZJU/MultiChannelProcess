@@ -12,11 +12,7 @@ try
         sortData.channelIdx = 1;
     end
 catch
-    if isfield(data, "spikeRaw")
-        data.snips = data.spikeRaw.snips;
-    else
-        data = TDTbin2mat(dataPath, 'TYPE', [1, 2, 3]);
-    end
+    data = TDTbin2mat(dataPath, 'TYPE', [1, 2, 3]);
     sortData.spikeTimeAll = data.snips.eNeu.ts;
     sortData.channelIdx = data.snips.eNeu.chan;
 end

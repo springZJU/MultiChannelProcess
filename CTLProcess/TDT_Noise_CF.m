@@ -1,13 +1,13 @@
 %% noise
-MATPATH = 'H:\AC\DDZ\ddz20231109\Block-36';
-% MATPATH = 'H:\MGB\CM\cm20231020\Block-15';
-% MATPATH = 'H:\AC\CM\cm20230901\Block-11';
+% MATPATH = 'H:\AC\DDZ\ddz202311142\Block-1';
+MATPATH = 'H:\MGB\CM\cm20231116\Block-20';
+% MATPATH = 'H:\AC\CM\cm20231113\Block-13';
 FIGPATH = fullfile(MATPATH, "Figure");
 RNP_Noise(MATPATH, FIGPATH, [-100, 800]);
 
 %% CF
-MATPATH = 'H:\AC\DDZ\ddz20231109\Block-37';
-% MATPATH = 'H:\MGB\CM\cm20231020\Block-32';
-% MATPATH = 'H:\AC\CM\cm20230901\Block-12';
+% MATPATH = 'H:\AC\DDZ\ddz20231109\Block-37';
+MATPATH = 'H:\MGB\CM\cm20231116\Block-21';
+% MATPATH = 'H:\AC\DDZ\ddz20231115\Block-32';
 FIGPATH = fullfile(MATPATH, "Figure");
 sFRA_RNP(MATPATH, FIGPATH)

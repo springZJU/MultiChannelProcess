@@ -136,7 +136,7 @@ if ~Exist_Single
     
         drawnow;
         pause(2);
-        print(singleunit_Fig(cIndex), strcat(FIGPATH, "kiloID", strrep(string(chSpikeLfp(dIndex).chSPK(cIndex).info), "CH", "")), "-djpeg", "-r200");
+        print(singleunit_Fig(cIndex), strcat(FIGPATH, "\kiloID", strrep(string(chSpikeLfp(dIndex).chSPK(cIndex).info), "CH", "")), "-djpeg", "-r200");
     end
     close all;
 end
@@ -217,6 +217,7 @@ if ~Exist_CH
         scaleAxes(Axes(:, 2), "y", "on");
         scaleAxes(Axes(:, 3), "y", "on");
         scaleAxes(Axes(:, 4), "y", [0 max(cell2mat(f'))]);
+        scaleAxes(Axes(:, 4), "c", "on");
         scaleAxes(AxesLFP, "x", compareWin);
         scaleAxes(AxesLFP, "y", "on");
         % add vertical line

@@ -2,11 +2,12 @@ clear; clc;
 
 DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
 SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
-                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s"];
+                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s",...
+                "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
 PSTHFFTWindow = [-5400, 0];
 
 %%
-for SettingIdx = 1 : numel(SettingParams)
+for SettingIdx = [3] % 1 : numel(SettingParams)
     % load spkRes.mat 
     MatRootPath = strcat(DataRootPath, SettingParams(SettingIdx), "\");
     MatDirsInfo = dir(MatRootPath);

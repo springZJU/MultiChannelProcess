@@ -24,7 +24,7 @@ try
     disp("Try loading data from MAT");
 
     % lfp
-    load(strrep(DATAPATH, "data.mat", "lfpData.mat"));
+    load(fullfile(erase(DATAPATH, "data.mat"), "lfpData.mat"));
     try
         lfpDataset = data.lfp;
     catch
@@ -35,7 +35,7 @@ try
     chs = size(lfpDataset.data, 1);
 
     % spike
-    load(strrep(DATAPATH, "data.mat", "spkData.mat"));
+    load(fullfile(erase(DATAPATH, "data.mat"), "spkData.mat"));
     if any(data.sortdata(:, 2) == 0)
         data.sortdata(:, 2) = data.sortdata(:, 2) + 1;
     end
@@ -54,7 +54,7 @@ catch e
     temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams', 'snips'});
     streams = temp.streams;
     spikeDataset = spikeByCh(sortrows([temp.snips.eNeu.ts double(temp.snips.eNeu.chan)], 2));
-    lfpDataset.lfp = streams.Llfp;
+    lfpDataset = streams.Llfp;
     soundFold = [];
 end
 
