@@ -1,15 +1,17 @@
 % MATPATH = 'H:\MGB\DDZ\ddz20230731\Block-20';
-MATPATH = 'H:\MGB\CM\cm20231116\Block-22';
+MATPATH = 'H:\AC\CM\cm20231205\Block-3';
 FIGPATH = MATPATH;
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainRNP;
 
 % dateStr = temp(end - 1);
-protStr = "TB_BaseICI_4_8_16";
+% protStr = "Offset_1_128_4s_MGB";
 % protStr = "TB_Ratio_4_4.04";
 % protStr = "Offset_1_64_4s_MGB";
 % protStr = "Offset_Duration_Effect_4ms_Reg_New";
-% protStr = "Offset_Variance_Last_N4_8_16";
+protStr = "Offset_Variance_Last_N4_8_16_32";
+% protStr = "Offset_2048_1024_512_4ms_Reg_New";
+
 
 DATAPATH = MATPATH;
 FIGPATH = strcat(FIGPATH, "\");
@@ -31,7 +33,7 @@ end
 %% load click train params
 CTLParams = MLA_ParseCTLParams(protStr);
 parseStruct(CTLParams);
-fd = fs;
+fd = 1000;
 try
     lfpDataset = lfpDataset.lfp;
 catch ME
@@ -164,6 +166,7 @@ if ~Exist_Single
     mkdir(FIGPATH);
     chPlotFcn(chSpikeLfp, CTLParams);
 end
+MLA_PlotRasterLfp_v2
 
 % lfp of whole period
 if ~Exist_LFP_By_Ch

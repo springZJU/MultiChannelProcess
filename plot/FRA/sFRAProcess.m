@@ -5,14 +5,6 @@ narginchk(2, 4);
 window = windowParams.window; % ms
 
 %% Information extraction
-if isfield(data.epocs,'tril')
-    onsetTimeAll = data.epocs.tril.onset * 1000; % ms
-elseif isfield(data.epocs,'Swep')
-    onsetTimeAll = data.epocs.Swep.onset * 1000; % ms
-end
-if isfield(data,'snips')
-    spikeTimeAll = data.snips.eNeu.ts * 1000; % ms
-end
 if isfield(data.epocs,'freq')
     freqAll = data.epocs.freq.data; % Hz
 elseif isfield(data.epocs,'vair')

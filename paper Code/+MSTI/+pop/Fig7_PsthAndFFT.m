@@ -1,9 +1,20 @@
 clear; clc;
 
-DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
-SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
-                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s",...
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New_补充\";
+% DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording1\";
+DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording2\";
+
+if strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New\") || contains(DataRootPath, "Recording1")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
+                    "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s"];
+elseif strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New_补充\") || contains(DataRootPath, "Recording2")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
                 "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
+end
+CommentTable = "2023-12-12CommentTable.xlsx";
+DDZ_ExcludeShank = [{[""]}, {[""]}]; % First for AC Shank, Second for MGB Shank
+CM_ExcludeShank = [{[""]}, {["A44R31"]}]; % First for AC Shank, Second for MGB Shank
 ArtificialSortChoose = true;
 SigTestWinLength = 300;%ms
 
@@ -26,17 +37,22 @@ for SettingIdx = 1 : numel(SettingParams)
     parseStruct(MSTIParams);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%% Data cleaning %%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
     %get artificial screen idx
-    if exist(strcat(MatRootPath, "ArtificialExcludeCell.xlsx"), "file") ~= 0 && ArtificialSortChoose
-        ArtificialSortInfoPath = strcat(MatRootPath, "ArtificialExcludeCell.xlsx");
-        ArtificialSortIdx = MSTI.tool.ArtificialScreenCell(popPsthData.PsthData, ArtificialSortInfoPath);
-        AllExcludeIdx = ArtificialSortIdx;
-    else
+    if exist(strcat(MatRootPath, CommentTable), "file") ~= 0 && ArtificialSortChoose
+        SortInfoPath = strcat(MatRootPath, CommentTable);
+        SortIdx = MSTI.tool.CommentTableScreenCell(popPsthData.PsthData, SortInfoPath);
+        AllExcludeIdx = SortIdx;
+    elseif ~ArtificialSortChoose
         AllExcludeIdx = [];
     end
+
     popPsthData.PsthData(AllExcludeIdx) = [];
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    ACIdx = find(matches(string({popPsthData.PsthData.Area}), "AC"))';
-    MGBIdx = find(matches(string({popPsthData.PsthData.Area}), "MGB"))';
+    ACIdx = find(matches(string({popPsthData.PsthData.Area}), "AC")' & ...
+        ~ismember(string({popPsthData.PsthData.Position})', DDZ_ExcludeShank{1}) & ...
+        ~ismember(string({popPsthData.PsthData.Position})', CM_ExcludeShank{1}));
+    MGBIdx = find(matches(string({popPsthData.PsthData.Area}), "MGB")' & ...
+        ~ismember(string({popPsthData.PsthData.Position})', DDZ_ExcludeShank{2}) & ...
+        ~ismember(string({popPsthData.PsthData.Position})', CM_ExcludeShank{2}));
     for trialTypeIdx = 1 : numel(popPsthData.PsthData(1).rawPsth)
         ACRawPsthTemp{trialTypeIdx} = cellfun(@(x) x(trialTypeIdx).RawPsth, {popPsthData.PsthData(ACIdx).rawPsth}', "UniformOutput", false);
         MGBRawPsthTemp{trialTypeIdx} = cellfun(@(x) x(trialTypeIdx).RawPsth, {popPsthData.PsthData(MGBIdx).rawPsth}', "UniformOutput", false);
@@ -165,16 +181,22 @@ for SettingIdx = 1 : numel(SettingParams)
             TestData(InterestfreqNum).ACData = cell2mat(cellfun(@(x) [x{2 * InterestfreqNum - 1, 1}(1), x{2 * InterestfreqNum, 1}(1)], ACAmp, "UniformOutput", false));% target VS baseline
             ACTargetAmp = TestData(InterestfreqNum).ACData(:, 1);
             ACBaselineAmp = TestData(InterestfreqNum).ACData(:, 2);
-            [FFT_h_AC, FFT_p_AC] = ttest(ACTargetAmp - ACBaselineAmp, 0, 'Tail', 'right');
-            TestData(InterestfreqNum).ACsig = FFT_h_AC;
-            TestData(InterestfreqNum).ACpvalue = FFT_p_AC;
+            [FFT_ttestH_AC, FFT_ttestP_AC] = ttest(ACTargetAmp - ACBaselineAmp, 0, 'Tail', 'right');
+            TestData(InterestfreqNum).ttsetACsig = FFT_ttestH_AC;
+            TestData(InterestfreqNum).ttsetACpvalue = FFT_ttestP_AC;
+            [FFT_ttest2H_AC, FFT_ttest2P_AC] = ttest2(ACTargetAmp, ACBaselineAmp, 'Tail', 'right');
+            TestData(InterestfreqNum).ttset2ACsig = FFT_ttest2H_AC;
+            TestData(InterestfreqNum).ttset2ACpvalue = FFT_ttest2P_AC;
             %MGB
             TestData(InterestfreqNum).MGBData = cell2mat(cellfun(@(x) [x{2 * InterestfreqNum - 1, 1}(1), x{2 * InterestfreqNum, 1}(1)], MGBAmp, "UniformOutput", false));% target VS baseline
             MGBTargetAmp = TestData(InterestfreqNum).MGBData(:, 1);
             MGBBaselineAmp = TestData(InterestfreqNum).MGBData(:, 2);
-            [FFT_h_MGB, FFT_p_MGB] = ttest(MGBTargetAmp - MGBBaselineAmp, 0, 'Tail', 'right');
-            TestData(InterestfreqNum).MGBsig = FFT_h_MGB;
-            TestData(InterestfreqNum).MGBpvalue = FFT_p_MGB;
+            [FFT_ttestH_MGB, FFT_ttestP_MGB] = ttest(MGBTargetAmp - MGBBaselineAmp, 0, 'Tail', 'right');
+            TestData(InterestfreqNum).ttestMGBsig = FFT_ttestH_MGB;
+            TestData(InterestfreqNum).ttestMGBpvalue = FFT_ttestP_MGB;
+            [FFT_ttest2H_MGB, FFT_ttest2P_MGB] = ttest2(MGBTargetAmp, MGBBaselineAmp, 'Tail', 'right');
+            TestData(InterestfreqNum).ttest2MGBsig = FFT_ttest2H_MGB;
+            TestData(InterestfreqNum).ttest2MGBpvalue = FFT_ttest2P_MGB;            
         end
         TrialTestData(trialTypeIdx).TrialType = trialTypeStr;
         TrialTestData(trialTypeIdx).TestResult = TestData;
@@ -201,7 +223,7 @@ for SettingIdx = 1 : numel(SettingParams)
 
         %% CDR plot
         if exist("ArtificialSortIdx", "var") && ArtificialSortChoose
-            CdrPlot_Fig7popPsth.ExcludeInfo{1, 1} = ArtificialSortIdx;
+            CdrPlot_Fig7popPsth.ExcludeInfo{1, 1} = SortIdx;
             CdrPlot_Fig7popPsth.ExcludeInfo{1, 2} = "Artificial screen";            
         end
         CdrPlot_Fig7popPsth.AC(trialTypeIdx).trialType = trialTypeStr;
@@ -226,6 +248,9 @@ for SettingIdx = 1 : numel(SettingParams)
 end
 % Plot Settings
 set(RawAxes(1 : 3, :), 'xtick', []);
+print(gcf, strcat(DataRootPath, "MSTIFig7_AC_MGB_population.jpg"), "-djpeg", "-r200");
+% close;
+
 
 
 

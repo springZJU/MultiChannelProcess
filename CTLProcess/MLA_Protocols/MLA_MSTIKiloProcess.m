@@ -26,11 +26,11 @@ fd = lfpDataset.fs;
 %% set trialAll
 trialAll([trialAll.devOrdr] == 0) = [];
 devType = unique([trialAll.devOrdr]);
-OnsetTemp = {trialAll.devOnset}';
-[~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
-ordTemp = num2cell(ordTemp);
-temp = cellfun(@(x, y) MSTIsoundinfo(x).Std_Dev_Onset(end) + y, ordTemp, OnsetTemp, "UniformOutput", false);
-trialAll = addFieldToStruct(trialAll, temp, "devOnset");
+% OnsetTemp = {trialAll.devOnset}';
+% [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
+% ordTemp = num2cell(ordTemp);
+% temp = cellfun(@(x, y) MSTIsoundinfo(x).Std_Dev_Onset(end) + y, ordTemp, OnsetTemp, "UniformOutput", false);
+% trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 trialAll(1) = [];
 
 %% split data
@@ -118,7 +118,7 @@ for dIndex = 1:length(devType)
     %     minBaseICI = min(BaseICI, [], "all");
     psthPara.binsize = 30; % ms
     psthPara.binstep = 1; % ms
-    chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);
+    chPSTH = cellfun(@(x) calPsth(x, psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);
     chStr = fields(trialsSPK)';
     kilochSPK = cell2struct([chStr; spikePlot; chPSTH; chRS], ["info", "spikePlot", "PSTH", "chRS"]);
 

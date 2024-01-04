@@ -1,13 +1,21 @@
 clear; clc;
 
-DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
-SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
-                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s",...
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New_补充\";
+% DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording1\";
+DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording2\";
+
+if strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New\") || contains(DataRootPath, "Recording1")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
+                    "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s"];
+elseif strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New_补充\") || contains(DataRootPath, "Recording2")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
                 "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
+end
 PSTHFFTWindow = [-5400, 0];
 
 %%
-for SettingIdx = [3] % 1 : numel(SettingParams)
+for SettingIdx = 1 : numel(SettingParams)
     % load spkRes.mat 
     MatRootPath = strcat(DataRootPath, SettingParams(SettingIdx), "\");
     MatDirsInfo = dir(MatRootPath);
@@ -45,7 +53,7 @@ for SettingIdx = [3] % 1 : numel(SettingParams)
                 for trialIdx = 1 : numel(AlltrialNum)
                     trialSpkIdx = find(AlltrialNum(trialIdx) == IDSpikeData(:, 2));
                     OneTrialSpikeTime = IDSpikeData(trialSpkIdx, 1);
-                    resTemp1{trialIdx, 1} = calPsth(OneTrialSpikeTime, psthPara, 1e3, 'EDGE', Window, 'NTRIAL', 1);
+                    resTemp1{trialIdx, 1} = calPsth(IDSpikeData(trialSpkIdx, :), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', 1);
                 end
                 t = resTemp1{1, 1}(:, 1);                
                 FFTIdx = find(t > PSTHFFTWindow(1) & t < PSTHFFTWindow(2));
@@ -59,7 +67,7 @@ for SettingIdx = [3] % 1 : numel(SettingParams)
 
                 %cal all trials PSTH, then FFT
                 TargetTrialSpikeTime = IDSpikeData(:, 1);
-                resTemp2{trialTypeIdx} = calPsth(TargetTrialSpikeTime, psthPara, 1e3, 'EDGE', Window, 'NTRIAL', length(AlltrialNum));
+                resTemp2{trialTypeIdx} = calPsth(IDSpikeData, psthPara, 1e3, 'EDGE', Window, 'NTRIAL', length(AlltrialNum));
 
                 PSTHDataTemp2 = resTemp2{trialTypeIdx};
                 t = PSTHDataTemp2(:, 1);

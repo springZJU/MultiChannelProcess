@@ -65,6 +65,7 @@ catch e
     disp(e.message);
 end
 
+data.SR_AP = SR_AP;
 % spike waveform
 try
     data.spkWave = spkWave;

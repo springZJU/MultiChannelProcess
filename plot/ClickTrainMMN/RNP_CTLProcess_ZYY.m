@@ -3,7 +3,7 @@ ccc;
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 %% TODO: configuration -- data select
-ratName = "Rat3_ZYY"; % required
+ratName = "Rat3_SPR"; % required
 ROOTPATH = "F:\MMN\neuroPixels"; % required
 project = "CTL_New"; % project, required
 dateSel = ""; % blank for all

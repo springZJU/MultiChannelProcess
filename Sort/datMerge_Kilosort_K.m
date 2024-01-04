@@ -11,7 +11,9 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 %         "XHX_MLA_Recording.xlsx");
 
 
-customInfo.idSel = [2];
+customInfo.idSel = [ 5];
+customInfo.kilosortAutoMerge = false; 
+customInfo.postMerge = false; 
 
 customInfo.MATPATH = "E:\ratNeuroPixel\MAT Data\";
 % customInfo.MATPATH = "I:\neuroPixels\MAT Data";
@@ -19,8 +21,8 @@ customInfo.MATPATH = "E:\ratNeuroPixel\MAT Data\";
 
 % customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
 
-customInfo.thr = [7, 3];                        
-% customInfo.thr = [7, 3];
+customInfo.thr = [ 7, 3];                        
+% customInfo.thr = [ 9, 4];
 
 customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;
@@ -66,9 +68,13 @@ strTemp = cellfun(@(x) char(strcat("Merge", num2str(x))), num2cell(customInfo.id
 mergeFolder = cell2mat(cellfun(@(x) x(matches({x.name}', strTemp)), folders, "UniformOutput", false));
 NPYPATH = string(cellfun(@(x, y) fullfile(x, y, ['th', num2str(thr(1)), '_', num2str(thr(2)), '\']), {mergeFolder.folder}', {mergeFolder.name}', "uni", false));
 for nIndex = 1 : length(NPYPATH)
+    try
     cd(NPYPATH(nIndex));
     if ~isfile("cluster_info.tsv")%~exist("cluster_info.tsv", "file")
         run("process_TemplateGUI");
+    end
+    catch
+        continue
     end
 end
 

@@ -32,13 +32,13 @@ for chIndex = chindSelect
     waitbar(chIndex / length(chindSelect), mWaitbar, ['Plot ChIndex', num2str(chIndex), ' ing...']);
     Fig = figure;
     maximizeFig(Fig);
-       ax1 = mSubplot(Fig, 6, 10, 10,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
-        ax5 = mSubplot(Fig, 6, 10, 30,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
-        ax3 = mSubplot(Fig, 6, 10, 50,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
+    ax1 = mSubplot(Fig, 6, 10, 10,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
+    ax3 = mSubplot(Fig, 6, 10, 30,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
+    ax5 = mSubplot(Fig, 6, 10, 50,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
 
-       ax2 = mSubplot(Fig, 6, 10, 20,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
-        ax4 = mSubplot(Fig, 6, 10, 40,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
-        ax6 = mSubplot(Fig, 6, 10, 60,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
+    ax2 = mSubplot(Fig, 6, 10, 20,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
+    ax4 = mSubplot(Fig, 6, 10, 40,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
+    ax6 = mSubplot(Fig, 6, 10, 60,'nSize',[2 0.8],'alignment','top-right', 'margins', margins, 'paddings', paddings);
 
     for tIndex = 1 : typeMax
         chinfo = chSpikeLfp(tIndex).chSPK(chIndex).info;
@@ -83,6 +83,21 @@ for chIndex = chindSelect
         xlim(spkPlotWindow);
         xticks(spkPlotWindow(1):50:spkPlotWindow(2));
         set(ax, 'xcolor', colors{ceil(tIndex/2)}, 'ycolor', colors{ceil(tIndex/2)}, 'LineWidth', 1);
+
+        % switch tIndex
+        %     case {1,3}
+        %     set(ax, 'xcolor', colors{1}, 'ycolor', colors{1}, 'LineWidth', 1);
+        %     case {2,4}
+        %     set(ax, 'xcolor', colors{2}, 'ycolor', colors{2}, 'LineWidth', 1);
+        %     case {5,7}
+        %     set(ax, 'xcolor', colors{3}, 'ycolor', colors{3}, 'LineWidth', 1);
+        %     case {6,8}
+        %     set(ax, 'xcolor', colors{4}, 'ycolor', colors{4}, 'LineWidth', 1);
+        %     case {9,11}
+        %     set(ax, 'xcolor', colors{5}, 'ycolor', colors{5}, 'LineWidth', 1);
+        %     case {10,12}
+        %     set(ax, 'xcolor', colors{6}, 'ycolor', colors{6}, 'LineWidth', 1);
+        % end
         [~, pvalue0_50] = ttest(chSpikeLfp(tIndex).chSPK(chIndex).DevfrWinOnset0_50, chSpikeLfp(tIndex).chSPK(chIndex).StdfrWinOnset0_50 );
         [~, pvalue50_200] = ttest(chSpikeLfp(tIndex).chSPK(chIndex).DevfrWinLate50_200, chSpikeLfp(tIndex).chSPK(chIndex).StdfrWinLate50_200 );
         [~, pvalue0_250] = ttest(chSpikeLfp(tIndex).chSPK(chIndex).DevfrWin0_250, chSpikeLfp(tIndex).chSPK(chIndex).StdfrWin0_250 );
@@ -91,7 +106,7 @@ for chIndex = chindSelect
             strcat(",p[50 200] = ", num2str(round(pvalue50_200, 3)))});
 
         %% ROW 3: win [0 250]
-     
+
         FrTemp = [];
         for i = 1:sum(ratio)
             FrTemp(:, i) = cell2mat(cellfun(@(x) calOriFirate(x, spkFrWin{1}, 0),  chSpikeLfp(tIndex).chSPK(chIndex).(['Sti',num2str(i)]), "UniformOutput", false ));
@@ -112,7 +127,7 @@ for chIndex = chindSelect
         xticks('');
 
         %% ROW 4: win onset
-     
+
         FrTemp = [];
         for i = 1:sum(ratio)
             FrTemp(:, i) = cell2mat(cellfun(@(x) calOriFirate(x, spkFrWin{3}, 0),  chSpikeLfp(tIndex).chSPK(chIndex).(['Sti',num2str(i)]), "UniformOutput", false ));
@@ -121,7 +136,7 @@ for chIndex = chindSelect
         FrSe = SE(FrTemp, 1);
         if any(ismember(1:8, tIndex))
             axes(ax2); hold on;
-          errorbar(ax2, 1:sum(ratio), FrMean, FrSe, 'Color', colorsLine{tIndex}, "LineWidth", 1.5); hold off;
+            errorbar(ax2, 1:sum(ratio), FrMean, FrSe, 'Color', colorsLine{tIndex}, "LineWidth", 1.5); hold off;
         else
             if any(ismember([typeMax, typeMax-1], tIndex))
                 axes(ax6);hold on;

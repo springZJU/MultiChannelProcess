@@ -17,8 +17,6 @@ end
 selData = recordInfo(selIdx);
 selInfo(rIndex).selIdx = selIdx;
 
-
-
 %     if isfield(selData, "datPath")
 %         DATAPATH = cellstr([selData.datPath]');
 %     end

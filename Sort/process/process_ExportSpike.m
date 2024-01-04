@@ -1,4 +1,4 @@
-clearvars -except selInfo  NPYPATH nIndex customInfo
+clearvars -except selInfo  NPYPATH nIndex customInfo 
 parseStruct(customInfo);
 temp = strsplit(NPYPATH(nIndex), "\");
 MERGEPATH = strjoin(temp(1:end-2), "\");

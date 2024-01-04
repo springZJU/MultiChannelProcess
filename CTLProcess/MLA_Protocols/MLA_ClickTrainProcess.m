@@ -26,7 +26,7 @@ end
 
 CTLParams = MLA_ParseCTLParams(protStr);
 parseStruct(CTLParams);
-fd = fs;
+fd = 1000;
 
 if ~isequal(lfpDataset.fs, fd)
     lfpDataset = ECOGResample(lfpDataset, fd);
@@ -41,10 +41,7 @@ trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 trialAll(1) = [];
 
 %% split data
-[trialsLFPRaw, ~, ~] = selectEcog(lfpDataset, trialAll, "dev onset", Window); % "dev onset"; "trial onset"
-if length(trialsLFPRaw) < length(trialAll)
-    trialAll(end) = [];
-end
+[trialsLFPRaw, ~, ~, ~, trialAll] = selectEcog(lfpDataset, trialAll, "dev onset", Window); % "dev onset"; "trial onset"
 trialsLFPFiltered = ECOGFilter(trialsLFPRaw, 0.1, 200, fd);
 tIdx = excludeTrials(trialsLFPFiltered, 0.1);
 trialsLFPFiltered(tIdx) = [];
@@ -124,7 +121,7 @@ for dIndex = 1:length(devType)
 
     %% spike
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
-    chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex)), spikePlot, "UniformOutput", false);
+    chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex), length(trialsSPK)), spikePlot, "UniformOutput", false);
     psthPara.binsize = 30; % ms
     psthPara.binstep = 1; % ms
     chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);

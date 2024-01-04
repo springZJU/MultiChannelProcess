@@ -1,9 +1,15 @@
 clear; clc;
 
-DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
+% DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording1\";
+DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording2\";
 SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
                 "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s",...
                 "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
+
+CommentTable = "2023-12-12CommentTable.xlsx";
+DDZ_ExcludeShank = [{[""]}, {[""]}]; % First for AC Shank, Second for MGB Shank
+CM_ExcludeShank = [{[""]}, {["A44R31"]}]; % First for AC Shank, Second for MGB Shank
 Area = ["AC", "MGB"];
 ArtificialSortChoose = true;
 %%
@@ -13,23 +19,21 @@ for SettingParamIdx = 1 : numel(SettingParams)
     AllCellInfo = [];
     % load .mat 
     MatRootPath = strcat(DataRootPath, SettingParams(SettingParamIdx), "\");
+    if ~exist(MatRootPath, "dir")
+        continue;
+    end
     PsthCSIData = load(strcat(MatRootPath, "PopData_PsthCSI.mat"));
     PsthFFTSigData = load(strcat(MatRootPath, "PopData_PsthFFTAmp.mat"));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%% Data cleaning %%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-    %get OutlierIdx(mean ± 3 * std)
-    DataAll = {cell2mat({PsthFFTSigData.PsthFFTAmpData.ClickFFT}');...
-        cell2mat({PsthFFTSigData.PsthFFTAmpData.ClickTrainFFT}');...
-        cell2mat({PsthCSIData.PsthCSIData.CSI}')};
-    OutlierIdx = cellfun(@(x) find((x > nanmean(x) + 3 * nanstd(x)) | (x < nanmean(x) - 3 * nanstd(x))), DataAll, "UniformOutput", false);
     %get NAN CSI
     isnan_CSIIdx = find(isnan(cell2mat({PsthCSIData.PsthCSIData.CSI}')));
     %get artificial screen idx
-    if exist(strcat(MatRootPath, "ArtificialExcludeCell.xlsx"), "file") ~= 0 && ArtificialSortChoose
-        ArtificialSortInfoPath = strcat(MatRootPath, "ArtificialExcludeCell.xlsx");
-        ArtificialSortIdx = MSTI.tool.ArtificialScreenCell(PsthFFTSigData.PsthFFTAmpData, ArtificialSortInfoPath);
-        AllExcludeIdx = unique([cell2mat(OutlierIdx); isnan_CSIIdx; ArtificialSortIdx]);
-    else
-        AllExcludeIdx = unique([cell2mat(OutlierIdx); isnan_CSIIdx]);
+    if exist(strcat(MatRootPath, CommentTable), "file") ~= 0 && ArtificialSortChoose
+        SortInfoPath = strcat(MatRootPath, CommentTable);
+        SortIdx = MSTI.tool.CommentTableScreenCell(PsthFFTSigData.PsthFFTAmpData, SortInfoPath);
+        AllExcludeIdx = unique([isnan_CSIIdx; SortIdx]);
+    elseif ~ArtificialSortChoose
+        AllExcludeIdx = unique([isnan_CSIIdx]);
     end
     
     PsthFFTSigData.PsthFFTAmpData(AllExcludeIdx) = [];
@@ -56,9 +60,13 @@ for SettingParamIdx = 1 : numel(SettingParams)
         'ClickTrainTag', {PsthFFTSigData.PsthFFTAmpData.ClickTrainTag},...
         'CSITag', {PsthCSIData.PsthCSIData.CSITag});
 
-    ACcellIdx = find(contains(string({AllCellInfo.Area}'), "AC"));
+    ACcellIdx = find(contains(string({AllCellInfo.Area}'), "AC") & ...
+        ~ismember(string({AllCellInfo.Position})', DDZ_ExcludeShank{1}) & ...
+        ~ismember(string({AllCellInfo.Position})', CM_ExcludeShank{1}));
     AC_CellInfo = AllCellInfo(ACcellIdx);
-    MGBcellIdx = find(contains(string({AllCellInfo.Area}'), "MGB"));
+    MGBcellIdx = find(contains(string({AllCellInfo.Area}'), "MGB") & ...
+        ~ismember(string({AllCellInfo.Position})', DDZ_ExcludeShank{2}) & ...
+        ~ismember(string({AllCellInfo.Position})', CM_ExcludeShank{2}));
     MGB_CellInfo = AllCellInfo(MGBcellIdx);
 
     AC_StasticTable = CellClasses(AC_CellInfo);

@@ -2,7 +2,7 @@ function result = sPREProcess(data, windowParams, sortData, chIndex)
 narginchk(2, 4);
 
 %% Parameter settings
-Window = windowParams.Window; % ms
+parseStruct(windowParams); % ms
 
 %% Information extraction
 if isfield(data.epocs,'tril')
@@ -43,28 +43,12 @@ for trialIndex = 1:length(onsetTimeAll)
     trialAll(trialIndex, 1).spike = spikeTimeAll(spikeTimeAll >= onsetTimeAll(trialIndex) + Window(1) & spikeTimeAll < onsetTimeAll(trialIndex) + Window(2)) - onsetTimeAll(trialIndex);
 end
 
-% trialAll = trialAll([trialAll.type]==1);
+trialAll = trialAll([trialAll.type]==1);
 
-% By freq
-ICIUnique = unique([trialAll.ICI]);
-
-for fIndex = 1:length(ICIUnique)
-    result(fIndex, 1).ICI = ICIUnique(fIndex);
-    trials = trialAll([trialAll.ICI] == ICIUnique(fIndex), 1);
-
-    % By attenuation
-    attUnique = sort(unique([trials.att]), "ascend");
-
-    for aIndex = 1:length(attUnique)
-        temp(aIndex, 1).amp = abs(roundn(attUnique(aIndex) - attUnique(end), 0)) + 10; % relative attenuation
-        temp(aIndex, 1).spikes = {trials([trials.att] == attUnique(aIndex), 1).spike}';
-    end
-
-    result(fIndex, 1).trials = temp;
-    clearvars temp
-end
-
-
+% By ICI
+ICIUnique = unique([trialAll.ICI])';
+spikes    = cellfun(@(x) {trialAll([trialAll.ICI] == x, 1).spike}', num2cell(ICIUnique), "UniformOutput", false);
+result    = cell2struct([num2cell(ICIUnique), spikes], ["ICI", "spikes"], 2);
 
 return;
 end

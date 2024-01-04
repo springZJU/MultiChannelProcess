@@ -7,6 +7,15 @@ end
 %% kilosort
 run([fileparts(mfilename("fullpath")), '\config\configFileMulti.m']);
 switch chNum
+    case 8
+        % treated as linear probe if no chanMap file
+        ops.chanMap             = [fileparts(mfilename("fullpath")), '\config\chan8_2_kilosortChanMap.mat'];  %16*1 linear array
+        % total number of channels in your recording
+        ops.NchanTOT            = 16; %16*1 linear array
+        % sample rate, Hz
+        ops.fs                  = fs;
+        ops.nblocks             = 0;
+
     case 16
         % treated as linear probe if no chanMap file
         ops.chanMap             = [fileparts(mfilename("fullpath")), '\config\chan16_1_kilosortChanMap.mat'];  %16*1 linear array
@@ -47,7 +56,7 @@ for tIndex = 1 : size(thr , 1)
     catch
         continue
     end
-    %         end
+%     %         end
 end
 
 for sIndex = 1 : length(selIdx)

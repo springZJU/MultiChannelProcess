@@ -5,11 +5,11 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 "SPR_MLA_Recording.xlsx"); 
 %     "SPR_RNP_TBOffset_Recording.xlsx");
 
-customInfo.idSel = [62:72];
+customInfo.idSel = [101:112];
 % customInfo.MATPATH = "I:\neuroPixels\MAT Data";
 customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
                         
-customInfo.thr = [6, 4];
+customInfo.thr = [7, 3];
 
 customInfo.reExportSpk = false;
 customInfo.exportSpkWave = false;

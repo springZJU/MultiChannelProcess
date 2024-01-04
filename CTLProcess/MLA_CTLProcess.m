@@ -3,12 +3,14 @@ clc; close all
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 %% TODO: configuration
-monkeyName = "DDZ"; % required
+monkeyName = "CM"; % required
 ROOTPATH = "E:\MonkeyLinearArray"; % required
 project = "CTL_New"; % project, required
-dateSel = "AC"; % blank for all
-% protSel = ["TB_BaseICI_4_8_16", "TB_Ratio_4_4.04", "Offset_1_64_4s_MGB", "Offset_Variance_Last_N4_8_16", "Offset_Duration_Effect_4ms_Reg_New"]; % blank for all
-protSel = ["Tone_CF"]; % blank for all
+dateSel = ["20231211"]; % blank for all
+% protSel = ["TB_BaseICI_4_8_16", "TB_Ratio_4_4o04", "Offset_Duration_Effect_4ms_Reg_New"]; % blank for all
+protSel = ["Offset_Variance_Last_N4_8_16_32"]; % blank for all
+
+% protSel = ["Tone_CF"]; % blank for all
 
 %% load protocols
 rootPathMat = strcat(ROOTPATH, "\MAT Data\", monkeyName, "\", project, "\");

@@ -1,4 +1,6 @@
 badCh = [16];   dz = 150;
-MATPATH = 'H:\AC\DDZ\ddz20231115\Block-32';
+% MATPATH = 'H:\AC\DDZ\ddz20231115\Block-32';
+% MATPATH = 'H:\AC\CM\cm20231120\Block-14';
+MATPATH = 'M:\DATA\CM\cm20231123\Block-14';
 FIGPATH = fullfile(MATPATH, "Figure");
 MLA_CSD(MATPATH, FIGPATH);

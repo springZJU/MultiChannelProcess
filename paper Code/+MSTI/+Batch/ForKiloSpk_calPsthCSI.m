@@ -1,11 +1,20 @@
 clear; clc;
 
-DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
-SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
-                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s",...
-                "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
-Area = ["AC", "MGB"];
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New_补充\";
+% DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording1\";
+DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording2\";
 
+if strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New\") || contains(DataRootPath, "Recording1")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
+                    "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s"];
+elseif strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New_补充\") || contains(DataRootPath, "Recording2")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
+                "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
+end
+
+Area = ["AC", "MGB"];
+CSIWindowChoice = "OneTrain";%"OneTrain":[0, 300]; "TwoTrain":[0, 600];
 
 %%
 for SettingParamIdx = 1 : numel(SettingParams)
@@ -41,10 +50,17 @@ for SettingParamIdx = 1 : numel(SettingParams)
 
                 % calculate CSI
                 %Window
-                Type1Windowlength = MSTIsoundinfo(1).Std_Dev_Onset(end) - MSTIsoundinfo(1).Std_Dev_Onset(end - 1);
-                Type2Windowlength = MSTIsoundinfo(2).Std_Dev_Onset(end) - MSTIsoundinfo(2).Std_Dev_Onset(end - 1);
-                Type1DevWin = [0, Type1Windowlength]; Type1StdWin = [-Type1Windowlength, 0];
-                Type2DevWin = [0, Type2Windowlength]; Type2StdWin = [-Type2Windowlength, 0];                
+                if strcmp(CSIWindowChoice, "TwoTrain")
+                    Type1Windowlength = MSTIsoundinfo(1).Std_Dev_Onset(end) - MSTIsoundinfo(1).Std_Dev_Onset(end - 1);
+                    Type2Windowlength = MSTIsoundinfo(2).Std_Dev_Onset(end) - MSTIsoundinfo(2).Std_Dev_Onset(end - 1);
+                    Type1DevWin = [0, Type1Windowlength]; Type1StdWin = [-Type1Windowlength, 0];
+                    Type2DevWin = [0, Type2Windowlength]; Type2StdWin = [-Type2Windowlength, 0];
+                elseif strcmp(CSIWindowChoice, "OneTrain")
+                    Type1Windowlength = 300;
+                    Type2Windowlength = 300;
+                    Type1DevWin = [0, 300]; Type1StdWin = [-600, -300];
+                    Type2DevWin = [0, 300]; Type2StdWin = [-600, -300];                   
+                end
                 %sikeTime
                 Type1IDSpikeTime = KiloSpkData.chSpikeLfp(1).chSPK(IDIdx).spikePlot(:, 1);
                 Type2IDSpikeTime = KiloSpkData.chSpikeLfp(2).chSPK(IDIdx).spikePlot(:, 1);
@@ -60,7 +76,9 @@ for SettingParamIdx = 1 : numel(SettingParams)
             
         end
     end
-    save(strcat(MatRootPath, "PopData_PsthCSI.mat"), "PsthCSIData", "-mat");
+    save(strcat(MatRootPath, "PopData_PsthCSI.mat"), "PsthCSIData", "CSIWindowChoice", "-mat");
+
+    
 end
 
 

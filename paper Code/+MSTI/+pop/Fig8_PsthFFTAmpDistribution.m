@@ -1,9 +1,20 @@
 clear; clc;
 
-DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
-SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
-                "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s",...
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New\";
+% DataRootPath = "H:\MLA_A1补充\Figure\CTL_New_补充\";
+% DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording1\";
+DataRootPath = "K:\ANALYSIS_202311_MonkeyLA_MSTI\Figure\MSTI_Recording2\";
+
+if strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New\") || contains(DataRootPath, "Recording1")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
+                    "MSTI-0.3s_BaseICI-BG-18.2ms-Si-15.2ms-Sii-21.9ms_devratio-1.2_BGstart2s"];
+elseif strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New_补充\") || contains(DataRootPath, "Recording2")
+    SettingParams = ["MSTI-0.3s_BaseICI-BG-3.6ms-Si-3ms-Sii-4.3ms_devratio-1.2_BGstart2s",...
                 "MSTI-0.3s_BaseICI-BG-14ms-Si-11.7ms-Sii-16.8ms_devratio-1.2_BGstart2s"];
+end
+CommentTable = "2023-12-12CommentTable.xlsx";
+DDZ_ExcludeShank = [{[""]}, {[""]}]; % First for AC Shank, Second for MGB Shank
+CM_ExcludeShank = [{[""]}, {["A44R31"]}]; % First for AC Shank, Second for MGB Shank
 Area = ["AC", "MGB"];
 ArtificialSortChoose = true;
 
@@ -28,33 +39,36 @@ for SettingParamIdx = 1 : numel(SettingParams)
     PsthFFTAmpTemp = load(strcat(MatRootPath, "PopData_PsthFFTAmp.mat"));
     PsthCSITemp = load(strcat(MatRootPath, "PopData_PsthCSI.mat"));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%% Data cleaning %%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-    %get OutlierIdx(mean ± 3 * std)
-    DataAll = {cell2mat({PsthFFTAmpTemp.PsthFFTAmpData.ClickFFT}');...
-        cell2mat({PsthFFTAmpTemp.PsthFFTAmpData.ClickTrainFFT}');...
-        cell2mat({PsthCSITemp.PsthCSIData.CSI}')};
-    OutlierIdx = cellfun(@(x) find((x > nanmean(x) + 3 * nanstd(x)) | (x < nanmean(x) - 3 * nanstd(x))), DataAll, "UniformOutput", false);
     %get NAN CSI
     isnan_CSIIdx = find(isnan(cell2mat({PsthCSITemp.PsthCSIData.CSI}')));
     %get artificial screen idx
     if exist(strcat(MatRootPath, "ArtificialExcludeCell.xlsx"), "file") ~= 0 && ArtificialSortChoose
-        ArtificialSortInfoPath = strcat(MatRootPath, "ArtificialExcludeCell.xlsx");
-        ArtificialSortIdx = MSTI.tool.ArtificialScreenCell(PsthFFTAmpTemp.PsthFFTAmpData, ArtificialSortInfoPath);
-        AllExcludeIdx = unique([cell2mat(OutlierIdx); isnan_CSIIdx; ArtificialSortIdx]);
-    else
-        AllExcludeIdx = unique([cell2mat(OutlierIdx); isnan_CSIIdx]);
+        SortInfoPath = strcat(MatRootPath, "ArtificialExcludeCell.xlsx");
+        SortIdx = MSTI.tool.ArtificialScreenCell(PsthFFTAmpTemp.PsthFFTAmpData, SortInfoPath);
+        AllExcludeIdx = unique([isnan_CSIIdx; SortIdx]);
+    elseif exist(strcat(MatRootPath, CommentTable), "file") ~= 0 && ArtificialSortChoose
+        SortInfoPath = strcat(MatRootPath, CommentTable);
+        SortIdx = MSTI.tool.CommentTableScreenCell(PsthFFTAmpTemp.PsthFFTAmpData, SortInfoPath);
+        AllExcludeIdx = unique([isnan_CSIIdx; SortIdx]);
+    elseif ~ArtificialSortChoose
+        AllExcludeIdx = unique([isnan_CSIIdx]);
     end
     
     PsthFFTAmpTemp.PsthFFTAmpData(AllExcludeIdx) = [];
     PsthCSITemp.PsthCSIData(AllExcludeIdx) = [];
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    ACIdx = find(strcmp(string({PsthCSITemp.PsthCSIData.Area}), "AC"))';
+    ACIdx = find(strcmp(string({PsthCSITemp.PsthCSIData.Area}), "AC")' & ...
+        ~ismember(string({PsthCSITemp.PsthCSIData.Position})', DDZ_ExcludeShank{1}) & ...
+        ~ismember(string({PsthCSITemp.PsthCSIData.Position})', CM_ExcludeShank{1}));
     ACPsthFFTDataTemp = PsthFFTAmpTemp.PsthFFTAmpData(ACIdx);
     ACCSIDataTemp = PsthCSITemp.PsthCSIData(ACIdx);
     ClickFFTAmpData_AC = cell2mat({ACPsthFFTDataTemp.ClickFFT}');
     ClickTrainFFTAmpData_AC = cell2mat({ACPsthFFTDataTemp.ClickTrainFFT}');
     CSIData_AC = cell2mat({ACCSIDataTemp.CSI}'); 
 
-    MGBIdx = find(strcmp(string({PsthCSITemp.PsthCSIData.Area}), "MGB"))';
+    MGBIdx = find(strcmp(string({PsthCSITemp.PsthCSIData.Area}), "MGB")' & ...
+        ~ismember(string({PsthCSITemp.PsthCSIData.Position})', DDZ_ExcludeShank{2}) & ...
+        ~ismember(string({PsthCSITemp.PsthCSIData.Position})', CM_ExcludeShank{2}));
     MGBPsthFFTDataTemp = PsthFFTAmpTemp.PsthFFTAmpData(MGBIdx);
     MGBCSIDataTemp = PsthCSITemp.PsthCSIData(MGBIdx);
     ClickFFTAmpData_MGB = cell2mat({MGBPsthFFTDataTemp.ClickFFT}');
@@ -68,7 +82,10 @@ for SettingParamIdx = 1 : numel(SettingParams)
     annotation('textbox', [.01 .44 - (SettingParamIdx - 1) * 0.4 .2 .3], 'String', ShowStr, 'EdgeColor', 'none', 'FontSize', 10);
     %%%%%%%%%%%%%%%%%%% Plot------click %%%%%%%%%%%%%%%%%%%
     Edge_click = [min([ClickFFTAmpData_AC; ClickFFTAmpData_MGB]):Step{1}:max([ClickFFTAmpData_AC; ClickFFTAmpData_MGB])];
-    [h_Click, pValue_Click] = ttest2(ClickFFTAmpData_AC, ClickFFTAmpData_MGB); 
+    [h_Click, pValue_Click] = ttest2(ClickFFTAmpData_AC, ClickFFTAmpData_MGB);
+    [h_AC_Click, pValue_AC_Click] = ttest(ClickFFTAmpData_AC, 0, "Tail", "right");
+    [h_MGB_Click, pValue_MGB_Click] = ttest(ClickFFTAmpData_MGB, 0, "Tail", "right");
+
     % AC------All Distribution 
     ClickCmpAx_AC(SettingParamIdx, 1) = mSubplot(RowNum, ColNum, 2 + (SettingParamIdx - 1) * 2 * ColNum, [1, 1], "margins", margins_Col1_2);%All Distribution   
     h_AC_click = histogram(ClickFFTAmpData_AC, Edge_click); hold on;
@@ -115,6 +132,9 @@ for SettingParamIdx = 1 : numel(SettingParams)
     %%%%%%%%%%%%%%%%%%% Plot------click train %%%%%%%%%%%%%%%%%%%
     Edge_clicktrain = [min([ClickTrainFFTAmpData_AC; ClickTrainFFTAmpData_MGB]):Step{2}:max([ClickTrainFFTAmpData_AC; ClickTrainFFTAmpData_MGB])];
     [h_Clicktrain, pValue_Clicktrain] = ttest2(ClickTrainFFTAmpData_AC, ClickTrainFFTAmpData_MGB);
+    [h_AC_Clicktrain, pValue_AC_Clicktrain] = ttest(ClickTrainFFTAmpData_AC, 0, "Tail", "right");
+    [h_MGB_Clicktrain, pValue_MGB_Clicktrain] = ttest(ClickTrainFFTAmpData_MGB, 0, "Tail", "right");
+
     % AC------All Distribution 
     ClicktrainCmpAx_AC(SettingParamIdx, 1) = mSubplot(RowNum, ColNum, 4 + (SettingParamIdx - 1) * 2 * ColNum, [1, 1], "margins", margins_Col1_2);
     h_AC_clicktrain = histogram(ClickTrainFFTAmpData_AC, Edge_clicktrain); hold on;
@@ -161,6 +181,9 @@ for SettingParamIdx = 1 : numel(SettingParams)
     %%%%%%%%%%%%%%%%%%% Plot------CSI %%%%%%%%%%%%%%%%%%%
     Edge_CSI = [min([CSIData_AC; CSIData_MGB]):Step{3}:max([CSIData_AC; CSIData_MGB])];
     [h_CSI, pValue_CSI] = ttest2(CSIData_AC, CSIData_MGB);
+    [h_AC_CSI, pValue_AC_CSI] = ttest(CSIData_AC, 0, "Tail", "right");
+    [h_MGB_CSI, pValue_MGB_CSI] = ttest(CSIData_MGB, 0, "Tail", "right");
+
     % AC------All Distribution 
     CSICmpAx_AC(SettingParamIdx) = mSubplot(RowNum, ColNum, 6 + (SettingParamIdx - 1) * 2 * ColNum, [2, 1], "margins", margins_Col3);
     h_AC_CSI = histogram(CSIData_AC, Edge_CSI, "Normalization", "probability"); hold on;
@@ -184,13 +207,11 @@ for SettingParamIdx = 1 : numel(SettingParams)
 
     %% CDR plot 
     %%%%%%%%%%%%%%%%%%% Data cleaning %%%%%%%%%%%%%%%%%%%
-    CdrPlot_Fig8popDistribution.ExcludeInfo{1, 1} = cell2mat(OutlierIdx);
-    CdrPlot_Fig8popDistribution.ExcludeInfo{1, 2} = "outlier";
-    CdrPlot_Fig8popDistribution.ExcludeInfo{2, 1} = isnan_CSIIdx;
-    CdrPlot_Fig8popDistribution.ExcludeInfo{2, 2} = "NAN CSI";
+    CdrPlot_Fig8popDistribution.ExcludeInfo{1, 1} = isnan_CSIIdx;
+    CdrPlot_Fig8popDistribution.ExcludeInfo{1, 2} = "NAN CSI";
     if exist("ArtificialSortIdx", "var")
-        CdrPlot_Fig8popDistribution.ExcludeInfo{3, 1} = ArtificialSortIdx;
-        CdrPlot_Fig8popDistribution.ExcludeInfo{3, 2} = "Artificial screen";
+        CdrPlot_Fig8popDistribution.ExcludeInfo{2, 1} = SortIdx;
+        CdrPlot_Fig8popDistribution.ExcludeInfo{2, 2} = "Artificial screen";
     end
     %%%%%%%%%%%%%%%%%%% Basic infomation %%%%%%%%%%%%%%%%%%%
     CdrPlot_Fig8popDistribution.protocol = proStrShort;
@@ -198,6 +219,8 @@ for SettingParamIdx = 1 : numel(SettingParams)
     CdrPlot_Fig8popDistribution.MGBNumber = length(MGBIdx);    
     %%%%%%%%%%%%%%%%%%% click %%%%%%%%%%%%%%%%%%%
     CdrPlot_Fig8popDistribution.click.CmppValue = pValue_Click;
+    CdrPlot_Fig8popDistribution.click.ACpValue = pValue_AC_Click;
+    CdrPlot_Fig8popDistribution.click.MGBpValue = pValue_MGB_Click;    
     CdrPlot_Fig8popDistribution.click.ACClickDis{1, 1} = X_AC_clicksig; 
     CdrPlot_Fig8popDistribution.click.ACClickDis{1, 2} = mean(X_AC_clicksig); 
     CdrPlot_Fig8popDistribution.click.ACClickDis{1, 3} = "Sig";
@@ -219,6 +242,8 @@ for SettingParamIdx = 1 : numel(SettingParams)
 
     %%%%%%%%%%%%%%%%%%% clicktrain %%%%%%%%%%%%%%%%%%%
     CdrPlot_Fig8popDistribution.cktrian.CmppValue = pValue_Clicktrain;
+    CdrPlot_Fig8popDistribution.cktrian.ACpValue = pValue_AC_Clicktrain;
+    CdrPlot_Fig8popDistribution.cktrian.MGBpValue = pValue_MGB_Clicktrain;
     CdrPlot_Fig8popDistribution.cktrian.ACcktrianDis{1, 1} = X_AC_cktrainsig; 
     CdrPlot_Fig8popDistribution.cktrian.ACcktrianDis{1, 2} = mean(X_AC_cktrainsig); 
     CdrPlot_Fig8popDistribution.cktrian.ACcktrianDis{1, 3} = "Sig";
@@ -240,6 +265,8 @@ for SettingParamIdx = 1 : numel(SettingParams)
 
     %%%%%%%%%%%%%%%%%%% CSI %%%%%%%%%%%%%%%%%%%
     CdrPlot_Fig8popDistribution.CSI.CmppValue = pValue_CSI;
+    CdrPlot_Fig8popDistribution.CSI.ACpValue = pValue_AC_CSI;
+    CdrPlot_Fig8popDistribution.CSI.MGBpValue = pValue_MGB_CSI;
     CdrPlot_Fig8popDistribution.CSI.ACCSIDis{1, 1} = CSIData_AC;
     CdrPlot_Fig8popDistribution.CSI.ACCSIDis{1, 2} = mean(CSIData_AC);    
     CdrPlot_Fig8popDistribution.CSI.ACCSIDis{1, 3} = "All";
@@ -249,3 +276,5 @@ for SettingParamIdx = 1 : numel(SettingParams)
     %% save .mat
     save(strcat(MatRootPath, "CdrPlot_Fig8popDistribution.mat"), "CdrPlot_Fig8popDistribution");
 end
+print(gcf, strcat(DataRootPath, "MSTIFig8_AC_MGB_Distribution.jpg"), "-djpeg", "-r200");
+% close;

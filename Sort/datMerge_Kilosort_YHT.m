@@ -1,29 +1,25 @@
 ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
+% customInfo.recordPath = "K:\DATA_202311_MonkeyLA_MSTI\RecordingInfo1.xlsx";
+% customInfo.recordPath = "K:\DATA_202311_MonkeyLA_MSTI\RecordingInfo2.xlsx";
+% if contains(customInfo.recordPath, "RecordingInfo1.xlsx")
+%     customInfo.MATPATH = "K:\DATA_202311_MonkeyLA_MSTI\DATA\MatData\Recording1\";
+% elseif contains(customInfo.recordPath, "RecordingInfo2.xlsx")
+%     customInfo.MATPATH = "K:\DATA_202311_MonkeyLA_MSTI\DATA\MatData\Recording2\";
+% end
+
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
         "YHT_MLA_Recording.xlsx");
-%               "SPR_MLA_Recording.xlsx"); 
-%     "ZYY_RNP_TBOffset_Recording.xlsx");  
-%     "Bao_RNP_TBOffset_Recording.xlsx");
-%         "YHT_RNP_Recording.xlsx");        
-%           "SPR_MLA_Recording.xlsx");   
-%         "XHX_MLA_Recording.xlsx");
+customInfo.MATPATH = "J:\MonkeyLA\MSTIReg\";
 
+customInfo.idSel = [4];                      
+customInfo.thr = [7,3];
 
-customInfo.idSel = [2];
-% customInfo.MATPATH = "E:\BXH\MAT Data\";
-% customInfo.MATPATH = "I:\neuroPixels\MAT Data";
-% customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
-customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
-
-customInfo.thr = [9, 4];                        
-% customInfo.thr = [7, 3];
-
-customInfo.reExportSpk = true;
+customInfo.reExportSpk = false;
 customInfo.exportSpkWave = false;
-customInfo.ReSaveMAT = true;
-
+customInfo.ReSaveMAT = false;
+customInfo.ExcludeIDLabels = ["noise"];% eg:["noise", "mua"] 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 parseStruct(customInfo);
@@ -66,13 +62,14 @@ NPYPATH = string(cellfun(@(x, y) fullfile(x, y, ['th', num2str(thr(1)), '_', num
 for nIndex = 1 : length(NPYPATH)
     cd(NPYPATH(nIndex));
     if ~isfile("cluster_info.tsv")%~exist("cluster_info.tsv", "file")
-        run("process_TemplateGUI");
+        run("process_TemplateGUI_NoSave");
     end
+    keyboard;
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%% selectKilosortResult %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for nIndex = 1 : length(NPYPATH)
-    run("process_ExportSpike.m");
+    run("process_ExportSpike_ExcludeNoise.m");
 end
  
 %% %%%%%%%%%%%%%%%%%%%%%% save MAT file %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

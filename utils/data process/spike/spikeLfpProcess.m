@@ -32,18 +32,23 @@ try
     end
     epocs = data.epocs;
     trialAll = processFcn(epocs);
-    chs = size(lfpDataset.data, 1);
+    %     chs = size(lfpDataset.data, 1);
 
     % spike
     load(fullfile(erase(DATAPATH, "data.mat"), "spkData.mat"));
-    if any(data.sortdata(:, 2) == 0)
-        data.sortdata(:, 2) = data.sortdata(:, 2) + 1;
+    if ~isempty(data.sortdata)
+        if any(data.sortdata(:, 2) == 0)
+            data.sortdata(:, 2) = data.sortdata(:, 2) + 1;
+        end
+        if size(data.sortdata, 2) == 1
+            data.sortdata(:, 2) = 1;
+        end
+        spikeDataset = spikeByCh(sortrows(data.sortdata, 2));
+    else
+        temp = data.spikeRaw.snips.eNeu;
+        spikeDataset = spikeByCh(sortrows([double(temp.ts), double(temp.chan)], 2));
     end
-    if size(data.sortdata, 2) == 1
-        data.sortdata(:, 2) = 1;
-    end
-    spikeDataset = spikeByCh(sortrows(data.sortdata, 2));
-    
+
 catch e
     disp(e.message);
     disp("Try loading data from TDT BLOCK...");
