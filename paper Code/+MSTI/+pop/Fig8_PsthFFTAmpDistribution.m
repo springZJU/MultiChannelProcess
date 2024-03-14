@@ -14,7 +14,7 @@ elseif strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New_补充\") || contain
 end
 CommentTable = "2023-12-12CommentTable.xlsx";
 DDZ_ExcludeShank = [{[""]}, {[""]}]; % First for AC Shank, Second for MGB Shank
-CM_ExcludeShank = [{[""]}, {["A44R31"]}]; % First for AC Shank, Second for MGB Shank
+CM_ExcludeShank = [{["A40R16"]}, {["A44R31"]}]; % First for AC Shank, Second for MGB Shank
 Area = ["AC", "MGB"];
 ArtificialSortChoose = true;
 

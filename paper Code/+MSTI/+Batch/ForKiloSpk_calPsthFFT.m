@@ -28,6 +28,8 @@ for SettingIdx = 1 : numel(SettingParams)
     minBaseICI = min(BaseICI, [], "all");
     psthPara.binsize = roundn(minBaseICI / 2, -1); % ms
     psthPara.binstep = 1; % ms
+    % PSTH filte params
+    opts.bsfreq = [1000 / max(BaseICI, [], "all") - 5, 1000 / min(BaseICI, [], "all") + 5];
 
     for MatDirIdx = 1 : numel(MatDirsInfo)
         clear chSpikeLfp PsthFFTData;
@@ -52,27 +54,37 @@ for SettingIdx = 1 : numel(SettingParams)
                 PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).info = KiloSpkData(IDIdx).info;  
                 for trialIdx = 1 : numel(AlltrialNum)
                     trialSpkIdx = find(AlltrialNum(trialIdx) == IDSpikeData(:, 2));
-                    OneTrialSpikeTime = IDSpikeData(trialSpkIdx, 1);
-                    resTemp1{trialIdx, 1} = calPsth(IDSpikeData(trialSpkIdx, :), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', 1);
+                    resTemp1{trialIdx, 1} = calPsth(IDSpikeData(trialSpkIdx, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', 1);
+
                 end
                 t = resTemp1{1, 1}(:, 1);                
                 FFTIdx = find(t > PSTHFFTWindow(1) & t < PSTHFFTWindow(2));
                 fs = length(t) / ((t(end) - t(1) + 1) / 1000);
                 [Amp1, f1, ~] = cellfun(@(x) mfft(x(FFTIdx, 2), fs), resTemp1, "UniformOutput", false);
                 FFTTemp = cellfun(@(x, y) [x', y'], f1, Amp1, "UniformOutput", false);
-                PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).FFT = FFTTemp; 
+                % filte psth
+                PSTHDatasets.fs = fs;
+                PSTHDatasets.channels = 1;
+                for trialIdx = 1 : size(resTemp1, 1)
+                    PSTHDatasets.data = resTemp1{trialIdx, 1}(:, 2)';
+                    [~, FiltePSTHData{trialIdx, 1}] = MSTI.tool.PSTHFilter(PSTHDatasets, opts.bsfreq);
+                end
+                [Filte_Amp1, f1, ~] = cellfun(@(x) mfft(x(1, FFTIdx), fs), FiltePSTHData, "UniformOutput", false);
+                FilteFFTTemp = cellfun(@(x, y) [x', y'], f1, Filte_Amp1, "UniformOutput", false);
 
+                PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).FFT = FFTTemp; 
                 PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).MeanFFT(:, 1) = f1{1}';
-                PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).MeanFFT(:, 2) = mean(cell2mat(Amp1), 1)';                
+                PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).MeanFFT(:, 2) = mean(cell2mat(Amp1), 1)';  
+                PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).FilteFFT = FilteFFTTemp; 
+                PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).MeanFilteFFT(:, 1) = f1{1}';
+                PsthFFTData(trialTypeIdx).PsthFFTEachTrial(IDIdx, 1).MeanFilteFFT(:, 2) = mean(cell2mat(Filte_Amp1), 1)';                
 
                 %cal all trials PSTH, then FFT
                 TargetTrialSpikeTime = IDSpikeData(:, 1);
-                resTemp2{trialTypeIdx} = calPsth(IDSpikeData, psthPara, 1e3, 'EDGE', Window, 'NTRIAL', length(AlltrialNum));
-
+                resTemp2{trialTypeIdx} = calPsth(IDSpikeData(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', length(AlltrialNum));
                 PSTHDataTemp2 = resTemp2{trialTypeIdx};
                 t = PSTHDataTemp2(:, 1);
                 PSTHLine = PSTHDataTemp2(:, 2);
-
                 FFTIdx = find(t > PSTHFFTWindow(1) & t < PSTHFFTWindow(2));
                 fs = length(t) / ((t(end) - t(1) + 1) / 1000);
                 [Amp2, f2, ~] = mfft(PSTHLine(FFTIdx), fs);

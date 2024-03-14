@@ -18,9 +18,9 @@ switch segOption
     case "dev onset"
         segIndex = [trials.devOnset]';
     case "push onset" % make sure pushing time of all trials not empty
-%         if length(trials) ~= length([trials.firstPush])
-%             error("Pushing time of all trials should not be empty");
-%         end
+        %         if length(trials) ~= length([trials.firstPush])
+        %             error("Pushing time of all trials should not be empty");
+        %         end
         segIndex = cell2mat(cellfun(@(x, y) max([x, y]), {trials.firstPush}', {trials.devOnset}', "UniformOutput", false));
     case "last std"
         segIndex = cellfun(@(x) x(end - 1), {trials.soundOnsetSeq}');

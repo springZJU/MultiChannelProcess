@@ -1,4 +1,23 @@
 function trialAll = PassiveProcess_clickTrainMSTIChainByTrail(epocs)
+%check ICI sequence
+ICISeqIdx = find(roundn(epocs.ICI0.data, -1) == 8.4);
+% ICISeqIdx = find(roundn(epocs.ICI0.data, -1) == 5);
+epocs.ICI0.data = epocs.ICI0.data(ICISeqIdx(1):ICISeqIdx(end));
+epocs.ICI0.onset = epocs.ICI0.onset(ICISeqIdx(1):ICISeqIdx(end));
+epocs.ICI0.offset = epocs.ICI0.offset(ICISeqIdx(1):ICISeqIdx(end));
+epocs.ordr.data = epocs.ordr.data(ICISeqIdx(1):ICISeqIdx(end));
+epocs.ordr.onset = epocs.ordr.onset(ICISeqIdx(1):ICISeqIdx(end));
+epocs.ordr.offset = epocs.ordr.offset(ICISeqIdx(1):ICISeqIdx(end));
+
+ExcludeICIIdx  = find(roundn(epocs.ICI0.data, -1) == 0);
+epocs.ICI0.data(ExcludeICIIdx) = [];
+epocs.ICI0.onset(ExcludeICIIdx) = [];
+epocs.ICI0.offset(ExcludeICIIdx) = [];
+epocs.ordr.data(ExcludeICIIdx) = [];
+epocs.ordr.onset(ExcludeICIIdx) = [];
+epocs.ordr.offset(ExcludeICIIdx) = [];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 onIdx         = find([0; diff(abs(roundn(epocs.ICI0.data, -1)))]);
 onIdx         = onIdx(1:2:end);
 ICI           = epocs.ICI0.data(onIdx);

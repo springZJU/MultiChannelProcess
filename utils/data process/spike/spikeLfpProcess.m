@@ -24,7 +24,9 @@ try
     disp("Try loading data from MAT");
 
     % lfp
-    load(fullfile(erase(DATAPATH, "data.mat"), "lfpData.mat"));
+
+    load(fullfile(erase(DATAPATH, regexp(DATAPATH, "\\\w*.mat", "match")), "lfpData.mat"));
+
     try
         lfpDataset = data.lfp;
     catch
@@ -32,10 +34,18 @@ try
     end
     epocs = data.epocs;
     trialAll = processFcn(epocs);
-    %     chs = size(lfpDataset.data, 1);
+    if length(trialAll) > 10000
+        for sIndex = 1:length(epocs.Swep.onset)
+            tt = find([trialAll(:).soundOnsetSeq] > epocs.Swep.onset(sIndex) * 1000);
+            trialnum(sIndex) = trialAll(tt(1)).trialNum;
+        end
+    trialAll = trialAll(trialnum);
+    end
 
     % spike
-    load(fullfile(erase(DATAPATH, "data.mat"), "spkData.mat"));
+
+    load(fullfile(erase(DATAPATH, regexp(DATAPATH, "\\\w*.mat", "match")), "spkData.mat"));
+    
     if ~isempty(data.sortdata)
         if any(data.sortdata(:, 2) == 0)
             data.sortdata(:, 2) = data.sortdata(:, 2) + 1;
@@ -52,11 +62,11 @@ try
 catch e
     disp(e.message);
     disp("Try loading data from TDT BLOCK...");
-    temp = TDTbin2mat(DATAPATH, 'TYPE', {'epocs'});
+    temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'epocs'});
     epocs = temp.epocs;
     trialAll = processFcn(epocs);
 
-    temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams', 'snips'});
+    temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams', 'snips'});
     streams = temp.streams;
     spikeDataset = spikeByCh(sortrows([temp.snips.eNeu.ts double(temp.snips.eNeu.chan)], 2));
     lfpDataset = streams.Llfp;

@@ -1,5 +1,6 @@
-ccc
+ccc;
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
+
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
     "ZYY_RNP_TBOffset_Recording_sort.xlsx");
@@ -9,7 +10,7 @@ customInfo.MATPATH = "I:\neuroPixels\MAT Data";
                     
 customInfo.thr = [8, 4];
 
-customInfo.reExportSpk = false;
+customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = false;
 

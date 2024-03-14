@@ -1,11 +1,14 @@
-function MLA_ClickTrainProcess(MATPATH, FIGPATH)
+function MLA_ClickTrainProcess(MATPATH, FIGPATH,protStr)
+narginchk(2, 3)
 %% Parameter setting
 params.processFcn = @PassiveProcess_clickTrainRNP;
 
 fdMUA = 1000;
 temp = string(strsplit(MATPATH, "\"));
 % dateStr = temp(end - 1);
-protStr = temp(end - 2);
+if nargin < 3
+    protStr = temp(end - 2);
+end
 DATAPATH = MATPATH;
 FIGPATH = strcat(FIGPATH, "\");
 

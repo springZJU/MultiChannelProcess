@@ -159,10 +159,11 @@ save(SAVENAME, "chAll", "trialAll", "trialAllRaw", "-mat");
 %% Plot Figure
 % single unit
 if ~Exist_Single
-    mkdir(FIGPATH);
+%     mkdir(FIGPATH);
     MSTIRegParams.FIGPATH = FIGPATH;
-    chPlotFcn = @MLA_PlotRasterLfp_MSTIKiloProcess;
-    chPlotFcn(chSpikeLfp, MSTIRegParams);
+    MSTIRegParams.trialAll = trialAll;
+    chPlotFcn = @MLA_PlotRasterLfp_MSTIRegProcess;
+    chPlotFcn(chSpikeLfpCopy, MSTIRegParams);
 end
 
 end

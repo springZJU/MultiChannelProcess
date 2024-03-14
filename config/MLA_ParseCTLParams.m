@@ -10,6 +10,7 @@ CTLParams.S1Duration = str2double(string(strsplit(mProtocol.S1Duration, ",")));
 CTLParams.Window = cell2mat(cellfun(@(x) str2double(string(strsplit(x, ","))), strsplit(mProtocol.Window, ";")', "UniformOutput", false));
 CTLParams.selWin = str2double(string(strsplit(mProtocol.selWin, ",")));
 CTLParams.Offset = str2double(string(strsplit(mProtocol.Offset, ",")));
+CTLParams.segLength = str2double(string(strsplit(mProtocol.segLength, ",")));
 eval(strcat("CTLParams.segPoint = ", string(mProtocol.segPoint), ";"));
 CTLParams.ordr2Onset = str2double(string(strsplit(mProtocol.ordr2Onset, ",")));
 CTLParams.stimStr = strrep(string(strsplit(mProtocol.trialTypes, ",")), "_", "-");

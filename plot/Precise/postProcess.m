@@ -27,19 +27,15 @@ FIGPATH = {'I:\neuroPixels\Figure\CTL_New\Rat3ZYY20231102_AC1\RNP_Precise', ...
            'I:\neuroPixels\Figure\CTL_New\Rat3ZYY20231103_AC4\RNP_Precise'};
 for fIndex = 1 : length(FIGPATH)
     load([FIGPATH{fIndex}, '\spkRes.mat'], "spkRes");
-
-    %% check noise
-    noiseRes = cellfun(@(x) x(end).spikes, {spkRes.spkData}', "UniformOutput", false);
-    result = cell2mat(cellfun(@(x) quantifyResp(x, windowParams), noiseRes, "uni", false));
-
-    %% plot figures
     for cIndex = 1 : length(spkRes)
-        result = cell2mat(cellfun(@(x) quantifyResp(x, windowParams), {spkRes(cIndex).spkData.spikes}', "uni", false));
-        result = structcat(rmfield(spkRes(cIndex).spkData, "spikes"), result);
-        Fig = plotResOfICIs(result, windowParams);
-        mPrint(Fig, fullfile(FIGPATH{fIndex}, ['CH', num2str(spkRes(cIndex).ch)]), "-djpeg", "-r0");
-        close(Fig);
+        result(cIndex).ch  = spkRes(cIndex).ch;
+        result(cIndex).res = cell2mat(cellfun(@(x) quantifyResp(x, windowParams), {spkRes(cIndex).spkData.spikes}', "uni", false));
+        result(cIndex).res = structcat(rmfield(spkRes(cIndex).spkData, "spikes"), result(cIndex).res);
+%         Fig = plotResOfICIs(result{cIndex, 1}, windowParams);
+%         mPrint(Fig, fullfile(FIGPATH{fIndex}, ['CH', num2str(spkRes(cIndex).ch)]), "-djpeg", "-r0");
+%         close(Fig);
     end
+    save(fullfile(FIGPATH{fIndex}, "ProcessedRes.mat"), "result", "-v7.3");
 end
 
 function result = quantifyResp(spikes, windowParams)
@@ -47,8 +43,9 @@ parseStruct(windowParams);
 %% quantifying
 % PSTH during Window
 result.spikes = spikes;
-PSTH = calPsth(spikes, psthPara, 1e3, "EDGE", Window);
-result.PSTH                  = PSTH;
+[PSTH, t] = calPSTH(spikes, Window, psthPara.binsize, psthPara.binstep);
+% PSTH = calPsth(spikes, psthPara, 1e3, "EDGE", Window);
+result.PSTH                  = [t', PSTH];
 
 % accumulation response
 % accumulation function during accWin (normalized, from 0 to 1)
@@ -57,15 +54,20 @@ ACC = cumsum(histcounts(cell2mat(spikes), accWindow(1):accBinsize:accWindow(2)))
 if all(isnan(ACC))
     ACC = [zeros(length(ACC)-1, 1); 1];
 end
-% check significance of adjacent windows across accWin
+% decide if any obvious (p < 0.05) response is elicited during accWin
 ACCTestData                  = changeCellRowNum(cellfun(@(x) histcounts(x, accWindow(1):accTestBinsize:accWindow(2))', spikes, "UniformOutput", false));
+onBaseCount                  = calFR(spikes, onBaseWin) * diff(onBaseWin) / 1000; 
+ACCPeriodH                   = any(cellfun(@(x) ttest2(x, onBaseCount), ACCTestData));
+% check significance of adjacent windows across accWin
 ACCTestH                     = cellfun(@(x, y) ttest2(x, y), ACCTestData(1:end-1), ACCTestData(2:end));
 ACCTestT                     = accWindow(1)+accTestBinsize:accTestBinsize:accWindow(2)-accTestBinsize;
 % check significance of early and late responses during accWin
 ACCHalfData                  = changeCellRowNum(cellfun(@(x) histcounts(x, accWindow(1):diff(accWindow)/2:accWindow(2))', spikes, "UniformOutput", false));
 [ACCHalfH, ACCHalfP]         = ttest2(ACCHalfData{1}, ACCHalfData{2}, "Alpha", 0.05); % determine if firing rate increase/decrease
+ACCHalfFRDiff                = diff(cellfun(@(x) mean(x)*1000/(diff(accWindow)/2), ACCHalfData));
 if ACCHalfH==1 ; if  mean(ACCHalfData{1}) <= mean(ACCHalfData{2}); ACCHalfDir = "sig Increase"; else; ACCHalfDir = "sig Decrease"; end; else; ACCHalfDir = "no Sig Change"; end
 % organize the ACC result
+result.ACCPeriodH            = ACCPeriodH;
 result.ACCTestH              = ACCTestH;
 result.ACCTestT              = ACCTestT;
 result.ACC                   = [tACC, ACC];
@@ -74,11 +76,12 @@ result.ACCTHRs               = [0.1:0.1:0.9; cellfun(@(x) tACC(find(ACC >= x, 1,
 result.ACCHalfH              = ACCHalfH;
 result.ACCHalfP              = ACCHalfP;
 result.ACCHalfDir            = ACCHalfDir;
+result.ACCHalfFRDiff         = ACCHalfFRDiff;
 
 % onset response
 % decide if an obvious (p < 0.05) onset response is elicited
-[onRespFR, ~, onRespCount]   = calFr(spikes, onRespWin);
-[onBaseFR, ~, onBaseCount]   = calFr(spikes, onBaseWin);
+onRespCount                  = calFR(spikes, onRespWin); onRespFR = mean(onRespCount);
+onBaseCount                  = calFR(spikes, onBaseWin); onBaseFR = mean(onBaseCount);
 [onsetH, onsetP]             = ttest2(onRespCount, onBaseCount, "Alpha", 0.05);
 if onsetH == 1; if  onRespFR >= onBaseFR ; onsetDir = "sig On Exc."; else; onsetDir = "sig On Inh."; end; else; onsetDir = "no Sig OnResp"; end
 % organize the onset result
@@ -92,8 +95,8 @@ result.onsetDir              = onsetDir;
 
 % offset response
 % decide if an obvious (p < 0.05) offset response is elicited
-[offRespFR, ~, offRespCount] = calFr(spikes, onRespWin);
-[offBaseFR, ~, offBaseCount] = calFr(spikes, onBaseWin);
+offRespCount                 = calFR(spikes, offRespWin); offRespFR = mean(offRespCount);
+offBaseCount                 = calFR(spikes, offBaseWin); offBaseFR = mean(offBaseCount);
 [offsetH, offsetP]           = ttest2(offRespCount, offBaseCount, "Alpha", 0.05);
 if offsetH == 1; if  offRespFR >= offBaseFR ; offsetDir = "sig Off Exc."; else; offsetDir = "sig Off Inh."; end; else; offsetDir = "no Sig OffResp"; end
 % organize the offset result

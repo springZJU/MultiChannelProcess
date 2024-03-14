@@ -25,6 +25,10 @@ for SettingIdx = 1 : numel(SettingParams)
     parseStruct(MSTIParams);
     PsthData = [];
     n = 0;
+
+    % psth filte
+    opts.bsfreq = [1000 / min(BaseICI, [], "all") - 5, 1000 / max(BaseICI, [], "all") + 5];
+
     for MatDirIdx = 1 : numel(MatDirsInfo)
         clear chSpikeLfp;
         SonDirName = MatDirsInfo(MatDirIdx).name;
@@ -47,7 +51,7 @@ for SettingIdx = 1 : numel(SettingParams)
 
                 PsthData(n).ID = KiloSpkData(IDIdx).info;
                 PsthData(n).rawPsth(trialTypeIdx).Trialtype = trialTypeStr;
-                PsthData(n).rawPsth(trialTypeIdx).RawPsth = KiloSpkData(IDIdx).PSTH;
+                PsthData(n).rawPsth(trialTypeIdx).RawPsth = KiloSpkData(IDIdx).PSTH;     
                 PsthData(n).fftPsth(trialTypeIdx).Trialtype = trialTypeStr;
                 PsthData(n).fftPsth(trialTypeIdx).MeanFFTPsth = FFTPsthData(IDIdx).MeanFFT;
                 

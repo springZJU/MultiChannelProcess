@@ -66,6 +66,7 @@ for cIndex = 1 : chNum
     %% PSTH Comparison
     Compare_Index = Compare_Index(cell2mat(cellfun(@(x) any(ismember(1 : colMax, x)), Compare_Index, "UniformOutput", false)));
     compareGroupN = length(Compare_Index);
+    compareCol = (PSTH_CompareSize(1) + LFP_CompareSize(1)) * compareGroupN;
     for pIndex = 1 : compareGroupN
         posIndex = nGeneral * compareCol + pIndex;
         AxesPSTH(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, PSTH_CompareSize, margins, paddings, "alignment", "top-left");

@@ -2,17 +2,17 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-        "Bao_Rat4_Right_Recording.xlsx");
+        "BXHDXY_RNP_MSTI_Recording.xlsx");
 
 %         "Bao_RNP_TBOffset_Recording");
 %     "SPR_RNP_TBOffset_Recording.xlsx");
 
-customInfo.idSel = [1:32];
+customInfo.idSel = [1:7];
 customInfo.MATPATH = "J:\BXH\MAT Data\";
 % customInfo.MATPATH = "I:\neuroPixels\MAT Data";
 
-% customInfo.thr = [9, 4];
-customInfo.thr = [7, 3];
+customInfo.thr = [9, 4];
+% customInfo.thr = [7, 3];
 
 customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;

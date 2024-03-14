@@ -1,4 +1,4 @@
-function CTLParams = RNP_ParseCTLParams(protStr)
+function CTLParams = TDT_MLA_ParseCTLParams(protStr)
 
 % load excel
 configPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\config\RNP_CTLConfig.xlsx");

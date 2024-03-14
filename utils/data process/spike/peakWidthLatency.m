@@ -31,6 +31,7 @@ if isnumeric(spikes)
     spikeCell = rowFcn(@(x) spikes(spikes(:, 2) == x), trials, "UniformOutput", false);
 elseif iscell(spikes)
     spikeCell = spikes;
+    spikes    = cell2mat(spikes);
 end
 
 if isempty(psthPara)
@@ -40,8 +41,8 @@ end
 countRaw = cellfun(@length, spikeCell);
 excludeIndex = countRaw > mean(countRaw)+3*std(countRaw);
 spikeCell(excludeIndex) = [];
-[frMean, ~, ~, frSD] = calFR(spikeCell, respWin);
-[frBase, ~, ~, frSDBase] = calFR(spikeCell, baseWin);
+[frMean, ~, ~, frSD] = calFr(spikeCell, respWin);
+[frBase, ~, ~, frSDBase] = calFr(spikeCell, baseWin);
 % change window
 calWinRaw = respWin;
 respWin(1) = respWin(1) - psthPara.binsize;

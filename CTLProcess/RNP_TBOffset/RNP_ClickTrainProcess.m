@@ -23,7 +23,7 @@ end
 
 %% load data and click train params
 [trialAll, spikeDataset, lfpDataset] = spikeLfpProcess(DATAPATH, params);
-
+% trialAll(61:120) = [];
 CTLParams = RNP_ParseCTLParams(protStr);
 parseStruct(CTLParams);
 fd = fs;
@@ -122,9 +122,11 @@ for dIndex = 1:length(devType)
 
     %% spike
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
+    spkeCell  = cellfun(@(x) cellfun(@(y) y(:, 1), x, "UniformOutput", false), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
     chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex),sum(tIndexRaw)), spikePlot, "UniformOutput", false);
     psthPara = evalin("base", "psthPara");
-    chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);
+%     [~, ~, chPSTH] = cellfun(@(x) calPSTH(x, Window, psthPara.binsize, psthPara.binstep), spkeCell, "UniformOutput", false);
+    chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "UniformOutput", false);
     chStr = fields(trialsSPK)';
     chSPK = cell2struct([chStr; spikePlot; chPSTH; chRS], ["info", "spikePlot", "PSTH", "chRS"]);
 
@@ -144,9 +146,9 @@ for dIndex = 1:length(devType)
     chAll(dIndex).rawLFP = rawLFP;
 end
 
-%% Plot Figure
-
-% single unit
+% %% Plot Figure
+mkdir(FIGPATH);
+single unit
 if ~Exist_Single
     mkdir(FIGPATH);
     chPlotFcn(chSpikeLfp, CTLParams);

@@ -14,7 +14,7 @@ elseif strcmp(DataRootPath, "H:\MLA_A1补充\Figure\CTL_New_补充\") || contain
 end
 CommentTable = "2023-12-12CommentTable.xlsx";
 DDZ_ExcludeShank = [{[""]}, {[""]}]; % First for AC Shank, Second for MGB Shank
-CM_ExcludeShank = [{[""]}, {["A44R31"]}]; % First for AC Shank, Second for MGB Shank
+CM_ExcludeShank = [{["A40R16"]}, {["A44R31"]}]; % First for AC Shank, Second for MGB Shank
 ArtificialSortChoose = true;
 SigTestWinLength = 300;%ms
 
@@ -152,12 +152,15 @@ for SettingIdx = 1 : numel(SettingParams)
         plot(X, cmpMeanY_MGB_Dev, 'r', "LineWidth", 1); hold on;    
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        scaleAxes(RawAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "y", [min([MeanY_AC - SeY_AC; MeanY_MGB - SeY_MGB], [], "all") - 5,...
-            max([MeanY_AC + SeY_AC; MeanY_MGB + SeY_MGB], [], "all") + 5]);
+%         scaleAxes(RawAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "y", [min([MeanY_AC - SeY_AC; MeanY_MGB - SeY_MGB], [], "all") - 5,...
+%             max([MeanY_AC + SeY_AC; MeanY_MGB + SeY_MGB], [], "all") + 5]);
+        scaleAxes(RawAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "x", [0, 300]);
+        scaleAxes(RawAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "y", [0, 500]);
+
         scaleAxes(CompareAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "y", "on");
         scaleAxes(FFTAxes(2 * (SettingIdx - 1) + trialTypeIdx, [1,3]), "y", "on");
         scaleAxes(FFTAxes(2 * (SettingIdx - 1) + trialTypeIdx, [2,4]), "y", [0, 10]);        
-        scaleAxes(RawAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "x", plotWin);
+%         scaleAxes(RawAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "x", plotWin);
         scaleAxes(CompareAxes(2 * (SettingIdx - 1) + trialTypeIdx, :), "x", compareWin);
         for lineNum = 1 : numel(MSTIsoundinfo(trialTypeIdx).Std_Dev_Onset)
             timelines(lineNum).X = MSTIsoundinfo(trialTypeIdx).Std_Dev_Onset(lineNum) - MSTIsoundinfo(trialTypeIdx).Std_Dev_Onset(end);

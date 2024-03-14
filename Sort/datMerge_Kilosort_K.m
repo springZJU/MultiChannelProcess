@@ -11,7 +11,7 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 %         "XHX_MLA_Recording.xlsx");
 
 
-customInfo.idSel = [ 5];
+customInfo.idSel = [7];
 customInfo.kilosortAutoMerge = false; 
 customInfo.postMerge = false; 
 
@@ -21,8 +21,10 @@ customInfo.MATPATH = "E:\ratNeuroPixel\MAT Data\";
 
 % customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
 
-customInfo.thr = [ 7, 3];                        
-% customInfo.thr = [ 9, 4];
+% customInfo.thr = [ 7, 3];                        
+customInfo.thr = [ 9, 4];
+
+
 
 customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;

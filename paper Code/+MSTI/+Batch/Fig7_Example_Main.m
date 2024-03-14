@@ -22,20 +22,20 @@ ColNum = 7;
 Colors_fft = ["#000000", "#999999"]; %black;gray;
 
 %%
-for SettingParamIdx = 1 : numel(SettingParams)
+for SettingParamIdx = 1%1 : numel(SettingParams)
     % load .mat 
     MatRootPath = strcat(DataRootPath, SettingParams(SettingParamIdx), "\");
     MatDirsInfo = dir(MatRootPath);
     MatDirsInfo(~(contains(string({MatDirsInfo.name}'), "cm") | contains(string({MatDirsInfo.name}'), "ddz"))) = [];
     PsthCSITemp = load(strcat(MatRootPath, "PopData_PsthCSI.mat"));
 
-    for AreaIdx = 1 : numel(Area)
+    for AreaIdx = 1%1 : numel(Area)
         TargetDirIdx = find(contains(string({MatDirsInfo.name}'), Area(AreaIdx)));
         % load params
         MSTIParams = MLA_ParseMSTIParams(SettingParams(SettingParamIdx));
         parseStruct(MSTIParams);
     
-        for MatDirIdx = 1 : numel(TargetDirIdx)
+        for MatDirIdx = 8%1 : numel(TargetDirIdx)
             clear KiloSpkData LfpData ProcessPsthFFTData;
             MatPath = strcat(MatRootPath, MatDirsInfo(TargetDirIdx(MatDirIdx)).name, "\");
             %kiloSpike
@@ -125,6 +125,8 @@ for SettingParamIdx = 1 : numel(SettingParams)
     
                         CdrPlot(IDIdx).SmoothRawPSTH(1).TrialType = TrialTypeStr;
                         CdrPlot(IDIdx).SmoothRawPSTH(1).Plot = [X Y];
+                        CdrPlot(IDIdx).RawPSTH(1).TrialType = TrialTypeStr;
+                        CdrPlot(IDIdx).RawPSTH(1).Plot = [X RawY];
     
                     elseif subAxesNum == 4 %raw---PSTH
                         clear X Y;
@@ -146,7 +148,9 @@ for SettingParamIdx = 1 : numel(SettingParams)
     
                         CdrPlot(IDIdx).SmoothRawPSTH(2).TrialType = TrialTypeStr;
                         CdrPlot(IDIdx).SmoothRawPSTH(2).Plot = [X Y];
-    
+                        CdrPlot(IDIdx).RawPSTH(2).TrialType = TrialTypeStr;
+                        CdrPlot(IDIdx).RawPSTH(2).Plot = [X RawY];
+   
                     elseif subAxesNum == 5 %fft---PSTH
                         clear X Y cellTestTemp InterestFreq Amp sigtest;
                         PSTHFFTAxesCount = PSTHFFTAxesCount + 1;
@@ -167,7 +171,7 @@ for SettingParamIdx = 1 : numel(SettingParams)
                         InterestFreq = [1000 ./ BaseICI(1, 1 : 2), 1000 / 300]; % BG and stdICI 
                         cellTestTemp = ProcessPsthFFTData.PsthFFTData(1).PsthFFTEachTrial(IDIdx).FFT;
                         % Significant test
-                        [~, Amp] = cellfun(@(x) MSTI.utils.calFFTAmp(InterestFreq, x(:, 2), x(:, 1)), cellTestTemp, 'UniformOutput', false);
+                        [~, Amp] = cellfun(@(x) MSTI.tool.calFFTAmp(InterestFreq, x(:, 2), x(:, 1)), cellTestTemp, 'UniformOutput', false);
                         IDtestTemp = cellfun(@(y) cell2mat(y), cellfun(@(x) x(:, 1), Amp, 'UniformOutput', false), 'UniformOutput', false);
 
                         for freqIdx = 1 : numel(InterestFreq)
@@ -200,7 +204,7 @@ for SettingParamIdx = 1 : numel(SettingParams)
                         InterestFreq = [1000 ./ BaseICI(2, 1 : 2), 1000 / 300]; % BG and stdICI 
                         cellTestTemp = ProcessPsthFFTData.PsthFFTData(2).PsthFFTEachTrial(IDIdx).FFT;
                         % Significant test
-                        [~, Amp] = cellfun(@(x) MSTI.utils.calFFTAmp(InterestFreq, x(:, 2), x(:, 1)), cellTestTemp, 'UniformOutput', false);
+                        [~, Amp] = cellfun(@(x) MSTI.tool.calFFTAmp(InterestFreq, x(:, 2), x(:, 1)), cellTestTemp, 'UniformOutput', false);
                         IDtestTemp = cellfun(@(y) cell2mat(y), cellfun(@(x) x(:, 1), Amp, 'UniformOutput', false), 'UniformOutput', false);
 
                         for freqIdx = 1 : numel(InterestFreq)
@@ -259,14 +263,14 @@ for SettingParamIdx = 1 : numel(SettingParams)
                         for ComparelineNum = 1 : 2
                             if ComparelineNum == 1 %Std 
                                 X_Std = KiloSpkData.chSpikeLfp(StdIdx).chSPK(IDIdx).PSTH(:, 1) + diff(MSTIsoundinfo(StdIdx).Std_Dev_Onset(end-1:end));
-                                RawY = KiloSpkData.chSpikeLfp(StdIdx).chSPK(IDIdx).PSTH(:, 2);
-                                Y_Std = smoothdata(RawY,'gaussian',25);
+                                RawY_Std = KiloSpkData.chSpikeLfp(StdIdx).chSPK(IDIdx).PSTH(:, 2);
+                                Y_Std = smoothdata(RawY_Std,'gaussian',25);
                                 plot(X_Std, Y_Std, "LineWidth", 1, "Color", 'b'); hold on;
 
                             elseif ComparelineNum == 2 %Dev                     
                                 X_Dev = KiloSpkData.chSpikeLfp(DevIdx).chSPK(IDIdx).PSTH(:, 1);
-                                RawY = KiloSpkData.chSpikeLfp(DevIdx).chSPK(IDIdx).PSTH(:, 2);
-                                Y_Dev = smoothdata(RawY,'gaussian',25);
+                                RawY_Dev = KiloSpkData.chSpikeLfp(DevIdx).chSPK(IDIdx).PSTH(:, 2);
+                                Y_Dev = smoothdata(RawY_Dev,'gaussian',25);
                                 plot(X_Dev, Y_Dev, "LineWidth", 1, "Color", 'r'); hold on;
                             end   
 
@@ -277,16 +281,21 @@ for SettingParamIdx = 1 : numel(SettingParams)
                             set(PSTHAxes(PSTHAxesCount), "XTickLabel", {});
                             [h, p] = ttest2(IDtrialFR(DevIdx).DevFR, IDtrialFR(StdIdx).LastStdFR, "Tail", "right");
                             CdrPlot(IDIdx).RawPSTHCompare(1).CompareICI = ICIStr;
-                            CdrPlot(IDIdx).RawPSTHCompare(1).BlueStd = [X_Std Y_Std];
-                            CdrPlot(IDIdx).RawPSTHCompare(1).RedDev = [X_Dev Y_Dev];
+                            CdrPlot(IDIdx).RawPSTHCompare(1).BlueStd = [X_Std RawY_Std];
+                            CdrPlot(IDIdx).RawPSTHCompare(1).RedDev = [X_Dev RawY_Dev];
                             CdrPlot(IDIdx).RawPSTHCompare(1).Sigtest = [h, p];
+                            CdrPlot(IDIdx).SmoothPSTHCompare(1).BlueStd = [X_Std Y_Std];
+                            CdrPlot(IDIdx).SmoothPSTHCompare(1).RedDev = [X_Dev Y_Dev];                            
+
                         elseif subAxesNum == 10
                             ICIStr = strrep(MMNcompare(2).sound, "Std", "ICI");
                             CdrPlot(IDIdx).RawPSTHCompare(2).CompareICI = ICIStr;
                             [h, p] = ttest2(IDtrialFR(DevIdx).DevFR, IDtrialFR(StdIdx).LastStdFR, "Tail", "right");
-                            CdrPlot(IDIdx).RawPSTHCompare(2).BlueStd = [X_Std Y_Std];
-                            CdrPlot(IDIdx).RawPSTHCompare(2).RedDev = [X_Dev Y_Dev];
+                            CdrPlot(IDIdx).RawPSTHCompare(2).BlueStd = [X_Std RawY_Std];
+                            CdrPlot(IDIdx).RawPSTHCompare(2).RedDev = [X_Dev RawY_Dev];
                             CdrPlot(IDIdx).RawPSTHCompare(2).Sigtest = [h, p];
+                            CdrPlot(IDIdx).SmoothPSTHCompare(1).BlueStd = [X_Std Y_Std];
+                            CdrPlot(IDIdx).SmoothPSTHCompare(1).RedDev = [X_Dev Y_Dev];  
                         end
                         title(ICIStr);
                         xlim(compareWin);

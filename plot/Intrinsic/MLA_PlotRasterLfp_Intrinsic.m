@@ -27,7 +27,7 @@ for cIndex = 1 : chNum
         trialN = arrayRep(temp(:, 2), unique(temp(:, 2)), 1 : length(unique(temp(:, 2))));
         scatter(t, trialN, 10, "black", "filled"); hold on
         title(stimStr(dIndex));
-
+        
         %% ROW2: spike ACF
         pIndex = colMax + dIndex;
         Axes(dIndex, 2) = mSubplot(Fig, plotRows, colMax, pIndex, [1, 1], margins, paddings);
@@ -37,7 +37,7 @@ for cIndex = 1 : chNum
         plot([0, chSpikeLfp(dIndex).chSPK(cIndex).acgSpkTime], [1/exp(1), 1/exp(1)], "k--"); hold on
         plot([1, 1] * chSpikeLfp(dIndex).chSPK(cIndex).acgSpkTime, [min(temp(:, 2)), 1/exp(1)], "k--"); hold on
 
-        title(strcat(chStr, " n=",  num2str(trialNum)));
+        title(strcat(chStr, "tau=",  num2str(chSpikeLfp(dIndex).chSPK(cIndex).acgSpkTime)));
 
         %% ROW3: whole time lfp
         pIndex = 2 * colMax + dIndex;

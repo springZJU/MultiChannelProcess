@@ -11,14 +11,15 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
         "YHT_MLA_Recording.xlsx");
-customInfo.MATPATH = "J:\MonkeyLA\MSTIReg\";
+customInfo.recordPath = "J:\YHT\DATA_202312_MonkeyLA_MSTIReg\RecordingInfo.xlsx";
+customInfo.MATPATH = "J:\YHT\DATA_202312_MonkeyLA_MSTIReg\DATA\";
 
-customInfo.idSel = [4];                      
+customInfo.idSel = [10];                      
 customInfo.thr = [7,3];
 
-customInfo.reExportSpk = false;
-customInfo.exportSpkWave = false;
-customInfo.ReSaveMAT = false;
+customInfo.reExportSpk = true;
+customInfo.exportSpkWave = true;
+customInfo.ReSaveMAT = true;
 customInfo.ExcludeIDLabels = ["noise"];% eg:["noise", "mua"] 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -30,7 +31,7 @@ for rIndex = 1 : length(recID)
         continue
     end
     
-    if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file')
+%     if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file')
         mkdir(MERGEPATH);
         % load data depends on recording tech
         if strcmpi(recTech, "TDT")
@@ -40,7 +41,7 @@ for rIndex = 1 : length(recID)
 %         elseif strcmpi(recTech, "newTech")
 %             newTech_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
         end
-    end
+%     end
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%% kilosortToProcess_TDT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

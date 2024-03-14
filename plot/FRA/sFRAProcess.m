@@ -7,7 +7,9 @@ window = windowParams.window; % ms
 %% Information extraction
 if isfield(data.epocs,'freq')
     freqAll = data.epocs.freq.data; % Hz
+    onsetTimeAll = data.epocs.freq.onset * 1000; % ms
 elseif isfield(data.epocs,'vair')
+    onsetTimeAll = data.epocs.vair.onset * 1000; % ms
     freqAll = data.epocs.vair.data; % Hz
 end
 if isfield(data.epocs,'attv')

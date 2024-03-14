@@ -1,16 +1,18 @@
 %% noise
-MATPATH = 'H:\MGB\DDZ\ddz20231124\Block-9';
+% MATPATH = 'H:\SPR Paper\Two-Photo Imaging\electrophysiological\Tank\20240131Rat2\Block-22';
 % MATPATH = 'H:\MGB\CM\cm20231118\Block-10';
 % MATPATH = 'H:\AC\CM\cm20231120\Block-12';
 % MATPATH = 'M:\DATA\CM\cm20231123\Block-12';
+MATPATH = 'J:\MonkeyLA\DDZ\ddz20240304\Block-1';
 FIGPATH = fullfile(MATPATH, "Figure");
-RNP_Noise(MATPATH, FIGPATH, [-100, 800]);
+RNP_N\oise(MATPATH, FIGPATH, [-100, 800]);
 
 %% CF
-MATPATH = 'H:\MGB\DDZ\ddz20231124\Block-6';
+% MATPATH = 'H:\SPR Paper\Two-Photo Imaging\electrophysiological\Tank\20240131Rat2\Block-23';
 % MATPATH = 'H:\MGB\CM\cm20231118\Block-11';
 % MATPATH = 'H:\AC\CM\cm20231120\Block-13';
 % MATPATH = 'M:\DATA\CM\cm20231123\Block-13';
+MATPATH = 'J:\MonkeyLA\DDZ\ddz20240304\Block-2';
 FIGPATH = fullfile(MATPATH, "Figure");
 sFRA_RNP(MATPATH, FIGPATH)
 

@@ -16,7 +16,7 @@ if iscell(data)
     NTRIAL = length(cellData);
     data = cell2mat(cellData);
 else
-    if numel(data) == length(data)
+    if numel(data) == size(data, 1)
         lengths = diff([0; find(diff([data; -inf]) < 0)]);
         chInfo = cellfun(@(x) x*ones(lengths(x), 1), num2cell(1:length(lengths))', "UniformOutput", false);
         data = [data, cell2mat(chInfo)];

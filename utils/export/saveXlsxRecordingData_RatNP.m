@@ -3,7 +3,7 @@ narginchk(4, 5);
 if nargin < 5
     fd_lfp = 1200;
 end
-
+rowNum = 385;
 BLOCKPATH = recordInfo(idx).BLOCKPATH;
 sitePos = recordInfo(idx).sitePos;
 depth = recordInfo(idx).depth;
@@ -25,14 +25,28 @@ else
     NP_Path = strcat(recordInfo(idx).datPath, ".0");
     LFP_Path = strcat(recordInfo(idx).datPath, ".1");
 end
+timestamps = readNPY(strcat(NP_Path, "\timestamps.npy"));
 sample_numbers = readNPY(strcat(NP_Path, "\sample_numbers.npy"));
 sample_times = (1:length(sample_numbers))'/SR_AP;
-mmf = memmapfile(strcat(NP_Path, "\continuous.dat"),'Format', {"int16", [385 length(sample_numbers)], 'x'});
-TTL = mmf.Data.x(end, :);
-TTL_Onset = sample_times([0, diff(TTL)] > 0);
+mmf = memmapfile(strcat(NP_Path, "\continuous.dat"),'Format', {"int16", [rowNum length(sample_numbers)], 'x'});
+
+try
+    TTL = mmf.Data.x(end, :);
+    TTL_Onset = sample_times([0, diff(TTL)] > 0);
+catch
+    onOff     = readNPY(strcat(strrep(NP_Path, "continuous", "events"), "\TTL\states.npy"));
+    timeStamp = readNPY(strcat(strrep(NP_Path, "continuous", "events"), "\TTL\timestamps.npy"));
+    if any([timeStamp <= 0 ; timestamps <= 0])
+        error("bad message: something wrong with TTL info!");
+    else
+        TTL_Onset = timeStamp(onOff == 1) - timestamps(1);
+    end
+end
+
+
 if length(TTL_Onset) == length(buffer.epocs.Swep.onset)
     delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset], 1, 2));
-elseif isfield(buffer.epocs, "ordr") 
+elseif isfield(buffer.epocs, "ordr")
     if length(TTL_Onset) == length(buffer.epocs.ordr.onset)
         delta_T = mean(diff([buffer.epocs.ordr.onset, TTL_Onset], 1, 2));
     end
@@ -42,7 +56,7 @@ else
     if strcmpi(isContinue, "n")
         error("the TTL sync signal does not match the TDT epocs [Swep] store!");
     else %% custom
-        delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset], 1, 2));
+        delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset(1:40)], 1, 2));
     end
 end
 

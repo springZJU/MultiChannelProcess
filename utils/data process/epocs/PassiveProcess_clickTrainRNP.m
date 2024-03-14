@@ -1,8 +1,12 @@
 function trialAll = PassiveProcess_clickTrainRNP(epocs)
 %% Information extraction
+if ~isfield(epocs, "ordr")
+    epocs.ordr = epocs.Swep;
+end
 trialOnsetIndex = 1:length(epocs.ordr.data);
 soundOnsetTimeAll = epocs.ordr.onset * 1000; % ms
 ordrAll = epocs.ordr.data; % Hz
+
 
 n = length(trialOnsetIndex);
 temp = cell(n, 1);
@@ -27,7 +31,7 @@ for tIndex = 1:length(trialOnsetIndex)
     end
     trialAll(tIndex, 1).soundOnsetSeq = soundOnsetTimeAll(soundOnsetIndex);
     trialAll(tIndex, 1).devOnset = trialAll(tIndex, 1).soundOnsetSeq(end);
-    trialAll(tIndex, 1).ordrSeq = ordrAll(soundOnsetIndex);
+     trialAll(tIndex, 1).ordrSeq = ordrAll(soundOnsetIndex);
     trialAll(tIndex, 1).stdOrdr = trialAll(tIndex, 1).ordrSeq(1);
     if trialAll(tIndex, 1).ordrSeq(end) == trialAll(tIndex, 1).ordrSeq(1)
         trialAll(tIndex, 1).oddballType = "STD";

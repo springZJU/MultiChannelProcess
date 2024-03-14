@@ -1,3 +1,5 @@
+
+
 %% configuration
 % compute time from last std to dev 
 tStdToDev  = sortrows(unique(cell2mat(cellfun(@(x, y) [roundn(diff(x([end-1, end])), -1), y], {trialAll.soundOnsetSeq}', {trialAll.devOrdr}', "UniformOutput", false)), "rows"), 2);
@@ -44,7 +46,8 @@ chSpkRes = cell2struct([
                                                         cellfun(@(spkTrial, devWins) mean(calFR(spkTrial, devWins)), spkDev, num2cell(winDevResp, 2), "UniformOutput", false) ... % fring rate for winDevResp
                                                         cellfun(@(spkTrial, stdWins) mean(calFR(spkTrial, stdWins)), spkDev, num2cell(winStdResp, 2), "UniformOutput", false) ... % fring rate for winStdResp
                                                         cellfun(@(spkTrial) calPSTH(spkTrial, winPSTH, binsize, binstep), spkDev, "UniformOutput", false) ... % PSTH
-                                                        cellfun(@(spkTrial) mfft(calPSTH(spkTrial, winPSTH, binsize, stepFFT), 1000/stepFFT), spkDev, "UniformOutput", false) ... % FFT of PSTH
+                                                        cellfun(@(spkTrial) cell2mat(cellfun(@(spkTrain) mfft(calPSTH({spkTrain}, winPSTH, binsize, stepFFT), 1000/stepFFT), spkTrial, "UniformOutput", false)), spkDev, "UniformOutput", false) ... % FFT of PSTH
+%                                                         cellfun(@(spkTrial) mfft(calPSTH(spkTrial, winPSTH, binsize, stepFFT), 1000/stepFFT), spkDev, "UniformOutput", false) ... % FFT of PSTH
                                                         cellfun(@(spkTrial, devWins) cellfun(@(spk) sum(spk >= devWins(1) & spk <= devWins(2)), spkTrial), spkDev, num2cell(winDevResp, 2), "UniformOutput", false) ... % spk count in devWin
                                                         cellfun(@(spkTrial, stdWins) cellfun(@(spk) sum(spk >= stdWins(1) & spk <= stdWins(2)), spkTrial), spkDev, num2cell(winStdResp, 2), "UniformOutput", false) ... % spk count in stdWin
                                                         ] ... % cell array boundary for inner struct
@@ -81,14 +84,16 @@ for cIndex = 1 : length(chSpkRes)
 
         % column 5: synchronization of single clicks (FFT, level 1)
         FFTSingleAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+5, "margin_left", magginLeft);
-        plot(fFFT, spkTemp.FFT_PSTH, "k-"); hold on
+        plot(fFFT, mean(spkTemp.FFT_PSTH, 1), "k-"); hold on
+%         plot(fFFT, spkTemp.FFT_PSTH, "k-"); hold on
         xlim(syncWin{2});
         if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
         title("FFT of single clicks");
 
         % column 6: syschronization of change responses (FFT, level 2)
         FFTChangeAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+6, "margin_left", magginLeft);
-        plot(fFFT, spkTemp.FFT_PSTH, "k-"); hold on
+        plot(fFFT, mean(spkTemp.FFT_PSTH, 1), "k-"); hold on
+%         plot(fFFT, spkTemp.FFT_PSTH, "k-"); hold on
         xlim(syncWin{1});
         if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
         title("FFT of change responses");
@@ -108,7 +113,7 @@ for cIndex = 1 : length(chSpkRes)
         RegRes = chSpkRes(cIndex).spkRes(RIDGroup{dIndex}(1)); IrregRes = chSpkRes(cIndex).spkRes(RIDGroup{dIndex}(2));
         plot(tPSTH + mod(dIndex+1, 2) * tStdToDev(cmpGroup{dIndex}(1)), RegRes.PSTH, "r-", "DisplayName", "In Reg"); hold on % as dev
         plot(tPSTH + mod(dIndex+1, 2) * tStdToDev(cmpGroup{dIndex}(2)), IrregRes.PSTH, "k-", "DisplayName", "In Irreg"); hold on % as std
-        xlim(cmpWin); legend;
+        xlim(cmpWin); legend;   
         if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
         if mod(dIndex+1, 2) % for std
             title(strcat(RISStr{dIndex}, ", RI:", num2str((RegRes.stdFR-IrregRes.stdFR)/(RegRes.stdFR+IrregRes.stdFR))));

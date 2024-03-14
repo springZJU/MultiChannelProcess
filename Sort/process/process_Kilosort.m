@@ -7,11 +7,20 @@ end
 %% kilosort
 run([fileparts(mfilename("fullpath")), '\config\configFileMulti.m']);
 switch chNum
+     case 4
+        % treated as linear probe if no chanMap file
+        ops.chanMap             = [fileparts(mfilename("fullpath")), '\config\chan5_5_6_16_kilosortChanMap.mat'];  %16*1 linear array
+        % total number of channels in your recording
+        ops.NchanTOT            = 32; %5*5*6*16 linear array
+        % sample rate, Hz
+        ops.fs                  = fs;
+        ops.nblocks             = 0;
+
     case 8
         % treated as linear probe if no chanMap file
         ops.chanMap             = [fileparts(mfilename("fullpath")), '\config\chan8_2_kilosortChanMap.mat'];  %16*1 linear array
         % total number of channels in your recording
-        ops.NchanTOT            = 16; %16*1 linear array
+        ops.NchanTOT            = 16; %8*2 linear array
         % sample rate, Hz
         ops.fs                  = fs;
         ops.nblocks             = 0;
