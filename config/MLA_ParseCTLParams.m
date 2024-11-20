@@ -1,8 +1,8 @@
 function CTLParams = MLA_ParseCTLParams(protStr)
 
 % load excel
-configPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\config\MLA_CTLConfig.xlsx");
-configTable = table2struct(readtable(configPath));
+configTable = table2struct(readtable(fullfile(fileparts(mfilename("fullpath")), "MLA_CTLConfig.xlsx")));
+
 mProtocol = configTable(matches({configTable.paradigm}', protStr));
 
 % parse CTLProt
@@ -27,7 +27,7 @@ CTLParams.LFP_CompareSize = str2double(string(strsplit(mProtocol.LFP_CompareSize
 CTLParams.BaseICI = str2double(string(strsplit(mProtocol.BaseICI, ",")));
 CTLParams.ICI2 = str2double(string(strsplit(mProtocol.ICI2, ",")));
 
-CTLParams.legendFontSize = mProtocol.legendFontSize;
+CTLParams.legendFontSize = str2double(mProtocol.legendFontSize);
 eval(strcat("CTLParams.chPlotFcn = ", string(mProtocol.chPlotFcn), ";"));
 
 Compare_Index =  string(strsplit(mProtocol.Compare_Index, ";"));

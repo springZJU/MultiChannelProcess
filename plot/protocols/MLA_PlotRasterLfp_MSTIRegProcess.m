@@ -1,5 +1,6 @@
 function MLA_PlotRasterLfp_MSTIRegProcess(chSpikeLfp, MSTIRegParams)
 parseStruct(MSTIRegParams);
+set(0, 'DefaultFigureWindowState', 'maximized');
 %% configuration
 % compute time from last std to dev 
 tStdToDev  = sortrows(unique(cell2mat(cellfun(@(x, y) [roundn(diff(x([end-1, end])), -1), y], {trialAll.soundOnsetSeq}', {trialAll.devOrdr}', "UniformOutput", false)), "rows"), 2);
@@ -44,17 +45,17 @@ chSpkRes = cell2struct([
                         cellstr({chSpikeLfp(1).chSPK.info}'), ... % channel number
                         cellfun(@(spkDev) cell2struct([ ... % inner cell2struct
                                                         cellstr([chSpikeLfp.stimStr]'), ... % stimStr
-                                                        cellfun(@(spkTrial)  cell2mat(cellfun(@(spk, trialNum)[spk, trialNum*ones(length(spk), 1)], spkTrial, num2cell(1:length(spkTrial))', "UniformOutput", false)), spkDev, "UniformOutput", false) ... % plotRaster
+                                                        cellfun(@(spkTrial)  cell2mat(cellfun(@(spk, trialNum) [spk, trialNum*ones(length(spk), 1)], spkTrial, num2cell(1:length(spkTrial))', "UniformOutput", false)), spkDev, "UniformOutput", false) ... % plotRaster
                                                         cellfun(@(spkTrial, devWins) mean(calFR(spkTrial, devWins)), spkDev, num2cell(winDevResp, 2), "UniformOutput", false) ... % fring rate for winDevResp
                                                         cellfun(@(spkTrial, stdWins) mean(calFR(spkTrial, stdWins)), spkDev, num2cell(winStdResp, 2), "UniformOutput", false) ... % fring rate for winStdResp
                                                         cellfun(@(spkTrial, devWins) calFR(spkTrial, devWins), spkDev, num2cell(winDevResp, 2), "UniformOutput", false) ... % fring rate for winDevResp
                                                         cellfun(@(spkTrial, stdWins) calFR(spkTrial, stdWins), spkDev, num2cell(winStdResp, 2), "UniformOutput", false) ... % fring rate for winStdResp                                                        
                                                         cellfun(@(spkTrial) calPSTH(spkTrial, winPSTH, binsize, binstep), spkDev, "UniformOutput", false) ... % PSTH
-                                                        cellfun(@(spkTrial) mfft(calPSTH(spkTrial, winPSTH, binsizeFFT, stepFFT), 1000/stepFFT), spkDev, "UniformOutput", false) ... % FFT of PSTH
+                                                        cellfun(@(spkTrial) mean(cell2mat(cellfun(@(x) mfft(calPSTH({x}, winPSTH, binsizeFFT, stepFFT), 1000/stepFFT), spkTrial, "UniformOutput", false))), spkDev, "UniformOutput", false) ...
                                                         cellfun(@(spkTrial, devWins) cellfun(@(spk) sum(spk >= devWins(1) & spk <= devWins(2)), spkTrial), spkDev, num2cell(winDevResp, 2), "UniformOutput", false) ... % spk count in devWin
                                                         cellfun(@(spkTrial, stdWins) cellfun(@(spk) sum(spk >= stdWins(1) & spk <= stdWins(2)), spkTrial), spkDev, num2cell(winStdResp, 2), "UniformOutput", false) ... % spk count in stdWin
                                                         ] ... % cell array boundary for inner struct
-                                                        , ["stimStr", "raster", "devFR", "stdFR", "devTrialFR", "stdTrialFR", "PSTH", "FFT_PSTH", "devCount", "stdCount"], 2), ... % end of inner cell2struct
+                                                        , ["stimStr", "raster", "devFR", "stdFR", "devTrialFR", "stdTrialFR", "PSTH", "trialsPsthFFT_Mean", "devCount", "stdCount"], 2), ... % end of inner cell2struct
                         spkCH, "UniformOutput", false)] ... % cell array boundary for outer struct
                         , ["CH", "spkRes"], 2); % end of outer cell2struct
 
@@ -65,66 +66,69 @@ chSpkRes = cell2struct([
 % column   6: syschronization of change responses (FFT, level 2)
 % column   7: SSA of the DEV in the block (PSTH, level 3)
 % column   8: Regularity Idex for the DEV and STD in the block (PSTH, level 4)
+plotOrder = [1, 3, 2, 4];
 for cIndex = 1 : length(chSpkRes)
     figure;
-    maximizeFig;
-    for dIndex = 1 : length(chSpkRes(1).spkRes)
+    n = 0;
+
+    for dIndex = plotOrder
+        n = n + 1;
         spkTemp = chSpkRes(cIndex).spkRes(dIndex);
 
         % column 1-2: raster plots
-        rasterAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+1, [2, 1], "alignment", "bottom-left");
+        rasterAxes(dIndex) = mSubplot(rowNum, colNum, (n-1)*colNum+1, [2, 1], "alignment", "bottom-left");
         col1_2_X = spkTemp.raster(:, 1); col1_2_Y = spkTemp.raster(:, 2);
         scatter(col1_2_X, col1_2_Y, 5, "black", "filled"); hold on
         xlim(dispWin);
-        if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
+        if n < length(chSpkRes(1).spkRes); xticklabels(""); end
         title(strcat(spkTemp.stimStr, "raster plot"));
 
         % column 3-4: PSTH
-        PSTHAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+3, [2, 1], "alignment", "bottom-left");
+        PSTHAxes(dIndex) = mSubplot(rowNum, colNum, (n-1)*colNum+3, [2, 1], "alignment", "bottom-left");
         col3_4_X = tPSTH; col3_4_Y = spkTemp.PSTH;
         plot(col3_4_X, col3_4_Y, "k-"); hold on
         xlim(dispWin);
-        if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
+        if n < length(chSpkRes(1).spkRes); xticklabels(""); end
         title(strcat(spkTemp.stimStr, "PSTH"));
 
         % column 5: synchronization of single clicks (FFT, level 1)
-        FFTSingleAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+5, "margin_left", magginLeft);
-        col5_6_X = fFFT; col5_6_Y = spkTemp.FFT_PSTH;        
+        FFTSingleAxes(dIndex) = mSubplot(rowNum, colNum, (n-1)*colNum+5, "margin_left", magginLeft);
+        col5_6_X = fFFT; col5_6_Y = spkTemp.trialsPsthFFT_Mean;        
         plot(col5_6_X, col5_6_Y, "k-"); hold on
         xlim(syncWin{2});
-        if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
+        if n < length(chSpkRes(1).spkRes); xticklabels(""); end
         title("FFT of single clicks");
 
         % column 6: syschronization of change responses (FFT, level 2)
-        FFTChangeAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+6, "margin_left", magginLeft);
+        FFTChangeAxes(dIndex) = mSubplot(rowNum, colNum, (n-1)*colNum+6, "margin_left", magginLeft);
         plot(col5_6_X, col5_6_Y, "k-"); hold on
         xlim(syncWin{1});
-        if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
+        if n < length(chSpkRes(1).spkRes); xticklabels(""); end
         title("FFT of change responses");
 
         % column 7: SSA of the DEV in the block (PSTH, level 3)
-        SSAAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+7, "margin_left", magginLeft);
+        SSAAxes(dIndex) = mSubplot(rowNum, colNum, (n-1)*colNum+7, "margin_left", magginLeft);
         devRes = chSpkRes(cIndex).spkRes(cmpGroup{dIndex}(1)); stdRes = chSpkRes(cIndex).spkRes(cmpGroup{dIndex}(2));
         col7_devX = tPSTH; col7_devY = devRes.PSTH;
         col7_stdX = tPSTH+tStdToDev(cmpGroup{dIndex}(2)); col7_stdY = stdRes.PSTH;
         plot(col7_devX, col7_devY, "r-", "DisplayName", "As Dev"); hold on % as dev
         plot(col7_stdX, col7_stdY, "k-", "DisplayName", "As Std"); hold on % as std
         xlim(cmpWin); legend;
-        if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
+        if n < length(chSpkRes(1).spkRes); xticklabels(""); end
         title(strcat("SSA:", cmpDevStr{dIndex}, ", SI:", num2str((devRes.devFR-stdRes.stdFR)/(devRes.devFR+stdRes.stdFR))));
         [~, p_SSA] = ttest2(devRes.devTrialFR, stdRes.stdTrialFR, "Tail", "right");
         text("string", strcat("p=", string(roundn(p_SSA, -4))), 'Units', 'normalized', 'position', [0.55,0.7]);
 
         % column 8: Regularity Idex for the DEV and STD in the block (PSTH, level 4)
         % row 1/3: RID (Regularity Index for Dev); row 2/4 RIS (Regularity Index for Std)
-        RIAxes(dIndex) = mSubplot(rowNum, colNum, (dIndex-1)*colNum+8, "margin_left", magginLeft);
+        RIAxes(dIndex) = mSubplot(rowNum, colNum, (n-1)*colNum+8, "margin_left", magginLeft);
         RegRes = chSpkRes(cIndex).spkRes(RIDGroup{dIndex}(1)); IrregRes = chSpkRes(cIndex).spkRes(RIDGroup{dIndex}(2));
         col8_RegX = tPSTH + mod(dIndex+1, 2) * tStdToDev(cmpGroup{dIndex}(1)); col8_RegY = RegRes.PSTH;
         col8_IrregX = tPSTH + mod(dIndex+1, 2) * tStdToDev(cmpGroup{dIndex}(2)); col8_IrregY = IrregRes.PSTH;       
         plot(col8_RegX, col8_RegY, "k-", "DisplayName", "In Reg"); hold on;
         plot(col8_IrregX, col8_IrregY, "r-", "DisplayName", "In Irreg"); hold on;
         xlim(cmpWin); legend;   
-        if dIndex < length(chSpkRes(1).spkRes); xticklabels(""); end
+        if n < length(chSpkRes(1).spkRes); xticklabels(""); end
         if mod(dIndex+1, 2) % for std
             title(strcat(RISStr{dIndex}, ", RI:", num2str((RegRes.stdFR-IrregRes.stdFR)/(RegRes.stdFR+IrregRes.stdFR))));
             [~, p_RIS] = ttest2(RegRes.stdTrialFR, IrregRes.stdTrialFR);
@@ -157,7 +161,7 @@ for cIndex = 1 : length(chSpkRes)
     % add vertical lines
     addLines2Axes(FFTSingleAxes, cell2struct(num2cell(FFTCursor)', "X", 2));
     addLines2Axes(FFTChangeAxes, cell2struct(num2cell(1000./[unique(tStdToDev(:, 1)); 300]), "X", 2));
-    for dIndex = 1 : length(chSpkRes(1).spkRes)
+    for dIndex = plotOrder
         addLines2Axes([rasterAxes(dIndex), PSTHAxes(dIndex)], cell2struct(num2cell((-5:1:0)'*tStdToDev(dIndex)), "X", 2));
     end
 

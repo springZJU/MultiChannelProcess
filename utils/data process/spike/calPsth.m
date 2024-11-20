@@ -1,12 +1,13 @@
-function [resPsth, count] = calPsth(data, binpara, scaleFactor, varargin)
+function [resPsth, count] = calPsth(data, binpara, varargin)
 mIp = inputParser;
 mIp.addRequired("data", @(x) isnumeric(x) | iscell(x));
 mIp.addRequired("binpara", @isstruct);
-mIp.addOptional("scaleFactor", 1e3, @isnumeric);
+mIp.addParameter("scaleFactor", 1e3, @isnumeric);
 mIp.addParameter("NTRIAL", 1, @isnumeric);
 mIp.addParameter("EDGE", [], @isnumeric);
 
-mIp.parse(data,binpara,scaleFactor, varargin{:});
+mIp.parse(data,binpara, varargin{:});
+scaleFactor = mIp.Results.scaleFactor;
 NTRIAL = mIp.Results.NTRIAL;
 EDGE = mIp.Results.EDGE;
 parseStruct(binpara);

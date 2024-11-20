@@ -17,6 +17,7 @@ tIdx = linspace(window(1), window(2), size(trialsLFP{1}, 2));
 [~, baseIdx] = findWithinInterval(tIdx', [window(1), 0]);
 trialsLFP = cellfun(@(x) x./SE(x(:, baseIdx), 2), trialsLFP, "UniformOutput", false);
 temp = changeCellRowNum(trialsLFP);
+
 if ~isempty(badCh)
     for badIdx = 1 :length(badCh)
         if ~ismember(badCh(badIdx), [1, size(trialsLFP{1}, 1)])
@@ -25,7 +26,8 @@ if ~isempty(badCh)
     end
 end
 trialsLFP = changeCellRowNum(temp);
-
+goodCH = find(~ismember(1:size(trialsLFP{1}, 1), badCh));
+trialsLFP_CSD = trialsLFP(min(goodCH): max(goodCH));
 
 %% compute CSD
 switch string(CSD_Method)
@@ -41,10 +43,10 @@ switch string(CSD_Method)
         W = -0.4 * [1, -2, 1];
         Boundary = 1;
 end
-[CSD_Raw, CSD_Wave] = cellfun(@(x) CSD_Compute(x, Boundary, W, dz), trialsLFP, "UniformOutput", false);
+[CSD_Raw, CSD_Wave] = cellfun(@(x) CSD_Compute(x, Boundary, W, dz), trialsLFP_CSD, "UniformOutput", false);
 
 CSD.Data = cell2mat(cellfun(@mean, changeCellRowNum(CSD_Raw), "uni", false));
-CSD.Chs = Boundary + 1 : size(trialsLFP{1}, 1) - Boundary;
+CSD.Chs = Boundary + min(goodCH) : max(goodCH) - Boundary;
 CSD.t = linspace(window(1), window(2), size(CSD.Data, 2));
 CSD.Boundary = Boundary;
 CSD.tWave = linspace(window(1), window(2), size(CSD_Wave{1}, 2));

@@ -57,10 +57,10 @@ colorbar
 % plot MUA Wave
 tIndex = MUA.tWave >= selWin(1) & MUA.tWave <= selWin(2);
 waveTemp = MUA.Wave(CSD.Boundary+1 : end-CSD.Boundary, tIndex);
-scaleFactor = 0.8* unique(diff(csdYTick)) / max(max(waveTemp, [], 2) - min(waveTemp, [], 2));
+scaleFactor = 0.8* unique(roundn(diff(csdYTick), -2)) / max(max(waveTemp, [], 2) - min(waveTemp, [], 2));
 waveTemp = scaleFactor * waveTemp;
 waveTemp = waveTemp - repmat(min(waveTemp ,[], 2), 1, size(waveTemp, 2));
-adds = repmat(flip(csdYTick)', 1, size(waveTemp, 2));
+adds = repmat(flip(1:unique(roundn(diff(csdYTick), -2)):size(waveTemp, 1)*unique(roundn(diff(csdYTick), -2)))', 1, size(waveTemp, 2));
 temp = waveTemp  + adds;
 plot(MUA.tWave(tIndex), temp, "k-", "LineWidth", 1); hold on
 title(Axes, "CSD (uv/mm2) & MUA");

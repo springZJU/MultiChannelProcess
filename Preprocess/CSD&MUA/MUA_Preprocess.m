@@ -10,7 +10,7 @@ end
 %% Loading data
 try
     disp("Try loading data from MAT");
-    load(MATPATH);
+    load(fullfile(erase(MATPATH, regexp(MATPATH, "\\\w*.mat", "match")), "lfpData.mat"));
     WaveDataset = data.Wave;
     epocs = data.epocs;
     trialAll = processFcn(epocs);

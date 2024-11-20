@@ -33,6 +33,10 @@ if ~isequal(lfpDataset.fs, fd)
 end
 %% set trialAll
 trialAll([trialAll.devOrdr] == 0) = [];
+if protStr == "Offset_ICI_1_16"
+    trialAll([trialAll.devOrdr] == 6) = [];
+end
+
 devType = unique([trialAll.devOrdr]);
 devTemp = {trialAll.devOnset}';
 [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
@@ -42,6 +46,9 @@ trialAll(1) = [];
 
 %% split data
 [trialsLFPRaw, ~, ~] = selectEcog(lfpDataset, trialAll, "dev onset", Window); % "dev onset"; "trial onset"
+if length(trialsLFPRaw) < length(trialAll)
+    trialAll(end - length(trialAll)+length(trialsLFPRaw) + 1 : end) = [];
+end
 trialsLFPFiltered = ECOGFilter(trialsLFPRaw, 0.1, 200, fd);
 tIdx = excludeTrials(trialsLFPFiltered, 0.1);
 trialsLFPFiltered(tIdx) = [];
@@ -125,8 +132,8 @@ for dIndex = 1:length(devType)
     spkeCell  = cellfun(@(x) cellfun(@(y) y(:, 1), x, "UniformOutput", false), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
     chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex),sum(tIndexRaw)), spikePlot, "UniformOutput", false);
     psthPara = evalin("base", "psthPara");
-%     [~, ~, chPSTH] = cellfun(@(x) calPSTH(x, Window, psthPara.binsize, psthPara.binstep), spkeCell, "UniformOutput", false);
-    chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "UniformOutput", false);
+    [~, ~, chPSTH] = cellfun(@(x) calPSTH(x, Window, psthPara.binsize, psthPara.binstep), spkeCell, "UniformOutput", false);
+%     chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "UniformOutput", false);
     chStr = fields(trialsSPK)';
     chSPK = cell2struct([chStr; spikePlot; chPSTH; chRS], ["info", "spikePlot", "PSTH", "chRS"]);
 

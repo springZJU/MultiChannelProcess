@@ -2,21 +2,22 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-        "BXHDXY_RNP_MSTI_Recording.xlsx");
+        "Bao_RatFF_LeftAC_Recording.xlsx");
 
 %         "Bao_RNP_TBOffset_Recording");
 %     "SPR_RNP_TBOffset_Recording.xlsx");
 
-customInfo.idSel = [1:7];
+customInfo.idSel = [46:58];
 customInfo.MATPATH = "J:\BXH\MAT Data\";
 % customInfo.MATPATH = "I:\neuroPixels\MAT Data";
 
 customInfo.thr = [9, 4];
-% customInfo.thr = [7, 3];
 
 customInfo.reExportSpk = true;
-customInfo.exportSpkWave = false;
+customInfo.exportSpkWave = true; 
 customInfo.ReSaveMAT = true;
+customInfo.reMerge  = false;
+customInfo.reWhiten   = false;
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,7 +29,7 @@ for rIndex = 1 : length(recID)
         continue
     end
     
-    if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file')
+    if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file') || getOr(customInfo, "reMerge", false)
         mkdir(MERGEPATH);
         % load data depends on recording tech
         if strcmpi(recTech, "TDT")
@@ -50,7 +51,7 @@ for rIndex = 1 : length(selInfo)
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%% open GUI and save it %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clearvars -except selInfo customInfo
+% clearvars -except selInfo customInfo 
 parseStruct(customInfo);
 tankSel = unique([selInfo.TANKNAME]');
 folders = cellfun(@(x) dir(x), tankSel, "uni", false);
@@ -75,7 +76,7 @@ parseStruct(customInfo);
 run("process_SaveMAT.m");
 
 %% %%%%%%%%%%%%%%%%%%%%%% delete merged file %%%%%%%%%%%%%%%%%%%%%%%%%%%
-for rIndex = 1 : length(customInfo.MERGEFILE)
-    deleteItem(customInfo.MERGEFILE(rIndex));
-    deleteItem(strrep(customInfo.MERGEFILE(rIndex), "Wave.bin", "temp_wh.dat"));
-end
+% for rIndex = 1 : length(customInfo.MERGEFILE)
+%     deleteItem(customInfo.MERGEFILE(rIndex));
+%     deleteItem(strrep(customInfo.MERGEFILE(rIndex), "Wave.bin"));
+% end

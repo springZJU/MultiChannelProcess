@@ -1,7 +1,7 @@
 function saveXlsxRecordingData_RatNP(ROOTPATH, recordInfo, idx, recordPath, fd_lfp)
 narginchk(4, 5);
 if nargin < 5
-    fd_lfp = 1200;
+    fd_lfp = 600;
 end
 rowNum = 385;
 BLOCKPATH = recordInfo(idx).BLOCKPATH;
@@ -13,7 +13,7 @@ lfpExported = logical(recordInfo(idx).lfpExported);
 temp = strsplit(BLOCKPATH, "\");
 animalID = temp(end - 2);
 dateStr = temp(end - 1);
-buffer=TDTbin2mat(char(BLOCKPATH));  %spike store name should be changed according to your real name
+buffer=TDTbin2mat(char(BLOCKPATH), 'TYPE',{'epocs'});  %spike store name should be changed according to your real name
 
 %% TTL synchronization
 SR_AP = recordInfo(idx).SR_AP;
@@ -25,17 +25,17 @@ else
     NP_Path = strcat(recordInfo(idx).datPath, ".0");
     LFP_Path = strcat(recordInfo(idx).datPath, ".1");
 end
-timestamps = readNPY(strcat(NP_Path, "\timestamps.npy"));
-sample_numbers = readNPY(strcat(NP_Path, "\sample_numbers.npy"));
-sample_times = (1:length(sample_numbers))'/SR_AP;
-mmf = memmapfile(strcat(NP_Path, "\continuous.dat"),'Format', {"int16", [rowNum length(sample_numbers)], 'x'});
+timestamps = readNPY(strcat(LFP_Path, "\timestamps.npy"));
+sample_numbers = readNPY(strcat(LFP_Path, "\sample_numbers.npy"));
+sample_times = (1:length(sample_numbers))'/SR_LFP;
+mmf = memmapfile(strcat(LFP_Path, "\continuous.dat"),'Format', {"int16", [rowNum length(sample_numbers)], 'x'});
 
 try
     TTL = mmf.Data.x(end, :);
     TTL_Onset = sample_times([0, diff(TTL)] > 0);
 catch
-    onOff     = readNPY(strcat(strrep(NP_Path, "continuous", "events"), "\TTL\states.npy"));
-    timeStamp = readNPY(strcat(strrep(NP_Path, "continuous", "events"), "\TTL\timestamps.npy"));
+    onOff     = readNPY(strcat(strrep(LFP_Path, "continuous", "events"), "\TTL\states.npy"));
+    timeStamp = readNPY(strcat(strrep(LFP_Path, "continuous", "events"), "\TTL\timestamps.npy"));
     if any([timeStamp <= 0 ; timestamps <= 0])
         error("bad message: something wrong with TTL info!");
     else
@@ -56,7 +56,10 @@ else
     if strcmpi(isContinue, "n")
         error("the TTL sync signal does not match the TDT epocs [Swep] store!");
     else %% custom
-        delta_T = mean(diff([buffer.epocs.Swep.onset, TTL_Onset(1:40)], 1, 2));
+        delta_T = mean(diff([buffer.epocs.Swep.onset(1:end), TTL_Onset(1:end)], 1, 2));
+%         delta_T = mean(buffer.epocs.Swep.onset) - mean(TTL_Onset);
+       
+% delta_T = 0;
     end
 end
 
@@ -80,20 +83,14 @@ catch e
 end
 
 data.SR_AP = SR_AP;
-% spike waveform
-try
-    data.spkWave = spkWave;
-catch e
-    data.spkWave = [];
-    disp(e.message);
-end
+
 %% try to get lfp data
-try
+% try
     data.lfp = NP2TDT_LFP(LFP_Path, SR_LFP, fd_lfp);
-catch e
-    data.lfp = [];
-    disp(e.message);
-end
+% catch e
+%     data.lfp = [];
+%     disp(e.message);
+% end
 
 %% try to get Wave data for CSD
 if contains(paradigm, 'CSD')
@@ -122,16 +119,18 @@ SAVEPATH = strcat(ROOTPATH, "\", animalID, "\CTL_New\", paradigm, "\", dateStr, 
 
 mkdir(SAVEPATH);
 dataCopy = data;
-if ~spkExported
+if ~spkExported || getOr(evalin("base", "customInfo"), "ReSaveMAT", false)
     data = rmfield(dataCopy, ["lfp", "Wave"]);
     save(fullfile(SAVEPATH, "spkData.mat"), "data", "-v7.3");
     recordInfo(idx).spkExported = 1;
 end
-if ~lfpExported
-    data = rmfield(dataCopy, ["sortdata", "spkWave"]);
+
+if ~lfpExported || getOr(evalin("base", "customInfo"), "ReSaveMAT", false)
+    data = rmfield(dataCopy, ["sortdata"]);
     save(fullfile(SAVEPATH, "lfpData.mat"), "data", "-v7.3");
     recordInfo(idx).lfpExported = 1;
 end
+
 
 writetable(struct2table(recordInfo), recordPath);
 

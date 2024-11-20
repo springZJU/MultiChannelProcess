@@ -42,13 +42,6 @@ catch e
     disp(e.message);
 end
 
-% spike waveform
-try
-    data.spkWave = spkWave;
-catch e
-    data.spkWave = [];
-    disp(e.message);
-end
 %% try to get lfp data
 try
     data.lfp = ECOGResample(buffer.streams.Llfp, fd_lfp);
@@ -94,10 +87,11 @@ if ~spkExported || customInfo.ReSaveMAT
     recordInfo(idx).spkExported = 1;
 end
 if ~lfpExported || customInfo.ReSaveMAT
-    data = rmfield(dataCopy, ["spikeRaw", "sortdata", "spkWave"]);
+    data = rmfield(dataCopy, ["spikeRaw", "sortdata"]);
     save(fullfile(SAVEPATH, "lfpData.mat"), "data", "-mat");
     recordInfo(idx).lfpExported = 1;
 end
+
     writetable(struct2table(recordInfo), recordPath);
 
 

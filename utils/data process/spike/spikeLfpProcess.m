@@ -23,6 +23,7 @@ end
 try
     disp("Try loading data from MAT");
 
+
     % lfp
 
     load(fullfile(erase(DATAPATH, regexp(DATAPATH, "\\\w*.mat", "match")), "lfpData.mat"));
@@ -39,7 +40,7 @@ try
             tt = find([trialAll(:).soundOnsetSeq] > epocs.Swep.onset(sIndex) * 1000);
             trialnum(sIndex) = trialAll(tt(1)).trialNum;
         end
-    trialAll = trialAll(trialnum);
+        trialAll = trialAll(trialnum);
     end
 
     % spike
@@ -55,8 +56,12 @@ try
         end
         spikeDataset = spikeByCh(sortrows(data.sortdata, 2));
     else
-        temp = data.spikeRaw.snips.eNeu;
-        spikeDataset = spikeByCh(sortrows([double(temp.ts), double(temp.chan)], 2));
+        if ~isempty(data.spikeRaw.snips)
+            temp = data.spikeRaw.snips.eNeu;
+            spikeDataset = spikeByCh(sortrows([double(temp.ts), double(temp.chan)], 2));
+        else
+            spikeDataset = struct('ch', num2cell(0), 'spike', num2cell(-1), 'realCh', num2cell(0));
+        end
     end
 
 catch e

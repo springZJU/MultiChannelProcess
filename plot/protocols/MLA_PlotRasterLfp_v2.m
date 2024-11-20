@@ -73,6 +73,9 @@ for cIndex = 1 : chNum
         AxesPSTH(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, PSTH_CompareSize, margins, paddings, "alignment", "top-left");
         idxs = Compare_Index{pIndex, 1};
         for dIndex = 1 : length(idxs)
+            if idxs(dIndex) > length(psthTemp)
+                continue
+            end
             X = psthTemp{idxs(dIndex), 1}(:, 1);
             Y = psthTemp{idxs(dIndex), 1}(:, 2);
             plot(AxesPSTH(pIndex), X, Y, "Color", colors(dIndex), "LineWidth", 1, "LineStyle", "-", "DisplayName", stimStr(idxs(dIndex))); hold on
@@ -92,6 +95,9 @@ for cIndex = 1 : chNum
         AxesLFP(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, LFP_CompareSize, margins, paddings, "alignment", "top-left");
         idxs = Compare_Index{pIndex, 1};
         for dIndex = 1 : length(idxs)
+            if idxs(dIndex) > length(psthTemp)
+                continue
+            end
             X = lfpTemp{idxs(dIndex), 1}(:, 1);
             Y = lfpTemp{idxs(dIndex), 1}(:, 2);
             plot(AxesLFP(pIndex), X, Y, "Color", colors(dIndex), "LineStyle", "-", "DisplayName", stimStr(idxs(dIndex))); hold on;

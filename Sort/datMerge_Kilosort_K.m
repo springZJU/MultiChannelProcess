@@ -3,29 +3,15 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
         "K_RNP_TBOffset_Recording.xlsx");
-%               "SPR_MLA_Recording.xlsx"); 
-%     "ZYY_RNP_TBOffset_Recording.xlsx");  
 
-%         "YHT_RNP_Recording.xlsx");        
-%           "SPR_MLA_Recording.xlsx");   
-%         "XHX_MLA_Recording.xlsx");
-
-
-customInfo.idSel = [7];
+customInfo.idSel = [9];
 customInfo.kilosortAutoMerge = false; 
 customInfo.postMerge = false; 
 
-customInfo.MATPATH = "E:\ratNeuroPixel\MAT Data\";
-% customInfo.MATPATH = "I:\neuroPixels\MAT Data";
-% customInfo.MATPATH = "E:\MonkeyLinearArray\MAT Data\";
-
-% customInfo.MATPATH = "H:\MLA_A1补充\MAT DATA\";
+customInfo.MATPATH = "E:\ratNeuroPixel\MAT Data\Sort Data\";
 
 % customInfo.thr = [ 7, 3];                        
-customInfo.thr = [ 9, 4];
-
-
-
+customInfo.thr = [9, 4];
 customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;

@@ -1,7 +1,8 @@
-function wf = getWaveForm_singleID_v2(fs, dataPath, NPYPATH, unitID, IDandCHANNEL, wfWin, onsetIdx)
+function wf = getWaveForm_singleID_v2(fs, dataPath, NPYPATH, unitID, IDandCHANNEL, wfWin, sampleRange)
 % Description: Get waveform of each spike from kilosort result
 % Input:
 %    - fs: sample rate of *.dat
+%    - nCh: inform raw data is [nCh*nSample]
 %    - dataPath: full path of *.dat
 %    - NPYPATH: full path of *.npy
 %    - unitID: id of units sorted from kilosort, 1*1 or n*1
@@ -24,12 +25,12 @@ function wf = getWaveForm_singleID_v2(fs, dataPath, NPYPATH, unitID, IDandCHANNE
 
 
 narginchk(5, 7);
-if nargin < 6
+if nargin < 7
     wfWin = [-30 30]; % Number of samples before and after spiketime to include in waveform
 end
 
 if nargin < 7
-    onsetIdx = 0;
+    sampleRange = 0;
 end
 
 
@@ -37,36 +38,48 @@ end
 spikeTimeIdx =    readNPY([NPYPATH, '\spike_times.npy']); % Vector of cluster spike times (in samples) same length as .spikeClusters
 spikeClusters = readNPY([NPYPATH, '\spike_clusters.npy']); % Vector of cluster IDs (Phy nomenclature)   same length as .spikeTimes
 chMap = readNPY([NPYPATH, '\channel_map.npy'])';               % Order in which data was streamed to disk; must be 1-indexed for Matlab
-
+load([NPYPATH, '\kiloRez.mat']);
+st3 = sortrows(rez.st3, 1);
 %% get corresponding channel
 MChInID = IDandCHANNEL(ismember(IDandCHANNEL(:,1), unitID), 3);
 
 %% read data via memory map
-fileName = fullfile(getRootDirPath(NPYPATH, 2), 'Wave.bin');% .dat file containing the raw
+fileName = fullfile(getRootDirPath(NPYPATH, 2), 'temp_wh.dat');% .dat file containing the raw
+
 dataInfo = dir(fileName);
 dataType = 'int16';            % Data type of .dat file (this should be BP filtered)
 dataTypeNBytes = numel(typecast(cast(0, dataType), 'uint8')); % determine number of bytes per sample
 nCh = length(unique(chMap));
-nSamp = fix(dataInfo.bytes/(nCh * dataTypeNBytes));  % Number of samples per channel
-mmf = memmapfile(fileName,'Format', {dataType, [nCh nSamp], 'x'});
-data = mmf.Data(1).x;
+sampStart = sampleRange(1);
+if ~isinf(sampleRange(2))
+    nSamp = diff(sampleRange);
+else
+    nSamp = fix(dataInfo.bytes/(nCh * dataTypeNBytes)) - sampleRange(1);  % Number of samples per channel
+end
+mmf = memmapfile(fileName,'Format', {dataType, [nCh nSamp], 'x'}, 'Offset', nCh*sampStart*2, 'Repeat', 1);
+
 
 %% get waveform for each unit
-for idIndex= 1 : length(1 : length(unitID))
+for idIndex= 1 : length(unitID)
+    chDataSel = mmf.Data(1).x(mod(MChInID(idIndex), 1000), :);
     disp(strcat("picking up unit ", num2str(unitID(idIndex)), " ..."));
     % compute spike segment index
-    SpikeIndex = double(spikeTimeIdx(spikeClusters==unitID(idIndex) & spikeTimeIdx > onsetIdx & spikeTimeIdx <= onsetIdx + size(data, 2))) - onsetIdx;
-    SpikeTime = double(SpikeIndex - 1) / fs ;
-    spkSegIdx = cell2mat(arrayfun(@(x) x + wfWin, SpikeIndex, "UniformOutput", false));
+    SpikeIndex = double(spikeTimeIdx(spikeClusters==unitID(idIndex)));
+    tempAmp = st3(spikeClusters==unitID(idIndex), 3);
+    SpikeTime = double(SpikeIndex - sampStart - 1) / fs ;
+
+    spkSegIdx = cell2mat(arrayfun(@(x) x + wfWin, SpikeIndex - sampStart, "UniformOutput", false));
     if ~isempty(spkSegIdx)
-        spkSegIdx(spkSegIdx(: ,1) + wfWin(1) < 0 | spkSegIdx(: ,2) + wfWin(2) > size(data, 2), :) = [];
+        delIdx = spkSegIdx(: ,1) + wfWin(1) < 0 | spkSegIdx(: ,2) + wfWin(2) > length(chDataSel);
+        spkSegIdx(delIdx, :) = [];
+        SpikeTime(delIdx) = [];
+        tempAmp(delIdx) = [];
 
         % Read spike time-centered waveforms
-        chDataSel = data(mod(MChInID(idIndex), 1000), :);
-        waveForms = double(cell2mat(cellfun(@(x) chDataSel(x(1) : x(2)), num2cell(spkSegIdx, 2) , "UniformOutput", false)));
-        wfSmooth = smoothdata(waveForms','gaussian', 10)';
+        waveForms = double(cell2mat(cellfun(@(x, y) chDataSel(x(1) : x(2)) / y, num2cell(spkSegIdx, 2) , num2cell(tempAmp), "UniformOutput", false)));
+%         wfSmooth = smoothdata(waveForms','gaussian', 10)';
         waveFormsMean = mean(waveForms);
-        wfSmMean = mean(wfSmooth);
+%         wfSmMean = mean(wfSmooth);
     
 
     % Package in wf(idIndex) struct
@@ -77,8 +90,8 @@ for idIndex= 1 : length(1 : length(unitID))
     wf(idIndex).SpikeTime = SpikeTime;
     wf(idIndex).waveForms = waveForms;
     wf(idIndex).waveFormsMean = waveFormsMean;
-    wf(idIndex).wfSmooth = wfSmooth;
-    wf(idIndex).wfSmMean = wfSmMean;
+%     wf(idIndex).wfSmooth = wfSmooth;
+%     wf(idIndex).wfSmMean = wfSmMean;
     disp("DONE!");
     clc;
     end

@@ -22,13 +22,13 @@ fprintf(fileID, ahkScript);
 fclose(fileID);
 %%
 system('start cmd /c phy template-gui params.py');
-
+% system('phy template-gui params.py');
 % 构建AutoHotkey运行命令
 ahkExecutablePath = '"C:\Program Files\AutoHotkey\AutoHotkey.exe"';
 runAhkCommand = [ahkExecutablePath, ' ', ahkScriptFilePath];
 % 运行AutoHotkey脚本
 system(runAhkCommand);
 
-pause(1);
+pause(10);
 delete(".\your_script.ahk");
 

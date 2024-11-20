@@ -39,8 +39,8 @@ if isnumeric(spike)
 elseif iscell(spike)
     spikeCell = spike;
 end
-[frRes.frMean_Resp, frRes.frSE_Resp, frRes.countRaw_Resp] = calFR(spikeCell, winResp);
-[frRes.frMean_Base, frRes.frSE_Base, frRes.countRaw_Base] = calFR(spikeCell, winBase);
+[frRes.frMean_Resp, frRes.frSE_Resp, frRes.countRaw_Resp] = calFr(spikeCell, winResp);
+[frRes.frMean_Base, frRes.frSE_Base, frRes.countRaw_Base] = calFr(spikeCell, winBase);
 [H, frRes.P] = ttest2(frRes.countRaw_Resp(:, 1), frRes.countRaw_Base(:, 1), "Tail", Tail, "Alpha", Alpha);
 if isnan(H)
     H = 0;

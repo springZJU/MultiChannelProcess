@@ -1,25 +1,17 @@
 ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
-% customInfo.recordPath = "K:\DATA_202311_MonkeyLA_MSTI\RecordingInfo1.xlsx";
-% customInfo.recordPath = "K:\DATA_202311_MonkeyLA_MSTI\RecordingInfo2.xlsx";
-% if contains(customInfo.recordPath, "RecordingInfo1.xlsx")
-%     customInfo.MATPATH = "K:\DATA_202311_MonkeyLA_MSTI\DATA\MatData\Recording1\";
-% elseif contains(customInfo.recordPath, "RecordingInfo2.xlsx")
-%     customInfo.MATPATH = "K:\DATA_202311_MonkeyLA_MSTI\DATA\MatData\Recording2\";
-% end
-
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-        "YHT_MLA_Recording.xlsx");
-customInfo.recordPath = "J:\YHT\DATA_202312_MonkeyLA_MSTIReg\RecordingInfo.xlsx";
-customInfo.MATPATH = "J:\YHT\DATA_202312_MonkeyLA_MSTIReg\DATA\";
+        "YHT\YHT_MLA_Recording_202410.xlsx");
+customInfo.MATPATH = "O:\MonkeyLA\MAT Data\";
 
-customInfo.idSel = [10];                      
+customInfo.idSel = [2];                      
 customInfo.thr = [7,3];
 
 customInfo.reExportSpk = true;
-customInfo.exportSpkWave = true;
+customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;
+customInfo.reWhiten = false;
 customInfo.ExcludeIDLabels = ["noise"];% eg:["noise", "mua"] 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,7 +23,7 @@ for rIndex = 1 : length(recID)
         continue
     end
     
-%     if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file')
+    if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file')
         mkdir(MERGEPATH);
         % load data depends on recording tech
         if strcmpi(recTech, "TDT")
@@ -41,7 +33,7 @@ for rIndex = 1 : length(recID)
 %         elseif strcmpi(recTech, "newTech")
 %             newTech_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
         end
-%     end
+    end
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%% kilosortToProcess_TDT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,5 +73,4 @@ run("process_SaveMAT.m");
 %% %%%%%%%%%%%%%%%%%%%%%% delete merged file %%%%%%%%%%%%%%%%%%%%%%%%%%%
 for rIndex = 1 : length(customInfo.MERGEFILE)
     deleteItem(customInfo.MERGEFILE(rIndex));
-    deleteItem(strrep(customInfo.MERGEFILE(rIndex), "Wave.bin", "temp_wh.dat"));
 end

@@ -10,7 +10,11 @@ trialsRaw = {spkData.chSpikeLfp.trialsRaw}';
 
 %% process spike
 for cIndex = 1 : length(spkData.chSpikeLfp(1).chSPK)
-    dateStr{cIndex, 1} = cellfun(@(x) [spkData.date, char(x(cIndex).info)], chSPK_All(1), "UniformOutput", false);
+    try
+        dateStr{cIndex, 1} = cellfun(@(x) [spkData.date, char(x(cIndex).info)], chSPK_All(1), "UniformOutput", false);
+    catch
+        dateStr{cIndex, 1} = cellfun(@(x) [spkData.dateStr, char(x(cIndex).info)], chSPK_All(1), "UniformOutput", false);
+    end
     temp = addFieldToStruct(rmfield(cell2mat(cellfun(@(x) x(cIndex), chSPK_All, "UniformOutput", false)), "info"), [stimStr, trialsRaw], ["stimStr"; "trialsRaw"]);
 
     ChangeSpike{cIndex, 1} = cellfun(@(y, k) rowFcn(@(x) y(y(:, 2) == x), k, "UniformOutput", false), {temp.spikePlot}', {temp.trialsRaw}', "UniformOutput", false);
@@ -22,16 +26,16 @@ for cIndex = 1 : length(spkData.chSpikeLfp(1).chSPK)
 
 
     % compute latency
-        OnsetLatency{cIndex, 1}  = [];  ChangeLatency{cIndex, 1} = [];
-%         OnsetLatency{cIndex, 1}  = cell2mat(cellfun(@(x) peakWidthLatency(x, winOnsetBase, latencyWin, binpara, "returnVal", "latency", "latencyMethod", latencyMethod, "firstSpkWin", [10, 100], "peakRatio", peakRatio), OnsetSpike{cIndex, 1}, "UniformOutput", false));
-%         ChangeLatency{cIndex, 1} = cell2mat(cellfun(@(x) peakWidthLatency(x, winOnsetBase, latencyWin, binpara, "returnVal", "latency", "latencyMethod", latencyMethod, "firstSpkWin", [10, 100], "peakRatio", peakRatio), ChangeSpike{cIndex, 1}, "UniformOutput", false));
-% 
+    OnsetLatency{cIndex, 1}  = [];  ChangeLatency{cIndex, 1} = [];
+    %         OnsetLatency{cIndex, 1}  = cell2mat(cellfun(@(x) peakWidthLatency(x, winOnsetBase, latencyWin, binpara, "returnVal", "latency", "latencyMethod", latencyMethod, "firstSpkWin", [10, 100], "peakRatio", peakRatio), OnsetSpike{cIndex, 1}, "UniformOutput", false));
+    %         ChangeLatency{cIndex, 1} = cell2mat(cellfun(@(x) peakWidthLatency(x, winOnsetBase, latencyWin, binpara, "returnVal", "latency", "latencyMethod", latencyMethod, "firstSpkWin", [10, 100], "peakRatio", peakRatio), ChangeSpike{cIndex, 1}, "UniformOutput", false));
+    %
 
 
-    
-%         % compute PSTH
-%         OnsetPSTH{cIndex, 1}  = cellfun(@(x) calPsth(x,binpara, 10e3), OnsetSpike{cIndex, 1},  "UniformOutput", false);
-%         ChangePSTH{cIndex, 1} = cellfun(@(x) calPsth(x,binpara, 10e3), ChangeSpike{cIndex, 1}, "UniformOutput", false);
+
+    %         % compute PSTH
+    %         OnsetPSTH{cIndex, 1}  = cellfun(@(x) calPsth(x,binpara, 10e3), OnsetSpike{cIndex, 1},  "UniformOutput", false);
+    %         ChangePSTH{cIndex, 1} = cellfun(@(x) calPsth(x,binpara, 10e3), ChangeSpike{cIndex, 1}, "UniformOutput", false);
 end
 
 
@@ -39,6 +43,6 @@ ChangeOnRatio = cellfun(@(x) (cell2mat({x.frMean_Resp}') - cell2mat({x.frMean_Ba
 % ChangeOnRatio = cellfun(@(x) cell2mat({x.frMean_Resp}') - cell2mat({x.frMean_Base}'), ChangeRes, "UniformOutput", false);
 
 res = cell2struct([ dateStr,   ChangeRes,    OnsetRes,   ChangeOnRatio,   OnsetSpike,   ChangeSpike,   OnsetLatency,   ChangeLatency], ...
-                  ["dateStr", "ChangeRes",  "OnsetRes", "ChangeOnRatio", "OnsetSpike", "ChangeSpike", "OnsetLatency", "ChangeLatency"], 2);
+    ["dateStr", "ChangeRes",  "OnsetRes", "ChangeOnRatio", "OnsetSpike", "ChangeSpike", "OnsetLatency", "ChangeLatency"], 2);
 
 end

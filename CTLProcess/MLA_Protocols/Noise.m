@@ -1,8 +1,8 @@
 function Noise(MATPATH, FIGPATH)
 
-if exist(FIGPATH, "dir")
-    return
-end
+% if exist(FIGPATH, "dir")
+%     return
+% end
 %% plot Noise
 % sNoise_RNP(MATPATH, FIGPATH);
 try
@@ -29,7 +29,13 @@ noiseSpike = cellfun(@(x, y) [findWithinInterval(spikes, x) - x(1) + Window(1), 
 baseCount = cellfun(@(x) length(findWithinInterval(x(:, 1), baseWin)), noiseSpike);
 respCount = cellfun(@(x) length(findWithinInterval(x(:, 1), respWin)), noiseSpike);
 sigRes(cIndex).CH = strcat("CH", num2str(ch(cIndex)));
-[sigRes(cIndex).H, sigRes(cIndex).P] = ttest(respCount, baseCount, "Tail", "right");
+try
+[H, sigRes(cIndex).P] = ttest(respCount, baseCount, "Tail", "right");
+catch
+    H = 0;
+    sigRes(cIndex).P = 1;
+end
+sigRes(cIndex).H = H * double(mean(respCount) > 1);
 
 mkdir(FIGPATH);
 mPrint(Fig, strcat(FIGPATH, "\CH", num2str(ch(cIndex))), "-djpeg", "-r300");

@@ -44,7 +44,7 @@ trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 trialAll(1) = [];
 
 %% split data
-[trialsLFPRaw, ~, ~, ~, trialAll] = selectEcog(lfpDataset, trialAll, "dev onset", Window); % "dev onset"; "trial onset"
+trialsLFPRaw = selectEcog(lfpDataset, trialAll, "dev onset", Window); % "dev onset"; "trial onset"
 trialsLFPFiltered = ECOGFilter(trialsLFPRaw, 0.1, 200, fd);
 tIdx = excludeTrials(trialsLFPFiltered, 0.1);
 trialsLFPFiltered(tIdx) = [];
@@ -124,10 +124,11 @@ for dIndex = 1:length(devType)
 
     %% spike
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
+    spkeCell  = cellfun(@(x) cellfun(@(y) y(:, 1), x, "UniformOutput", false), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
     chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex), length(trialsSPK)), spikePlot, "UniformOutput", false);
     psthPara.binsize = 30; % ms
     psthPara.binstep = 1; % ms
-    chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);
+    [~, ~, chPSTH] = cellfun(@(x) calPSTH(x, Window, psthPara.binsize, psthPara.binstep), spkeCell, "UniformOutput", false);
     chStr = fields(trialsSPK)';
     chSPK = cell2struct([chStr; spikePlot; chPSTH; chRS], ["info", "spikePlot", "PSTH", "chRS"]);
 

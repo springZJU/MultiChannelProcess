@@ -51,7 +51,7 @@ for mIndex = 1 : length(CSD_Methods)
     FigCSD = MLA_Plot_LFP_CSD_MUA(LFP, CSD, MUA, selWin);
     print(FigCSD, FIGNAME, "-djpeg", "-r300");
 
-    close all;
+%     close all;
 end
 save(fullfile(FIGPATH, dateStr, "MUARes.mat"), "MUA", "trialsWAVE", "-mat");
 

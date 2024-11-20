@@ -1,6 +1,6 @@
 function trialAll = PassiveProcess_clickTrainMSTIChainByTrail(epocs)
 %check ICI sequence
-ICISeqIdx = find(roundn(epocs.ICI0.data, -1) == 8.4);
+ICISeqIdx = find(roundn(epocs.ICI0.data, -1) == roundn(mode(epocs.ICI0.data), -1));% BGICI
 % ICISeqIdx = find(roundn(epocs.ICI0.data, -1) == 5);
 epocs.ICI0.data = epocs.ICI0.data(ICISeqIdx(1):ICISeqIdx(end));
 epocs.ICI0.onset = epocs.ICI0.onset(ICISeqIdx(1):ICISeqIdx(end));

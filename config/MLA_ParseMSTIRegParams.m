@@ -1,4 +1,4 @@
-function MSTIparamsAll = MLA_ParseMSTIRegParams(ProtocolStr)
+function MSTIparamsAllGet = MLA_ParseMSTIRegParams(ProtocolStr)
 
 ConfigExcelPATH = strcat(fileparts(fileparts(mfilename("fullpath"))), "\config\MLA_MSTIRegConfig.xlsx");
 
@@ -23,38 +23,39 @@ writetable(struct2table(MSTIparamsAll), ConfigExcelPATH, "Sheet", "MSTI");
 for comparenum = 1:numel(stimStrs)
     Regtype = regexpi(stimStrs(comparenum), ".*REG", "match");
     Oddtype = regexpi(stimStrs(comparenum), "Std(.*?)ms", "match");
-    MSTIparamsAll.MMNcompare(comparenum).sound = strjoin([Regtype, Oddtype], "-");
-    MSTIparamsAll.MMNcompare(comparenum).StdOrder_Lagidx = find(contains(stimStrs, regexpi(stimStrs(comparenum), "Std(.*?)ms", "match")) & ...
+    MSTIparamsAll(idx).MMNcompare(comparenum).sound = strjoin([Regtype, Oddtype], "-");
+    MSTIparamsAll(idx).MMNcompare(comparenum).StdOrder_Lagidx = find(contains(stimStrs, regexpi(stimStrs(comparenum), "Std(.*?)ms", "match")) & ...
                                                  cellfun(@(x) isequal(x, 1), regexpi(stimStrs, regexpi(stimStrs(comparenum), Regtype, "match"), "start")));
-    MSTIparamsAll.MMNcompare(comparenum).DevOrder = find(contains(stimStrs, strrep(regexpi(stimStrs(comparenum), "Std(.*?)ms", "match"), "Std", "Dev")) & ...
+    MSTIparamsAll(idx).MMNcompare(comparenum).DevOrder = find(contains(stimStrs, strrep(regexpi(stimStrs(comparenum), "Std(.*?)ms", "match"), "Std", "Dev")) & ...
                                            cellfun(@(x) isequal(x, 1), regexpi(stimStrs, regexpi(stimStrs(comparenum), Regtype, "match"), "start")));
 end
 %% get params
-MSTIparamsAll.Protocol = string(MSTIparamsAll(idx).ProtocolType);
-MSTIparamsAll.stimStrs = cellfun(@(x) strrep(x, ".", "o"), stimStrs);
+MSTIparamsAllGet.Protocol = string(MSTIparamsAll(idx).ProtocolType);
+MSTIparamsAllGet.stimStrs = cellfun(@(x) strrep(x, ".", "o"), stimStrs);
 
-MSTIparamsAll.Colors = regexpi(string(MSTIparamsAll(idx).Colors), ",", "split");
+MSTIparamsAllGet.Colors = regexpi(string(MSTIparamsAll(idx).Colors), ",", "split");
+MSTIparamsAllGet.MMNcompare = MSTIparamsAll(idx).MMNcompare;
 % MSTIparamsAll.GroupTypes = cellfun(@double, ...
 %                                 rowFcn(@(x) regexpi(x, ",", "split"), ...
 %                                 regexpi(string(MSTIparamsAll(idx).GroupTypes), ";", "split")', "UniformOutput", false),...
 %                                 'UniformOutput', false);
 % MSTIparamsAll.SoundMatIdx = double(regexpi(string(MSTIparamsAll(idx).SoundMatIdx), ",", "split"));
 % MSTIparamsAll.SoundMatPath = string(MSTIparamsAll(idx).SoundMatPath);
-MSTIparamsAll.trialonset_Win = double(regexpi(string(MSTIparamsAll(idx).trialonset_Window), ",", "split"));
-MSTIparamsAll.Window = double(regexpi(string(MSTIparamsAll(idx).devonset_Window), ",", "split"));
-MSTIparamsAll.ICAWindow = double(regexpi(string(MSTIparamsAll(idx).ICAWindow), ",", "split"));
-MSTIparamsAll.plotWin = double(regexpi(string(MSTIparamsAll(idx).plotWindow), ",", "split"));
-MSTIparamsAll.compareWin = double(regexpi(string(MSTIparamsAll(idx).compareWindow), ",", "split"));
-MSTIparamsAll.FFTWin = double(regexpi(string(MSTIparamsAll(idx).FFTWindow), ",", "split"));
-MSTIparamsAll.CWTplotWindow = double(regexpi(string(MSTIparamsAll(idx).CWTplotWindow), ",", "split"));
-MSTIparamsAll.sigTestWin = double(regexpi(string(MSTIparamsAll(idx).sigTestWin), ",", "split"));
+MSTIparamsAllGet.trialonset_Win = double(regexpi(string(MSTIparamsAll(idx).trialonset_Window), ",", "split"));
+MSTIparamsAllGet.Window = double(regexpi(string(MSTIparamsAll(idx).devonset_Window), ",", "split"));
+MSTIparamsAllGet.ICAWindow = double(regexpi(string(MSTIparamsAll(idx).ICAWindow), ",", "split"));
+MSTIparamsAllGet.plotWin = double(regexpi(string(MSTIparamsAll(idx).plotWindow), ",", "split"));
+MSTIparamsAllGet.compareWin = double(regexpi(string(MSTIparamsAll(idx).compareWindow), ",", "split"));
+MSTIparamsAllGet.FFTWin = double(regexpi(string(MSTIparamsAll(idx).FFTWindow), ",", "split"));
+MSTIparamsAllGet.CWTplotWindow = double(regexpi(string(MSTIparamsAll(idx).CWTplotWindow), ",", "split"));
+MSTIparamsAllGet.sigTestWin = double(regexpi(string(MSTIparamsAll(idx).sigTestWin), ",", "split"));
 
-MSTIparamsAll.Duration = double(MSTIparamsAll(idx).Duration);
-MSTIparamsAll.cursor1 = roundn(double(regexpi(string(MSTIparamsAll(idx).cursor1), ",", "split")), -1);
-MSTIparamsAll.cursor2 = roundn(double(regexpi(string(MSTIparamsAll(idx).cursor2), ",", "split")), -1);
-MSTIparamsAll.cursor3 = roundn(double(regexpi(string(MSTIparamsAll(idx).cursor3), ",", "split")), -1);
-MSTIparamsAll.BaseICI = Groups;
-MSTIparamsAll.sigTestMethod = "ttest2";
-eval(strcat("MSTIparamsAll.chPlotFcn = ", string(MSTIparamsAll(idx).chPlotFcn), ";"))
+MSTIparamsAllGet.Duration = double(MSTIparamsAll(idx).Duration);
+MSTIparamsAllGet.cursor1 = roundn(double(regexpi(string(MSTIparamsAll(idx).cursor1), ",", "split")), -1);
+MSTIparamsAllGet.cursor2 = roundn(double(regexpi(string(MSTIparamsAll(idx).cursor2), ",", "split")), -1);
+MSTIparamsAllGet.cursor3 = roundn(double(regexpi(string(MSTIparamsAll(idx).cursor3), ",", "split")), -1);
+MSTIparamsAllGet.BaseICI = Groups;
+MSTIparamsAllGet.sigTestMethod = "ttest2";
+eval(strcat("MSTIparamsAllGet.chPlotFcn = ", string(MSTIparamsAll(idx).chPlotFcn), ";"))
 
 end

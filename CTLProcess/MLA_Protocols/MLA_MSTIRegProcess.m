@@ -26,11 +26,6 @@ fd = lfpDataset.fs;
 %% set trialAll
 trialAll([trialAll.devOrdr] == 0) = [];
 devType = unique([trialAll.devOrdr]);
-% OnsetTemp = {trialAll.devOnset}';
-% [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
-% ordTemp = num2cell(ordTemp);
-% temp = cellfun(@(x, y) MSTIsoundinfo(x).Std_Dev_Onset(end) + y, ordTemp, OnsetTemp, "UniformOutput", false);
-% trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 trialAll(1) = [];
 MSTIRegParams.tStdToDev     = sortrows(unique(cell2mat(cellfun(@(x, y) [roundn(diff(x([end-1, end])), -1), y], {trialAll.soundOnsetSeq}', {trialAll.devOrdr}', "UniformOutput", false)), "rows"), 2);
 MSTIRegParams.Std_Dev_Onset = cellfun(@(x) x*(-1*mode([trialAll.stdNum]):0), num2cell(MSTIRegParams.tStdToDev(:, 1)), "UniformOutput", false);
@@ -117,10 +112,10 @@ for dIndex = 1:length(devType)
             chRS{chIdx}(ICIidx, 2) = BaseICI(dIndex, ICIidx);
         end
     end
-    %     minBaseICI = min(BaseICI, [], "all");
+    % inBaseICI = min(BaseICI, [], "all");
     psthPara.binsize = 30; % ms
     psthPara.binstep = 5; % ms
-    chPSTH = cellfun(@(x) calPsth(x, psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);
+    chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 'scaleFactor', 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "uni", false);
     chStr = fields(trialsSPK)';
     kilochSPK = cell2struct([chStr; spikePlot; chPSTH; chRS], ["info", "spikePlot", "PSTH", "chRS"]);
 
@@ -140,6 +135,7 @@ for dIndex = 1:length(devType)
 end
 
 %% save
+mkdir(FIGPATH);
 chSpikeLfpCopy = chSpikeLfp;
 % spikeRes
 SAVENAME = strcat(FIGPATH, "spkRes.mat");
@@ -159,7 +155,6 @@ save(SAVENAME, "chAll", "trialAll", "trialAllRaw", "-mat");
 %% Plot Figure
 % single unit
 if ~Exist_Single
-%     mkdir(FIGPATH);
     MSTIRegParams.FIGPATH = FIGPATH;
     MSTIRegParams.trialAll = trialAll;
     chPlotFcn = @MLA_PlotRasterLfp_MSTIRegProcess;

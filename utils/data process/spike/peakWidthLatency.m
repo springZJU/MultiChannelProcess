@@ -48,7 +48,7 @@ calWinRaw = respWin;
 respWin(1) = respWin(1) - psthPara.binsize;
 respWin(2) = respWin(2) + psthPara.binsize;
 % calPSTH
-PSTH = calPsth(spikeCell, psthPara, 1e3, 'EDGE', respWin);
+PSTH = calPsth(spikeCell, psthPara, 'scaleFactor', 1e3, 'EDGE', respWin);
 PSTH = findWithinInterval(PSTH, calWinRaw, 1);
 smthPSTH = PSTH(:, 2);
 % smthPSTH = mGaussionFilter(PSTH(:, 2), 20, 101);

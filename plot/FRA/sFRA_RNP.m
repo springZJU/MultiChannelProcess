@@ -13,13 +13,18 @@ try
     end
 catch
     data = TDTbin2mat(dataPath, 'TYPE', [1, 2, 3]);
-    sortData.spikeTimeAll = data.snips.eNeu.ts;
-    sortData.channelIdx = data.snips.eNeu.chan;
+    fieldname = fieldnames(data.snips);% 20240513 edit by YHT
+    sortData.spikeTimeAll = data.snips.(string(fieldname)).ts;
+    if numel(data.snips.(string(fieldname)).chan) ~= 1
+        sortData.channelIdx = data.snips.(string(fieldname)).chan;
+    else
+        sortData.channelIdx = repmat(data.snips.(string(fieldname)).chan, size(data.snips.(string(fieldname)).data, 1), 1);
+    end
 end
 waitbar(1/4, mWaitbar, 'Data loaded');
 
 %% Parameter Settings
-windowParams.window = [0 120]; % ms
+windowParams.window = [0 300]; % ms
 
 %% Process
 

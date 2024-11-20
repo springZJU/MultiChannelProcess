@@ -3,10 +3,10 @@ clc; clear;close all
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 %% TODO: configuration -- data select
-ratName = "RAT15"; % required
+ratName = "RAT16"; % required
 ROOTPATH = "E:\ratNeuroPixel"; % required
 project = "CTL_New"; % project, required
-dateSel = "0123"; % blank for all
+dateSel = "0313"; % blank for all
 % protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_TB_Ratio", "RNP_TB_Basic_2_3"...
 %     "RNP_TB_BaseICI_2_3", "RNP_Precise", "RNP_ToneCF_Late"]; % blank for all
 % protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_Precise"]; % blank for all
@@ -14,7 +14,7 @@ dateSel = "0123"; % blank for all
 % protSel = [ "NewBaseICI","TrainDurTBChange S1","TrainDurTBChange S2",...
 %     "LocalChangeReg2-3 N0-16","LocalChangeReg2-4 N0-16","TrainDurToneChange S1","TrainDurToneChange S2"]; % blank for all
 % protSel = ["Noise", "ToneCF"  "Anesthesia_Ratio_4_01234"]; % blank for all   "Anesthesia_Ratio_4_01234""MMN" 
-protSel = ["MMN","MSTI"];
+protSel = ["Noise"];
 
 %% TODO : configuration -- process parameters
 psthPara.binsize = 20; % ms

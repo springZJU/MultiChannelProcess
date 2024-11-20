@@ -1,4 +1,4 @@
-function Fig = MLA_PlotLfpByCh_Intrinsic(lfpRes, spkRes, CTLParams)   
+function Fig = MLA_PlotLfpByCh_Intrinsic(lfpRes, spkRes, CTLParams)
 
 CTLFields = string(fields(CTLParams));
 for fIndex = 1 : length(CTLFields)
@@ -12,8 +12,15 @@ Fig = figure;
 maximizeFig(Fig);
 
 sigRes = evalin("caller", "sigRes");
-sigCH  = unique(mod(double(erase([sigRes([sigRes.H] == 1).CH], "CH")), 1000));
-
+if any([sigRes.H] == 1)
+    if max(unique(mod(double(erase([sigRes([sigRes.H] == 1).CH], "CH")), 1000))) == length(lfpRes(1).acgLFP)
+        sigCH  = unique(mod(double(erase([sigRes([sigRes.H] == 1).CH], "CH")), 1000));
+    else
+        sigCH  = unique(mod(double(erase([sigRes([sigRes.H] == 1).CH], "CH")), 1000))+1;
+    end
+else
+    sigCH = [];
+end
 for dIndex = 1 : length(lfpRes)
     for cIndex = 1 : chNum
         %% ACG curve
@@ -28,7 +35,7 @@ for dIndex = 1 : length(lfpRes)
             title(strcat("CH ", num2str(cIndex), ", Auditory Responsive channel, tau=",  num2str(lfpRes(dIndex).acgLFP(cIndex).acgLfpTime)));
         else
             title(strcat("CH ", num2str(cIndex), ", tau=",  num2str(lfpRes(dIndex).acgLFP(cIndex).acgLfpTime)));
-        end 
+        end
         if cIndex < chNum
             set(gca, 'xticklabel', '');
         end
@@ -41,27 +48,43 @@ for dIndex = 1 : length(lfpRes)
         acgLfpTime = [lfpRes(dIndex).acgLFP.acgLfpTime];
         plot([lfpRes(dIndex).acgLFP.acgLfpTime], 1:chNum, "r-"); hold on
         scatter([lfpRes(dIndex).acgLFP.acgLfpTime], 1:chNum, 40, "red"); hold on
-        scatter([lfpRes(dIndex).acgLFP(sigCH).acgLfpTime], sigCH, 40, "red", "filled"); hold on
+        if ~isempty(sigCH)
+            scatter([lfpRes(dIndex).acgLFP(sigCH).acgLfpTime], sigCH, 40, "red", "filled"); hold on
+        end
         yticks(1:chNum);
         ylim([0.5, chNum+0.5]);
         xlim([floor(min(acgLfpTime) / 10)*10, ceil(max(acgLfpTime) / 10)*10]);
         set(gca, "YDir", "reverse");
     end
-        %% ACG curve
-        
-        mSubplot(Fig, 2, 3, 3, [1, 1], [0.05, 0.05, 0.01, 0.01], paddings)
-        t    = spkRes(dIndex).ACGRes.spkACGMean(:, 1);
-        temp = spkRes(dIndex).ACGRes.spkACGMean(:, 2);
-        acgSpkTime = mean(spkRes(dIndex).ACGRes.acgSpkTime);
-        set(groot, 'defaultAxesNextPlot', 'add');
-        cellfun(@(x) plot(x(:, 1), x(:, 2), "Color", "#AAAAAA", "LineStyle", "-", "LineWidth", 0.5), spkRes.ACGRes.spkACG, "UniformOutput", false);
-        set(groot, 'defaultAxesNextPlot', 'replace');
-        plot([0;t], [1;temp], "Color", "red", "LineStyle", "-", "LineWidth", 1.5); hold on;
-        plot([0, acgSpkTime], [1/exp(1), 1/exp(1)], "k--"); hold on
-        plot([1, 1] * acgSpkTime, [0, 1/exp(1)], "k--"); hold on
-        xlim([0, t(end)]);
-        ylim([0, 1]);
-        title(strcat("tau=",  num2str(acgSpkTime)));
+    %% spk ACG curve
+
+    t    = spkRes(dIndex).ACGRes.spkACGMean(:, 1);
+    temp = spkRes(dIndex).ACGRes.spkACGMean(:, 2);
+    acgSpkTime = spkRes(dIndex).ACGRes.acgSpkTime;
+    acgPlot = spkRes.ACGRes.spkACG';
+
+    for cIndex = 1 : length(acgPlot)
+        Axes = mSubplot(Fig, length(acgPlot),  3, cIndex*3, [1, 1], margins, paddings);
+        if cIndex < length(acgPlot)
+            if matches(spkRes.chSPK(cIndex).info, [sigRes(find([sigRes.H])).CH, ""])
+                plot([0;acgPlot{cIndex}(:, 1)], [1;acgPlot{cIndex}(:, 2)], "Color", "b", "LineStyle", "-", "LineWidth", 1.5); hold on;
+            else
+                plot([0;acgPlot{cIndex}(:, 1)], [1;acgPlot{cIndex}(:, 2)], "Color", "k", "LineStyle", "-", "LineWidth", 1.5); hold on;
+
+            end
+            ylabel(spkRes.chSPK(cIndex).info);
+            plot([0, acgSpkTime(cIndex)], [1/exp(1), 1/exp(1)], "k-"); hold on
+            plot([1, 1] * acgSpkTime(cIndex), [min(acgPlot{cIndex}(:, 2)), 1/exp(1)], "k-"); hold on
+        else
+            plot([0;acgPlot{cIndex}(:, 1)], [1;acgPlot{cIndex}(:, 2)], "Color", "r", "LineStyle", "-", "LineWidth", 1.5); hold on;
+            plot([0, acgSpkTime(cIndex)], [1/exp(1), 1/exp(1)], "k-"); hold on
+            plot([1, 1] * acgSpkTime(cIndex), [min(acgPlot{cIndex}(:, 2)), 1/exp(1)], "k-"); hold on
+            title(strcat("tau=",  num2str(acgSpkTime)));
+            ylabel("pooled");
+        end
+        title(strcat("tau=",  num2str(acgSpkTime(cIndex))));
+        xlim([0, 100]);
+    end
 end
 
 % add vertical line

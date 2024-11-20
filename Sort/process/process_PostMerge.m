@@ -12,13 +12,15 @@ cd(npypath);
 
 idSimilar = readNPY('similar_templates.npy');
 clusterAll = double(readNPY('spike_clusters.npy'));
+load(".\kiloRez.mat");
+st3 = sortrows(rez.st3, 1);
 clusterID = unique(clusterAll);
 
 idSimilar = idSimilar(ismember(1:length(idSimilar), clusterID+1), ismember(1:length(idSimilar), clusterID+1));
 
-spikeTime = double(readNPY('spike_times.npy'))/fs;
+spikeTime = double(readNPY('spike_times.npy'))/fs(1);
 spikeTrain = cellfun(@(x) spikeTime(clusterAll == x), num2cell(clusterID), "uni", false);
-spikeFR    = cellfun(@length, spikeTrain) / (spikeTime(end) - spikeTime(1));
+spikeFR    = cellfun(@length, spikeTrain) / (spikeTime(end, 1) - spikeTime(1, 1));
 
 template = readNPY('templates.npy');
 simCell = mCell2mat(cellfun(@(x, y) mNchoosek(find(all(spikeFR(x > simThr) > frThr0) & x > simThr & ~ismember(1:length(idSimilar), y)), 1:sum(x > simThr)-1, y), num2cell(idSimilar, 2), num2cell(1:length(idSimilar))', "UniformOutput", false));
@@ -71,7 +73,7 @@ fclose(fileID);
 
 % id和ch对应
 id = [cluster_info.cluster_id]';
-ch = [cluster_info.ch]' + 1;
+ch = [cluster_info.ch]';
 idCh = sortrows([id, ch], 1);
 idCh(idToDel, :) = [];
 chs = unique(idCh(:, 2));

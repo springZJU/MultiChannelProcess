@@ -3,18 +3,18 @@ clc; clear;close all
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 
 %% TODO: configuration -- data select
-ratName = "RatDXY_MSTI1"; % required
+ratName = "RatFB"; % required
 ROOTPATH = "J:\BXH\"; % required
 project = "CTL_New"; % project, required
-dateSel = ["0116","0117","0118","0119","0120","0121","0122"]; % blank for all
+dateSel = ["240904"]; % blank for all
 % protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_TB_Ratio", "RNP_TB_Basic_2_3"...
 %     "RNP_TB_BaseICI_2_3", "RNP_Precise", "RNP_ToneCF_Late"]; % blank for all
-% protSel = ["RNP_ToneCF", "RNP_Noise", "RNP_Precise"]; % blank for all
-% protSel = ["RNP_ToneCF"]; % blank for all
+% protSel = ["RNP_ToneCF", "RNP_Noise"]; % blank for all
+protSel = ["RNP_ToneCF"]; % blank for all
 % protSel = [ "NewBaseICI","TrainDurTBChange S1","TrainDurTBChange S2",...
 %     "LocalChangeReg2-3 N0-16","LocalChangeReg2-4 N0-16","TrainDurToneChange S1","TrainDurToneChange S2"]; % blank for all
-% protSel = ["Noise", "ToneCF" ,"JCD"]; % blank for all
-protSel = ["Noise", "ToneCF"];
+% protSel = ["JCD"];
+% protSel = ["RNP_ToneCF","RNP_Noise","4050"];
 
 %% TODO : configuration -- process parameters
 psthPara.binsize = 20; % ms
@@ -30,6 +30,7 @@ temp(ismember(string({temp.name}'), [".", ".."])) = [];
 protocols = string({temp.name}');
 
 %% BATCH
+% for rIndex = 5
 for rIndex = 1 : length(protocols)
     protPathMat = strcat(rootPathMat, protocols(rIndex), "\");
     protocolStr = protocols(rIndex);

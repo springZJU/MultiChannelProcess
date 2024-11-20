@@ -3,7 +3,7 @@ parseStruct(customInfo);
 temp = strsplit(NPYPATH(nIndex), "\");
 MERGEPATH = strjoin(temp(1:end-2), "\");
 load(fullfile(MERGEPATH,'mergePara.mat'));
-fs = selInfo(nIndex).fs;
+parseStruct(selInfo);
 npypath = char(NPYPATH(nIndex));
 
 try
@@ -11,14 +11,17 @@ try
 catch
     BLOCKPATHTEMP = BLOCKPATH;
 end
-if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATH)) && ~reExportSpk
+temp = char(selInfo(nIndex).TANKNAME);
+BLOCKPATH = cellstr(strrep(BLOCKPATH, BLOCKPATH{1}(1:3), temp(1:3)));
+
+if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATH)) && ~reExportSpk && ~exportSpkWave
     return
 end
 
 %% cluster_info.tsv, for preview and selection
 run("process_PostMerge.m");
 clusterIdx = idCh(:, 1);
-chIdx = idCh(:, 2);
+chIdx = idCh(:, 2)+1;
 
 %% split sort data into different blocks
 kiloSpikeAll = cellfun(@(x) [spikeTime(clusterAll == x), chIdx(clusterIdx == x)*ones(sum(clusterAll == x), 1)], num2cell(clusterIdx), "UniformOutput", false);
@@ -28,9 +31,18 @@ if exist("waveLength", "var")
     segPoint = [0, cumsum(cell2mat(cellfun(@(x) sum(x), waveLength, "UniformOutput", false)))];
 end
 
+%% load excel
+[~, opts] = getTableValType(recordPath, "0");
+recordInfo = table2cell(readtable(recordPath, opts));
+recordInfo(1, cell2mat(cellfun(@(x) isequaln(x, NaN), recordInfo(1, :), "uni", false))) = {["double"]};
+recordInfo = cell2struct(recordInfo, opts.SelectedVariableNames, 2);
+idSel = ismember([recordInfo.ID]', customInfo.idSel) & contains(string({recordInfo.BLOCKPATH}'), BLOCKPATH);
+recordInfo = recordInfo(idSel);
+
+%%
 for blks = 1:length(BLOCKPATH)
     clear sortdata
-    if exist([BLOCKPATH{blks} '\sortdata.mat'], "file") && ~reExportSpk
+    if exist([BLOCKPATH{blks} '\sortdata.mat'], "file") && ~reExportSpk && ~exportSpkWave
         continue
     end
 
@@ -49,20 +61,30 @@ for blks = 1:length(BLOCKPATH)
         sortdata(:,1) = sortdata(:,1) - t(1);
     end
     %% export waveform
-    if exportSpkWave
-        onsetIdx = ceil(t(1) * fs);
-        wfWin = [-30, 30];
-        IDandCHANNEL = [idx, zeros(length(idx), 1), ch];
+    if exportSpkWave 
+        blkTemp = BLOCKPATH{blks};
+        temp = strsplit(BLOCKPATH{blks}, "\");
+        animalID = temp{end - 2};
+        dateStr = temp{end - 1};
+        paradigm = recordInfo(matches(string({recordInfo.BLOCKPATH}'), BLOCKPATH{blks})).paradigm;
+        sitePos = recordInfo(matches(string({recordInfo.BLOCKPATH}'), BLOCKPATH{blks})).sitePos;
+        SAVEPATH = strcat(MATPATH, animalID, "\CTL_New\", paradigm, "\", dateStr, "_", sitePos);
+        mkdir(SAVEPATH);
+        if exist(fullfile(SAVEPATH, "spkWave.mat"), "file")
+            continue
+        end
+
+        sampleRange = fix(t * fs(nIndex));
+        wfWin = [-30, 60]; % ms
+        IDandCHANNEL = [clusterIdx, zeros(length(clusterIdx), 1), chIdx];
         disp(strcat("Processing blocks (", num2str(blks), "/", num2str(length(BLOCKPATH)), ") ..."));
-        spkWave = getWaveForm_singleID_v2(fs, BLOCKPATH{blks}, npypath, idx, IDandCHANNEL, wfWin, onsetIdx);
+        spkWave = getWaveForm_singleID_v2(fs(nIndex), BLOCKPATH{blks}, npypath, clusterIdx, IDandCHANNEL, wfWin, sampleRange);
+        save(fullfile(SAVEPATH, "spkWave.mat"), "spkWave", "-v7.3");
     end
 
     %%
-    if exist("spkWave", "var")
-        save([BLOCKPATH{blks} '\sortdata.mat'], 'sortdata', 'spkWave', '-v7.3');
-    else
         save([BLOCKPATH{blks} '\sortdata.mat'], 'sortdata', '-v7.3');
-    end
+  
 
 end
 

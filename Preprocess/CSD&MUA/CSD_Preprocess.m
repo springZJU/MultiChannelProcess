@@ -11,7 +11,7 @@ end
 %% Loading data
 try
     disp("Try loading data from MAT");
-    load(strcat(MATPATH, "data.mat"));
+    load(fullfile(erase(MATPATH, regexp(MATPATH, "\\\w*.mat", "match")), "lfpData.mat"));
     lfpDataset = data.lfp;
     epocs = data.epocs;
     trialAll = processFcn(epocs);
