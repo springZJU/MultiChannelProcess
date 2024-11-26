@@ -1,4 +1,4 @@
-function R(MATPATH, FIGPATH)
+function BF_CSD_Rat(MATPATH, FIGPATH)
 
 % csd paramters config
 temp = fullfile(MATPATH, "temp");

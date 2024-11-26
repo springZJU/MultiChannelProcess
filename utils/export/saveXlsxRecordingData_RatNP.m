@@ -1,8 +1,13 @@
-function saveXlsxRecordingData_RatNP(ROOTPATH, recordInfo, idx, recordPath, fd_lfp)
-narginchk(4, 5);
+function saveXlsxRecordingData_RatNP(ROOTPATH, recordInfo, idx, recordPath, fd_lfp, fd_mua)
+narginchk(4, 6);
 if nargin < 5
     fd_lfp = 600;
 end
+
+if nargin < 6
+    fd_mua = 1000;
+end
+
 rowNum = 385;
 BLOCKPATH = recordInfo(idx).BLOCKPATH;
 sitePos = recordInfo(idx).sitePos;
@@ -56,7 +61,7 @@ else
     if strcmpi(isContinue, "n")
         error("the TTL sync signal does not match the TDT epocs [Swep] store!");
     else %% custom
-        delta_T = mean(diff([buffer.epocs.Swep.onset(1:end), TTL_Onset(1:end)], 1, 2));
+        delta_T = mean(diff([buffer.epocs.Swep.onset(1:3149), TTL_Onset(1:3149)], 1, 2));
 %         delta_T = mean(buffer.epocs.Swep.onset) - mean(TTL_Onset);
        
 % delta_T = 0;
@@ -92,6 +97,20 @@ data.SR_AP = SR_AP;
 %     disp(e.message);
 % end
 
+%% try to get MUA
+% try
+costomInfo = evalin("base", "customInfo");
+if costomInfo.ExportMUA
+    data.mua = NP2TDT_MUA(NP_Path, SR_AP, fd_mua);
+else
+    data.mua = [];
+end
+% catch e
+%     data.mua = [];
+%     disp(e.message);
+% end
+
+
 %% try to get Wave data for CSD
 if contains(paradigm, 'CSD')
     try
@@ -119,15 +138,17 @@ SAVEPATH = strcat(ROOTPATH, "\", animalID, "\CTL_New\", paradigm, "\", dateStr, 
 
 mkdir(SAVEPATH);
 dataCopy = data;
-if ~spkExported || getOr(evalin("base", "customInfo"), "ReSaveMAT", false)
-    data = rmfield(dataCopy, ["lfp", "Wave"]);
+if ~spkExported || getOr(evalin("base", "customInfo", "mua"), "ReSaveMAT", false)
+    data = rmfield(dataCopy, ["lfp", "mua"]);
     save(fullfile(SAVEPATH, "spkData.mat"), "data", "-v7.3");
     recordInfo(idx).spkExported = 1;
 end
 
 if ~lfpExported || getOr(evalin("base", "customInfo"), "ReSaveMAT", false)
-    data = rmfield(dataCopy, ["sortdata"]);
+    data = rmfield(dataCopy, ["sortdata", "mua"]);
     save(fullfile(SAVEPATH, "lfpData.mat"), "data", "-v7.3");
+    data = rmfield(dataCopy, ["sortdata", "lfp", "Wave"]);
+    save(fullfile(SAVEPATH, "muaData.mat"), "data", "-v7.3");
     recordInfo(idx).lfpExported = 1;
 end
 

@@ -13,6 +13,7 @@ customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;
 customInfo.reWhiten = false;
 customInfo.ExcludeIDLabels = ["noise"];% eg:["noise", "mua"] 
+customInfo.ExportMUA = false;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 parseStruct(customInfo);

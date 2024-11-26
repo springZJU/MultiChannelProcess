@@ -2,14 +2,14 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-        "\DXY\D_TemporalGroup.xlsx"); 
+        "\DXY\D_TemporalDomain_Recording.xlsx"); 
 %     "\SPR\RatBE_TBOffset_first_Recording.xlsx"); 
 %         "\SPR\SPR_MLA_Recording.xlsx"); 
 %     "SPR_RNP_TBOffset_Recording.xlsx");
 % "\SPR\RatBD_TB_Recording.xlsx"); 
 
 
-customInfo.idSel = [6:11];
+customInfo.idSel = [83:92];
 customInfo.MATPATH = "";
 % customInfo.MATPATH = "H:\SPR Paper\Offset Comparison\MAT Data\";
 % customInfo.MATPATH = "H:\SPR Paper\Local Global Detection\MAT Data\";
@@ -25,6 +25,7 @@ customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = false;
 customInfo.reMerge  = false;
 customInfo.reWhiten   = false;
+customInfo.ExportMUA = false;
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,7 +1,7 @@
-function RNP_Noise(MATPATH, FIGPATH, plotWin)
+function ClickTrain_5_6o5(MATPATH, FIGPATH, plotWin)
 narginchk(2, 3);
 if nargin < 3
-    plotWin = [-50, 300];
+    plotWin = [-1000, 15000];
 end
 % if exist(FIGPATH, "dir")
 %     return
@@ -33,7 +33,7 @@ trialN = num2cell(1 : length(data.epocs.Swep.onset))';
 spikes = spikesAll(channelIdx == ch(cIndex), 1);
 noiseSpike = cellfun(@(x, y) [findWithinInterval(spikes, x) - x(1) + Window(1), fix(y)*ones(length(findWithinInterval(spikes, x)), 1)], segWin, trialN, "UniformOutput", false);
 [~, ~, ~, Fig] = peakWidthLatency(noiseSpike, [-100, 0], plotWin, "toPlot", true);
-
+maximizeFig(Fig)
 baseCount = cellfun(@(x) length(findWithinInterval(x(:, 1), baseWin)), noiseSpike);
 respCount = cellfun(@(x) length(findWithinInterval(x(:, 1), respWin)), noiseSpike);
 sigRes(cIndex).CH = strcat("CH", num2str(ch(cIndex)));

@@ -1,5 +1,5 @@
 function varargout = peakWidthLatency(spikes, baseWin, respWin, varargin)
-psthDef.binsize = 3;  psthDef.binstep = 0.3;
+psthDef.binsize = 50;  psthDef.binstep = 1;
 
 mIp = inputParser;
 mIp.addRequired("spikes", @(x) isnumeric(x) | iscell(x));

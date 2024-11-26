@@ -76,12 +76,16 @@ switch chNum
         ops.whiteningRange      = 32; % number of channels to use for whitening each channel
     case 128
         ops.chanMap = [fileparts(mfilename("fullpath")), '\config\PKU128_kilosortChanMap.mat'];
-        ops.NchanTOT = 128; %384 CHs + 1 sync
+        ops.NchanTOT = 128; 
         ops.fs = fs;
-        ops.nblocks = 5;
-        ops.ntbuff              = 32;    % samples of symmetrical buffer for whitening and spike detection
-        ops.NT                  = 32*1024+ ops.ntbuff; % must be multiple of 32 + ntbuff. This is the batch size (try decreasing if out of memory).
+        ops.nblocks = 0;
+        ops.ntbuff              = 64;    % samples of symmetrical buffer for whitening and spike detection
+        ops.NT                  = 64*1024+ ops.ntbuff; % must be multiple of 32 + ntbuff. This is the batch size (try decreasing if out of memory).
         ops.whiteningRange      = 16; % number of channels to use for whitening each channel
+        ops.spkTh               = -4;      % spike threshold in standard deviations (-6)
+        ops.nfilt_factor        = 6; % max number of clusters per good channel (even temporary ones)
+        ops.nPCs                = 5; % how many PCs to project the spikes into
+
 
         %         case newCH
         %             ops.chanMap = [];

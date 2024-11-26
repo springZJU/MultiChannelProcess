@@ -301,11 +301,7 @@ for bIndex = 1 : length(BLOCKPATH)
     num_data_blocks = bytes_remaining / bytes_per_block;
 
     num_amplifier_samples = num_samples_per_data_block * num_data_blocks;
-    num_aux_input_samples = (num_samples_per_data_block / 4) * num_data_blocks;
-    num_supply_voltage_samples = 1 * num_data_blocks;
-    num_board_adc_samples = num_samples_per_data_block * num_data_blocks;
     num_board_dig_in_samples = num_samples_per_data_block * num_data_blocks;
-    num_board_dig_out_samples = num_samples_per_data_block * num_data_blocks;
 
     record_time = num_amplifier_samples / sample_rate;
     if (data_present)
@@ -323,15 +319,15 @@ for bIndex = 1 : length(BLOCKPATH)
         % Pre-allocate memory for data.
         fprintf(1, 'Allocating memory for data...\n');
 
-        amplifier_data = zeros(num_amplifier_channels, num_amplifier_samples);
-        aux_input_data = zeros(num_aux_input_channels, num_aux_input_samples);
-        supply_voltage_data = zeros(num_supply_voltage_channels, num_supply_voltage_samples);
-        temp_sensor_data = zeros(num_temp_sensor_channels, num_supply_voltage_samples);
-        board_adc_data = zeros(num_board_adc_channels, num_board_adc_samples);
+%         amplifier_data = zeros(num_amplifier_channels, num_amplifier_samples);
+%         aux_input_data = zeros(num_aux_input_channels, num_aux_input_samples);
+%         supply_voltage_data = zeros(num_supply_voltage_channels, num_supply_voltage_samples);
+%         temp_sensor_data = zeros(num_temp_sensor_channels, num_supply_voltage_samples);
+%         board_adc_data = zeros(num_board_adc_channels, num_board_adc_samples);
         board_dig_in_data = zeros(num_board_dig_in_channels, num_board_dig_in_samples);
         board_dig_in_raw = zeros(1, num_board_dig_in_samples);
-        board_dig_out_data = zeros(num_board_dig_out_channels, num_board_dig_out_samples);
-        board_dig_out_raw = zeros(1, num_board_dig_out_samples);
+%         board_dig_out_data = zeros(num_board_dig_out_channels, num_board_dig_out_samples);
+%         board_dig_out_raw = zeros(1, num_board_dig_out_samples);
 
 
         % Read sampled data from file.
@@ -352,9 +348,9 @@ for bIndex = 1 : length(BLOCKPATH)
             % timestamps for pretrigger data.
             if ((data_file_main_version_number == 1 && data_file_secondary_version_number >= 2) ...
                     || (data_file_main_version_number > 1))
-                t_amplifier(amplifier_index:(amplifier_index + num_samples_per_data_block - 1)) = fread(fid, num_samples_per_data_block, 'int32');
+                fread(fid, num_samples_per_data_block, 'int32');
             else
-                t_amplifier(amplifier_index:(amplifier_index + num_samples_per_data_block - 1)) = fread(fid, num_samples_per_data_block, 'uint32');
+                fread(fid, num_samples_per_data_block, 'uint32');
             end
             if (num_amplifier_channels > 0)
                 data = fread(fid, [num_samples_per_data_block, num_amplifier_channels], 'uint16')';
@@ -363,22 +359,22 @@ for bIndex = 1 : length(BLOCKPATH)
                 fwrite(fidOutSingle, data, 'integer*2');
             end
             if (num_aux_input_channels > 0)
-                aux_input_data(:, aux_input_index:(aux_input_index + (num_samples_per_data_block / 4) - 1)) = fread(fid, [(num_samples_per_data_block / 4), num_aux_input_channels], 'uint16')';
+                fread(fid, [(num_samples_per_data_block / 4), num_aux_input_channels], 'uint16')';
             end
             if (num_supply_voltage_channels > 0)
-                supply_voltage_data(:, supply_voltage_index) = fread(fid, [1, num_supply_voltage_channels], 'uint16')';
+                fread(fid, [1, num_supply_voltage_channels], 'uint16')';
             end
             if (num_temp_sensor_channels > 0)
-                temp_sensor_data(:, supply_voltage_index) = fread(fid, [1, num_temp_sensor_channels], 'int16')';
+                fread(fid, [1, num_temp_sensor_channels], 'int16')';
             end
             if (num_board_adc_channels > 0)
-                board_adc_data(:, board_adc_index:(board_adc_index + num_samples_per_data_block - 1)) = fread(fid, [num_samples_per_data_block, num_board_adc_channels], 'uint16')';
+                fread(fid, [num_samples_per_data_block, num_board_adc_channels], 'uint16')';
             end
             if (num_board_dig_in_channels > 0)
-                board_dig_in_raw(board_dig_in_index:(board_dig_in_index + num_samples_per_data_block - 1)) = fread(fid, num_samples_per_data_block, 'uint16');
+            board_dig_in_raw(board_dig_in_index:(board_dig_in_index + num_samples_per_data_block - 1)) = fread(fid, num_samples_per_data_block, 'uint16');
             end
             if (num_board_dig_out_channels > 0)
-                board_dig_out_raw(board_dig_out_index:(board_dig_out_index + num_samples_per_data_block - 1)) = fread(fid, num_samples_per_data_block, 'uint16');
+                fread(fid, num_samples_per_data_block, 'uint16');
             end
 
 

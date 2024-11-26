@@ -2,7 +2,11 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR\SPR_RRHD_TBOffset_Recording.xlsx");
+    "\SPR\SPR_RNP_TBOffset_Recording.xlsx");
+
+%                        "YHT\YHT_RatLA_Recording.xlsx");
+
+%     "GFJ\GFJ_RatLA_Recording-3.xlsx");
 %                            "YHT\YHT_MLA_Recording_202410.xlsx");
 
 %     "\KXK\KXK_MLA_Recording_202410.xlsx");
@@ -12,7 +16,6 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 
 %     "GFJ\GFJ_RatLA_Recording.xlsx");
 %                     "\KXK\KXK_RatLA_Recording.xlsx");
-%                    "YHT\YHT_RatLA_Recording.xlsx");
 
 %     "\SPR\RatBE_TBOffset_first_Recording.xlsx");
 %         "\SPR\SPR_MLA_Recording.xlsx");
@@ -20,10 +23,10 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 % "\SPR\RatBD_TB_Recording.xlsx");
 
 
-customInfo.idSel = [1];
+customInfo.idSel = [9:12];
 % customInfo.MATPATH = "J:\MonkeyLA\MAT DATA\";
 % customInfo.MATPATH = "H:\SPR Paper\Offset Comparison\MAT Data\";
-customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Two Kinds of Pitch\MAT Data\";
+customInfo.MATPATH = "H:\SPR Paper\(Under recording) Local Global Detection\MAT Data\";
 % customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Regular Inserted in Irregular\MAT Data\";
 % customInfo.MATPATH = "H:\SPR Paper\Intrinsic Temporal Scale\MAT DATA\";
 % customInfo.MATPATH = "H:\SPR Paper\Temporal Merging in the Macaque Auditory Cortex\MAT Data\";
@@ -32,11 +35,12 @@ customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Two Kinds of Pitch\MAT Data\";
 
 customInfo.thr = [7, 3];
 
-customInfo.reExportSpk = false;
+customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;
 customInfo.reMerge  = false;
 customInfo.reWhiten   = false;
+customInfo.ExportMUA = false;
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

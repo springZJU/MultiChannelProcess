@@ -18,6 +18,7 @@ customInfo.exportSpkWave = true;
 customInfo.ReSaveMAT = true;
 customInfo.reMerge  = false;
 customInfo.reWhiten   = false;
+customInfo.ExportMUA = false;
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

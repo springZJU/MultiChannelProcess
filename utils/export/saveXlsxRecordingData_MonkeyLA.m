@@ -2,7 +2,7 @@ function saveXlsxRecordingData_MonkeyLA(ROOTPATH, recordInfo, idx, recordPath, f
 e = [];
 narginchk(4, 5);
 if nargin < 5
-    fd_lfp = 1200;
+    fd_lfp = 1000;
 end
 BLOCKPATH = char(recordInfo(idx).BLOCKPATH);
 sitePos = recordInfo(idx).sitePos;
@@ -10,6 +10,8 @@ depth = recordInfo(idx).depth;
 paradigm = recordInfo(idx).paradigm;
 spkExported = logical(recordInfo(idx).spkExported);
 lfpExported = logical(recordInfo(idx).lfpExported);
+ExportMUA = logical(recordInfo(idx).ExportMUA);
+
 temp = strsplit(BLOCKPATH, "\");
 animalID = temp{end - 2};
 dateStr = temp{end - 1};
@@ -50,9 +52,30 @@ catch e
     disp(e.message);
 end
 
+%% try to get MUA
+% try
+customInfo = evalin("base", "customInfo");
+if customInfo.ExportMUA
+    raw_wave = buffer.streams.Wave.data;
+    SR_AP    = buffer.streams.Wave.fs;
+    [dataTemp, fs] = cellfun(@(x) pickUpMUA(double(x), SR_AP, [300, min([4500, SR_AP/2-500])], 500, 2, fd_lfp), num2cell(raw_wave, 2), "UniformOutput", false);
+    data.mua.data = cell2mat(dataTemp);
+    data.mua.channels = buffer.streams.Wave.channels;
+    data.mua.name = 'MUA';
+    data.mua.startTime = 0;
+    data.mua.fs = fs{1};
+else
+    data.mua = [];
+end
+% catch e
+%     data.mua = [];
+%     disp(e.message);
+% end
+
+
 %% try to get Wave data for CSD
 if contains(paradigm, 'CSD')
-    try 
+    try
         data.Wave = buffer.streams.Wave;
     catch e
         data.Wave = [];
@@ -82,17 +105,19 @@ mkdir(SAVEPATH);
 dataCopy = data;
 customInfo = evalin("base", "customInfo");
 if ~spkExported || customInfo.ReSaveMAT
-    data = rmfield(dataCopy, ["lfp", "Wave"]);
+    data = rmfield(dataCopy, ["lfp", "Wave", "mua"]);
     save(fullfile(SAVEPATH, "spkData.mat"), "data", "-mat");
     recordInfo(idx).spkExported = 1;
 end
 if ~lfpExported || customInfo.ReSaveMAT
-    data = rmfield(dataCopy, ["spikeRaw", "sortdata"]);
+    data = rmfield(dataCopy, ["spikeRaw", "sortdata", "mua"]);
     save(fullfile(SAVEPATH, "lfpData.mat"), "data", "-mat");
+    data = rmfield(dataCopy, ["sortdata", "lfp", "Wave"]);
+    save(fullfile(SAVEPATH, "muaData.mat"), "data", "-v7.3");
     recordInfo(idx).lfpExported = 1;
 end
 
-    writetable(struct2table(recordInfo), recordPath);
+writetable(struct2table(recordInfo), recordPath);
 
 
 end

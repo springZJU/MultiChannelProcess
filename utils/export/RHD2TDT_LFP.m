@@ -15,7 +15,7 @@ if nSamp > 3e6
     lfp.channels = 1:32;
     for gIndex = 1 : length(groups)
         chData = mmf.Data.x(groups{gIndex}, :);
-        lfp.data = double(chData)/1e6;
+        lfp.data = double(chData);
         resampleRes = ECOGResample(lfp, fd_lfp);
         dataBuffer(groups{gIndex}, :) = resampleRes.data;
         clc

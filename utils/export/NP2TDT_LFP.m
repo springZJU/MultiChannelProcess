@@ -10,7 +10,7 @@ lfp.fs = SR_LFP;
 lfp.name = 'Llfp';
 lfp.startTime = 0;
 % dataBuffer = zeros(nCh, nSamp);
-groups = num2cell(reshape(1:385, 77, []), 1);
+groups = num2cell(reshape(1:nCh, 77, []), 1);
 if nSamp > 3e6
     lfp.channels = 1:77;
     for gIndex = 1 : length(groups)

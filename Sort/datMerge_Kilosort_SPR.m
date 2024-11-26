@@ -2,10 +2,12 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR\SPR_RNP_TBOffset_Recording.xlsx");
-%                            "YHT\YHT_MLA_Recording_202410.xlsx");
+                           "YHT\YHT_MLA_Recording_202410.xlsx");
+% "\KXK\KXK_MLA_Recording_202410.xlsx");
 
-%     "\KXK\KXK_MLA_Recording_202410.xlsx");
+%         "SPR\SPR_RRHD_TBOffset_Recording.xlsx");
+
+
 
 
 
@@ -20,11 +22,11 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 % "\SPR\RatBD_TB_Recording.xlsx");
 
 
-customInfo.idSel = [9:12];
+customInfo.idSel = [37:40];
 % customInfo.MATPATH = "J:\MonkeyLA\MAT DATA\";
 % customInfo.MATPATH = "H:\SPR Paper\Offset Comparison\MAT Data\";
-customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Two Kinds of Pitch\MAT Data\";
-% customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Regular Inserted in Irregular\MAT Data\";
+% customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Two Kinds of Pitch\MAT Data\";
+customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Regular Inserted in Irregular\MAT Data\";
 % customInfo.MATPATH = "H:\SPR Paper\Intrinsic Temporal Scale\MAT DATA\";
 % customInfo.MATPATH = "H:\SPR Paper\Temporal Merging in the Macaque Auditory Cortex\MAT Data\";
 
@@ -32,11 +34,12 @@ customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Two Kinds of Pitch\MAT Data\";
 
 customInfo.thr = [7, 3];
 
-customInfo.reExportSpk = false;
+customInfo.reExportSpk = true;
 customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;
 customInfo.reMerge  = false;
 customInfo.reWhiten   = false;
+customInfo.ExportMUA = false;
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%% datMerge %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,6 +105,6 @@ parseStruct(customInfo);
 run("process_SaveMAT.m");
 
 %% %%%%%%%%%%%%%%%%%%%%%% delete merged file %%%%%%%%%%%%%%%%%%%%%%%%%%%
-for rIndex = 1 : length(customInfo.MERGEFILE)
-    deleteItem(customInfo.MERGEFILE(rIndex));
-end
+% for rIndex = 1 : length(customInfo.MERGEFILE)
+%     deleteItem(customInfo.MERGEFILE(rIndex));
+% end
