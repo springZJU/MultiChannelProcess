@@ -9,7 +9,7 @@ if nargin < 6
 end
 
 rowNum = 385;
-BLOCKPATH = recordInfo(idx).BLOCKPATH;
+BLOCKPATH = recordInfo(idx).BLOCKPATH; % ROOTPATH\animalID\date\Block-n
 sitePos = recordInfo(idx).sitePos;
 depth = recordInfo(idx).depth;
 paradigm = recordInfo(idx).paradigm;
@@ -134,7 +134,8 @@ params.dateStr = dateStr;
 data.params = params;
 
 %% export result
-SAVEPATH = strcat(ROOTPATH, "\", animalID, "\CTL_New\", paradigm, "\", dateStr, "_", sitePos);
+% SAVEPATH = strcat(ROOTPATH, "\", animalID, "\CTL_New\", paradigm, "\", dateStr, "_", sitePos);
+SAVEPATH = fullfile(ROOTPATH, animalID, paradigm, strcat(dateStr, "_", sitePos));
 
 mkdir(SAVEPATH);
 dataCopy = data;

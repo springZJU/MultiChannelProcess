@@ -26,10 +26,8 @@ for i = selIdx'
         saveXlsxRecordingData_MonkeyLA(MATPATH, recordInfo, i, recordPath);
     elseif matches(recTech, "NeuroPixel")
         saveXlsxRecordingData_RatNP(MATPATH, recordInfo, i, recordPath);
-            elseif matches(recTech, "RHD")
+    elseif matches(recTech, "RHD")
         saveXlsxRecordingData_RHD(MATPATH, recordInfo, i, recordPath);
-        %     elseif matches(recTech, "custom")
-        %         % custom
     end
 
 end

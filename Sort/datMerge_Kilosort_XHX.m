@@ -3,26 +3,9 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
     "XHX\XHX_RNP_Recording.xlsx");
-%                            "YHT\YHT_MLA_Recording_202410.xlsx");
-
-%     "\KXK\KXK_MLA_Recording_202410.xlsx");
-
-
-
-
-%     "GFJ\GFJ_RatLA_Recording.xlsx");
-%                     "\KXK\KXK_RatLA_Recording.xlsx");
-%                    "YHT\YHT_RatLA_Recording.xlsx");
-
-%     "\SPR\RatBE_TBOffset_first_Recording.xlsx");
-%         "\SPR\SPR_MLA_Recording.xlsx");
-
-% "\SPR\RatBD_TB_Recording.xlsx");
-
 
 customInfo.idSel = [2];
-customInfo.MATPATH = "G:\Rat\Rat Neuropixels\Preferred temporal structure\MAT DATA\raw\";
-
+customInfo.MATPATH = "D:\Lab members\XHX\Preferred temporal structure\DATA\MAT DATA\raw\";
 
 customInfo.thr = [7, 3];
 
@@ -30,7 +13,7 @@ customInfo.reExportSpk = false;
 customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;
 customInfo.reMerge  = false;
-customInfo.reWhiten   = false;
+customInfo.reWhiten  = false;
 customInfo.ExportMUA = false;
 
 
