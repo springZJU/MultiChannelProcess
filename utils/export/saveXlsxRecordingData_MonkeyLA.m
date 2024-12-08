@@ -4,13 +4,13 @@ narginchk(4, 5);
 if nargin < 5
     fd_lfp = 1000;
 end
+customInfo = evalin("base", "customInfo");
 BLOCKPATH = char(recordInfo(idx).BLOCKPATH);
 sitePos = recordInfo(idx).sitePos;
 depth = recordInfo(idx).depth;
 paradigm = recordInfo(idx).paradigm;
 spkExported = logical(recordInfo(idx).spkExported);
 lfpExported = logical(recordInfo(idx).lfpExported);
-ExportMUA = logical(recordInfo(idx).ExportMUA);
 
 temp = strsplit(BLOCKPATH, "\");
 animalID = temp{end - 2};

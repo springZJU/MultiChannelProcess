@@ -2,10 +2,13 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-                           "YHT\YHT_MLA_Recording_202410.xlsx");
+"YHT\YHT_MLA_Recording_202410.xlsx");
 % "\KXK\KXK_MLA_Recording_202410.xlsx");
 
-%         "SPR\SPR_RRHD_TBOffset_Recording.xlsx");
+% "GFJ\GFJ_RatLA_Recording-3.xlsx");
+
+% "SPR\SPR_RRHD_TBOffset_Recording.xlsx");
+
 
 
 
@@ -22,7 +25,8 @@ customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\ut
 % "\SPR\RatBD_TB_Recording.xlsx");
 
 
-customInfo.idSel = [37:40];
+customInfo.idSel = [51];
+% customInfo.MATPATH = "H:\SPR Paper\(Under recording) Local Global Detection\MAT Data\";
 % customInfo.MATPATH = "J:\MonkeyLA\MAT DATA\";
 % customInfo.MATPATH = "H:\SPR Paper\Offset Comparison\MAT Data\";
 % customInfo.MATPATH = "H:\SPR Paper\(Preliminary) Two Kinds of Pitch\MAT Data\";
