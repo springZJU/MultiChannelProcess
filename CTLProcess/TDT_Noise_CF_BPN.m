@@ -4,11 +4,11 @@
 % MATPATH = 'H:\AC\CM\cm20231120\Block-12';
 % MATPATH = 'M:\DATA\CM\cm20231123\Block-12';
 % MATPATH = '\\Xtzj-2024sygfoi\data\DDZ\ddz20240528\Block-12';
-% MATPATH = '\\Win-6jbl2qksvfr\DATA\CM\CM20241206\Block-2';
-MATPATH = '\\Win-6jbl2qksvfr\DATA\Joker\Joker20241207\Block-1';                                           
+MATPATH = '\\Win-6jbl2qksvfr\DATA\CM\CM20241227\Block-12';
+% MATPATH = '\\Win-6jbl2qksvfr\DATA\Joker\Joker20241227\Block-22';                                           
 
 FIGPATH = fullfile(MATPATH, "Figure");
-RNP_Noise(MATPATH, FIGPATH, [-50, 200]);
+RNP_Noise(MATPATH, FIGPATH, [-50, 150]);
 
 %% CF
 % MATPATH = 'H:\SPR Paper\Two-Photo Imaging\electrophysiological\Tank\20240131Rat2\Block-23';
@@ -16,8 +16,8 @@ RNP_Noise(MATPATH, FIGPATH, [-50, 200]);
 % MATPATH = 'H:\AC\CM\cm20231120\Block-13';
 % MATPATH = 'O:\MonkeyLA\DDZ\ddz20240612\Block-2';
 % MATPATH = '\\Win-6jbl2qksvfr\data\DDZ\ddz20240508\Block-4';
-% MATPATH = '\\Win-6jbl2qksvfr\DATA\CM\CM20241206\Block-6';
-MATPATH = '\\Win-6jbl2qksvfr\DATA\Joker\Joker20241207\Block-7';                                           
+% MATPATH = '\\Win-6jbl2qksvfr\DATA\CM\CM20241227\Block-6';
+MATPATH = '\\Win-6jbl2qksvfr\DATA\Joker\Joker20241228\Block-16';                                           
 FIGPATH = fullfile(MATPATH, "Figure");
 sFRA_RNP(MATPATH, FIGPATH);
 
