@@ -24,7 +24,7 @@ end
 waitbar(1/4, mWaitbar, 'Data loaded');
 
 %% Parameter Settings
-windowParams.window = [0 300]; % ms
+windowParams.window = [0 150]; % ms
 
 %% Process
 

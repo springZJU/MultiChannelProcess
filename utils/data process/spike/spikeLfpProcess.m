@@ -46,7 +46,9 @@ try
     % spike
 
     load(fullfile(erase(DATAPATH, regexp(DATAPATH, "\\\w*.mat", "match")), "spkData.mat"));
-    
+    if isfield(data, "sortdataCorrected")
+        data.sortdata = data.sortdataCorrected;
+    end
     if ~isempty(data.sortdata)
         if any(data.sortdata(:, 2) == 0)
             data.sortdata(:, 2) = data.sortdata(:, 2) + 1;
