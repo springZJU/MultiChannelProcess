@@ -81,10 +81,7 @@ switch chNum
         ops.nblocks = 0;
         ops.ntbuff              = 64;    % samples of symmetrical buffer for whitening and spike detection
         ops.NT                  = 64*1024+ ops.ntbuff; % must be multiple of 32 + ntbuff. This is the batch size (try decreasing if out of memory).
-        ops.whiteningRange      = 16; % number of channels to use for whitening each channel
-%         ops.spkTh               = -4;      % spike threshold in standard deviations (-6)
-        ops.nfilt_factor        = 6; % max number of clusters per good channel (even temporary ones)
-        ops.nPCs                = 5; % how many PCs to project the spikes into
+        ops.whiteningRange      = 32;
 
 
         %         case newCH

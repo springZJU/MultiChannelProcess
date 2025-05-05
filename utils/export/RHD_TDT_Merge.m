@@ -324,8 +324,13 @@ for bIndex = 1 : length(BLOCKPATH)
 %         supply_voltage_data = zeros(num_supply_voltage_channels, num_supply_voltage_samples);
 %         temp_sensor_data = zeros(num_temp_sensor_channels, num_supply_voltage_samples);
 %         board_adc_data = zeros(num_board_adc_channels, num_board_adc_samples);
+        try
         board_dig_in_data = zeros(num_board_dig_in_channels, num_board_dig_in_samples);
         board_dig_in_raw = zeros(1, num_board_dig_in_samples);
+        catch
+        board_dig_in_data = zeros(num_board_dig_in_channels, floor(num_board_dig_in_samples));
+        board_dig_in_raw = zeros(1, floor(num_board_dig_in_samples));
+        end
 %         board_dig_out_data = zeros(num_board_dig_out_channels, num_board_dig_out_samples);
 %         board_dig_out_raw = zeros(1, num_board_dig_out_samples);
 

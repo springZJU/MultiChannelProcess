@@ -16,7 +16,7 @@ if all(cellfun(@(x) exist([x '\sortdata.mat'], "file"), BLOCKPATH)) && ~reExport
 end
 
 %% cluster_info.tsv, for preview and selection
-run("process_PostMerge_ExcludeNoise.m");
+run("process_PostMerge.m");
 clusterIdx = idCh(:, 1);
 chIdx = idCh(:, 2);
 

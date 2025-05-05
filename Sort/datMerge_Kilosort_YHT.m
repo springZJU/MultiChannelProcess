@@ -2,10 +2,12 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-        "YHT\YHT_MLA_Recording_202410.xlsx");
-customInfo.MATPATH = "O:\MonkeyLA\MAT Data\";
+        "YHT\YHT_RRHD_LocalGlobal_Recording.xlsx");
+        % "YHT\YHT_MLA_Recording_202410.xlsx");
 
-customInfo.idSel = [2];                      
+customInfo.MATPATH = "D:\Lab members\YHT\LocalGlobal\DATA\MAT\";
+
+customInfo.idSel = 20;                      
 customInfo.thr = [7,3];
 
 customInfo.reExportSpk = true;
@@ -23,7 +25,7 @@ for rIndex = 1 : length(recID)
     if isempty(selIdx)
         continue
     end
-    
+
     if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file')
         mkdir(MERGEPATH);
         % load data depends on recording tech
@@ -31,8 +33,10 @@ for rIndex = 1 : length(recID)
             TDT2binMerge(BLOCKPATH,MERGEFILE);
         elseif strcmpi(recTech, "NeuroPixel")
             NP_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
-%         elseif strcmpi(recTech, "newTech")
-%             newTech_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
+        elseif strcmpi(recTech, "RHD")
+            RHD_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
+            %         elseif strcmpi(recTech, "newTech")
+            %             newTech_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
         end
     end
 end
@@ -56,14 +60,14 @@ NPYPATH = string(cellfun(@(x, y) fullfile(x, y, ['th', num2str(thr(1)), '_', num
 for nIndex = 1 : length(NPYPATH)
     cd(NPYPATH(nIndex));
     if ~isfile("cluster_info.tsv")%~exist("cluster_info.tsv", "file")
-        run("process_TemplateGUI_NoSave");
+        run("process_TemplateGUI");
     end
-    keyboard;
+    % keyboard;
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%% selectKilosortResult %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for nIndex = 1 : length(NPYPATH)
-    run("process_ExportSpike_ExcludeNoise.m");
+    run("process_ExportSpike.m");
 end
  
 %% %%%%%%%%%%%%%%%%%%%%%% save MAT file %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
