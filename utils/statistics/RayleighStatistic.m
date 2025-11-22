@@ -1,47 +1,47 @@
-function [RS, vs] = RayleighStatistic(spikes, ISI, winRS, trialNum)
-narginchk(2, 4);
+function [RS, vs, pValue] = RayleighStatistic(spikes, ISI, winRS)
+% 计算 Rayleigh Statistic、Vector Strength 及其 p 值
+% 输入：
+%   spikes : n×1 cell，每个元素为某次 trial 的 spike 时刻
+%   ISI    : 循环周期（单位与 spike 相同）
+%   winRS  : 可选，时间窗口 [t_start, t_end]
+% 输出：
+%   RS     : Rayleigh Statistic
+%   vs     : Vector Strength
+%   pValue : 对应的显著性 p 值（p = exp(-RS)）
 
-if iscell(spikes)
-    trialNum = length(spikes);
-%     spikes = cell2mat(spikes);
+if nargin < 2
+    error('至少需要 spikes 和 ISI 两个输入');
 end
 
 if isempty(spikes)
-    vs = 0;
-    RS = 0;
+    RS = 0; vs = 0; pValue = 1;
     return;
 end
 
+% 筛选时间窗口
 if nargin >= 3
-    spikes = spikes(spikes >= winRS(1) & spikes <= winRS(2));
+    for i = 1:length(spikes)
+        spikes{i} = spikes{i}(spikes{i} >= winRS(1) & spikes{i} <= winRS(2)) - winRS(1);
+    end
 end
 
-if ~exist("trialNum", "var")
-    error("trialNum should be provided if input is a vector!");
-end
-% RS_total = 0;
-% vs_total = 0;
-% for i = 1:trialNum
-%     current_spikes = spikes{i};
-%     piBuffer = 2 * pi * current_spikes / ISI;
-%     n = length(current_spikes);
-%     sumCos = sum(cos(piBuffer));
-%     sumSin = sum(sin(piBuffer));
-%     vs = sqrt(sumCos^2 + sumSin^2) / n;
-%     vs_total = vs_total + vs;
-%     RS = n * vs^2;
-%     RS_total = RS_total + RS;
-% end
-% RS_avg = RS_total / trialNum;
-% vs_avg = vs_total/trialNum;
-% % 计算 p 值
-% p = exp(-RS_avg);
+% 合并所有 spike
+allSpikes = cell2mat(spikes(:));
+n = length(allSpikes);
 
+% 转换为相位（单位弧度）
+theta = mod(allSpikes, ISI) * 2 * pi / ISI;
 
-piBuffer = 2 * pi * cell2mat(spikes) / ISI;
-n = length(cell2mat(spikes));
-sumCos = sum(cos(piBuffer));
-sumSin = sum(sin(piBuffer));
-vs = sqrt(sumCos^2 + sumSin^2) / n;
+% spike 数量
+n = numel(theta);
+
+% 计算 vector strength
+vs = abs(mean(exp(1i * theta)));
+
+% Rayleigh statistic
 RS = 2 * n * vs^2;
+
+% 近似 p 值（适用于较大 n）
+pValue = exp(-RS);
+
 end

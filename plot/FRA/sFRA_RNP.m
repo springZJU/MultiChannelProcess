@@ -4,7 +4,7 @@ narginchk(1, 2);
 %% Load data
 mWaitbar = waitbar(0, 'Data loading ...');
 try
-    load(strrep(dataPath, "data.mat", "spkData.mat"));
+    load(fullfile(erase(dataPath, regexp(dataPath, "\\\w*.mat", "match")), "spkData.mat"));
     sortData.spikeTimeAll = data.sortdata(:,1);
     if size(data.sortdata, 2) == 2
         sortData.channelIdx = data.sortdata(:, 2);

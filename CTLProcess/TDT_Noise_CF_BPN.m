@@ -17,7 +17,7 @@ RNP_Noise(MATPATH, FIGPATH, [-50, 150]);
 % MATPATH = 'O:\MonkeyLA\DDZ\ddz20240612\Block-2';
 % MATPATH = '\\Win-6jbl2qksvfr\data\DDZ\ddz20240508\Block-4';
 % MATPATH = '\\Win-6jbl2qksvfr\DATA\CM\CM20241227\Block-6';
-MATPATH = '\\Win-6jbl2qksvfr\DATA\Joker\Joker20241228\Block-16';                                           
+MATPATH = 'D:\Lab members\SPR\DATA\TDT\SPR20251118Implanted\Block-1';                                           
 FIGPATH = fullfile(MATPATH, "Figure");
 sFRA_RNP(MATPATH, FIGPATH);
 

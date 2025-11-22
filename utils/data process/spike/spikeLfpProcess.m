@@ -28,11 +28,16 @@ try
 
     load(fullfile(erase(DATAPATH, regexp(DATAPATH, "\\\w*.mat", "match")), "lfpData.mat"));
 
-    try
-        lfpDataset = data.lfp;
-    catch
-        lfpDataset = data.streams.Llfp;
+    if exist("lfp", "var")
+        lfpDataset = struct("data", lfp, "fs", fs, "channels", 1:size(lfp, 1));
+    else
+        try
+            lfpDataset = data.lfp;
+        catch
+            lfpDataset = data.streams.Llfp;
+        end
     end
+    
     epocs = data.epocs;
     trialAll = processFcn(epocs);
     if length(trialAll) > 10000

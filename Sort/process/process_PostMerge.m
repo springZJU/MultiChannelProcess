@@ -1,5 +1,5 @@
 try
-   simThr = max([inf * (~evalin("base", "customInfo.postMerge")), 0.7]);
+    simThr = max([inf * (~evalin("base", "customInfo.postMerge")), 0.7]);
 catch
     simThr = 0.7;
 end
@@ -12,8 +12,8 @@ cd(npypath);
 
 idSimilar = readNPY('similar_templates.npy');
 clusterAll = double(readNPY('spike_clusters.npy'));
-load(".\kiloRez.mat");
-st3 = sortrows(rez.st3, 1);
+% load(".\kiloRez.mat");
+% st3 = sortrows(rez.st3, 1);
 clusterID = unique(clusterAll);
 
 idSimilar = idSimilar(ismember(1:length(idSimilar), clusterID+1), ismember(1:length(idSimilar), clusterID+1));

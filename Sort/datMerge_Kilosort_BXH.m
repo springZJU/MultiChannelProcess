@@ -1,20 +1,21 @@
 ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
-customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-        "Bao_RatFF_LeftAC_Recording.xlsx");
+customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\BXH\", ...
+        "Bao_RatKC_Recording.xlsx");
 
 %         "Bao_RNP_TBOffset_Recording");
 %     "SPR_RNP_TBOffset_Recording.xlsx");
 
-customInfo.idSel = [46:58];
-customInfo.MATPATH = "J:\BXH\MAT Data\";
+customInfo.idSel = [1:11];
+customInfo.MATPATH = "D:\Lab members\BXH\MAT Data\";
 % customInfo.MATPATH = "I:\neuroPixels\MAT Data";
 
-customInfo.thr = [9, 4];
+% customInfo.thr = [9,4];
+customInfo.thr = [7,3];
 
-customInfo.reExportSpk = true;
-customInfo.exportSpkWave = true; 
+customInfo.reExportSpk = true;  
+customInfo.exportSpkWave = false; 
 customInfo.ReSaveMAT = true;
 customInfo.reMerge  = false;
 customInfo.reWhiten   = false;
@@ -37,6 +38,8 @@ for rIndex = 1 : length(recID)
             TDT2binMerge(BLOCKPATH,MERGEFILE);
         elseif strcmpi(recTech, "NeuroPixel")
             NP_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
+        elseif strcmpi(recTech, "RHD")
+            RHD_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
 %         elseif strcmpi(recTech, "newTech")
 %             newTech_TDT_Merge(BLOCKPATH, DATAPATH, MERGEFILE, fs)
         end

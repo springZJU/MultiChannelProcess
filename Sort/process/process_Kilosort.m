@@ -78,11 +78,8 @@ switch chNum
         ops.chanMap = [fileparts(mfilename("fullpath")), '\config\PKU128_kilosortChanMap.mat'];
         ops.NchanTOT = 128; 
         ops.fs = fs;
-        ops.nblocks = 0;
-        ops.ntbuff              = 64;    % samples of symmetrical buffer for whitening and spike detection
-        ops.NT                  = 64*1024+ ops.ntbuff; % must be multiple of 32 + ntbuff. This is the batch size (try decreasing if out of memory).
-        ops.whiteningRange      = 32;
-
+        
+        
 
         %         case newCH
         %             ops.chanMap = [];

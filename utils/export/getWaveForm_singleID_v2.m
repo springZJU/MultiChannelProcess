@@ -44,7 +44,7 @@ st3 = sortrows(rez.st3, 1);
 MChInID = IDandCHANNEL(ismember(IDandCHANNEL(:,1), unitID), 3);
 
 %% read data via memory map
-fileName = fullfile(getRootDirPath(NPYPATH, 2), 'temp_wh.dat');% .dat file containing the raw
+fileName = fullfile(getRootDirPath(NPYPATH, 1), 'temp_wh.dat');% .dat file containing the raw
 
 dataInfo = dir(fileName);
 dataType = 'int16';            % Data type of .dat file (this should be BP filtered)

@@ -10,6 +10,8 @@ DATAPATH = MATPATH;
 FIGPATH = strcat(FIGPATH, "\");
 
 temp = dir(FIGPATH);
+Exist_ResMat =  any(contains(string({temp.name}), "spkRes"));
+% Exist_Single = 1;
 Exist_Single = any(contains(string({temp.name}), "CH"));
 % Exist_CSD_MUA = any(contains(string({temp.name}), "LFP_Compare_CSD_MUA"));
 Exist_CSD_MUA = 1;
@@ -17,7 +19,7 @@ Exist_CSD_MUA = 1;
 Exist_LFP_By_Ch = 1;
 % Exist_LFP_Acorss_Ch = any(contains(string({temp.name}), "LFP_Compare_Chs"));
 Exist_LFP_Acorss_Ch = 1;
-if all([Exist_LFP_Acorss_Ch, Exist_LFP_By_Ch, Exist_CSD_MUA, Exist_Single])
+if all([Exist_ResMat, Exist_LFP_Acorss_Ch, Exist_LFP_By_Ch, Exist_CSD_MUA, Exist_Single])
     return
 end
 
@@ -42,7 +44,7 @@ devTemp = {trialAll.devOnset}';
 [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
 temp = cellfun(@(x, y) x + S1Duration(y), devTemp, num2cell(ordTemp), "UniformOutput", false);
 trialAll = addFieldToStruct(trialAll, temp, "devOnset");
-trialAll(1) = [];
+trialAll([trialAll.devOnset]' < -1*(Window(1))) = [];
 
 %% split data
 [trialsLFPRaw, ~, ~] = selectEcog(lfpDataset, trialAll, "dev onset", Window); % "dev onset"; "trial onset"
@@ -124,18 +126,18 @@ for dIndex = 1:length(devType)
     rawLFP.rawWave = trialsToFFT;
     rawLFP.f = ff';
     rawLFP.FFT = trialsFFT;
-
     
 
     %% spike
     spikePlot = cellfun(@(x) cell2mat(x), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
     spkeCell  = cellfun(@(x) cellfun(@(y) y(:, 1), x, "UniformOutput", false), num2cell(struct2cell(trialsSPK)', 1), "UniformOutput", false);
-    chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BaseICI(dIndex),sum(tIndexRaw)), spikePlot, "UniformOutput", false);
+    % chRS = cellfun(@(x) RayleighStatistic(x(:, 1), BasesICI(dIndex),sum(tIndexRaw)), spikePlot, "UniformOutput", false);
     psthPara = evalin("base", "psthPara");
-    [~, ~, chPSTH] = cellfun(@(x) calPSTH(x, Window, psthPara.binsize, psthPara.binstep), spkeCell, "UniformOutput", false);
-%     chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "UniformOutput", false);
+    [psth, edge] = cellfun(@(x) mu_calPSTH(x, Window, psthPara.binsize, psthPara.binstep), spkeCell, "UniformOutput", false);
+    chPSTH = cellfun(@(x, y) [y', x], psth, edge, "UniformOutput", false);
+    %     chPSTH = cellfun(@(x) calPsth(x(:, 1), psthPara, 1e3, 'EDGE', Window, 'NTRIAL', sum(tIndex)), spikePlot, "UniformOutput", false);
     chStr = fields(trialsSPK)';
-    chSPK = cell2struct([chStr; spikePlot; chPSTH; chRS], ["info", "spikePlot", "PSTH", "chRS"]);
+    chSPK = cell2struct([chStr; spikePlot; chPSTH], ["info", "spikePlot", "PSTH"]);
 
 
     %% integration
@@ -155,7 +157,6 @@ end
 
 % %% Plot Figure
 mkdir(FIGPATH);
-single unit
 if ~Exist_Single
     mkdir(FIGPATH);
     chPlotFcn(chSpikeLfp, CTLParams);
@@ -192,9 +193,23 @@ if ~Exist_CSD_MUA
         chAll(dIndex).chMUA = rmfield(chAll(dIndex).chMUA, ["Data", "tImage"]);
     end
 end
-SAVENAME = strcat(FIGPATH, "res.mat");
+% SAVENAME = strcat(FIGPATH, "res.mat");
+% save(SAVENAME, "chSpikeLfp", "chAll", "trialAll", "trialAllRaw", "-mat");
 
-save(SAVENAME, "chSpikeLfp", "chAll", "trialAll", "trialAllRaw", "-mat");
+chSpikeLfpCopy = chSpikeLfp;
+% spikeRes
+SAVENAME = strcat(FIGPATH, "spkRes.mat");
+chSpikeLfp = rmfield(chSpikeLfpCopy, "chLFP");
+save(SAVENAME, "chSpikeLfp", "trialAll", "trialAllRaw", "-mat");
+
+% lfpRes
+SAVENAME = strcat(FIGPATH, "lfpRes.mat");
+chSpikeLfp = rmfield(chSpikeLfpCopy, "chSPK");
+save(SAVENAME, "chSpikeLfp", "trialAll", "trialAllRaw", "-mat");
+
+% lfpRaw
+SAVENAME = strcat(FIGPATH, "lfpRaw.mat");
+save(SAVENAME, "chAll", "trialAll", "trialAllRaw", "-mat");
 close all;
 end
 

@@ -1,11 +1,14 @@
 ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
+% customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
+%     "XHX\XHX_RNP_Recording.xlsx");
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "XHX\XHX_RNP_Recording.xlsx");
+    "XHX\XHX_MA_Recording.xlsx");
 
-customInfo.idSel = [2];
-customInfo.MATPATH = "D:\Lab members\XHX\Preferred temporal structure\DATA\MAT DATA\raw\";
+customInfo.idSel = 1:18;
+% customInfo.MATPATH = "D:\Lab members\XHX\Preferred temporal structure\DATA\MAT DATA\raw\";
+customInfo.MATPATH = "D:\Lab members\XHX\Mouse\DATA\MAT DATA\raw\";
 
 customInfo.thr = [7, 3];
 

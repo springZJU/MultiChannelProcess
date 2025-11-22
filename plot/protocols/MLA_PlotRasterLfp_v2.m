@@ -70,7 +70,7 @@ for cIndex = 1 : chNum
     compareCol = (PSTH_CompareSize(1) + LFP_CompareSize(1)) * compareGroupN;
     for pIndex = 1 : compareGroupN
         posIndex = nGeneral * compareCol + pIndex;
-        AxesPSTH(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, PSTH_CompareSize, margins, paddings, "alignment", "top-left");
+        AxesPSTH(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, PSTH_CompareSize, margins, paddings, "alignment", "left-top");
         idxs = Compare_Index{pIndex, 1};
         for dIndex = 1 : length(idxs)
             if idxs(dIndex) > length(psthTemp)
@@ -92,7 +92,7 @@ for cIndex = 1 : chNum
     for pIndex = 1 : compareGroupN
         compareIdx = pIndex + compareGroupN * PSTH_CompareSize(1);
         posIndex = nGeneral * compareCol + compareIdx;
-        AxesLFP(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, LFP_CompareSize, margins, paddings, "alignment", "top-left");
+        AxesLFP(pIndex) = mSubplot(Fig, plotRows, compareCol, posIndex, LFP_CompareSize, margins, paddings, "alignment", "left-top");
         idxs = Compare_Index{pIndex, 1};
         for dIndex = 1 : length(idxs)
             if idxs(dIndex) > length(psthTemp)

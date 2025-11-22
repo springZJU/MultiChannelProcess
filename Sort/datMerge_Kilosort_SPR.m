@@ -2,40 +2,34 @@ ccc
 addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
-    "SPR\SPR_RRHD_TBOffset_Recording.xlsx");
+   "SPR\SPR_RRHD_TBOffset_Recording.xlsx");
+   % "SPR\SPR_RRHD_TBOffset_Recording.xlsx");
 
+    % "\KXK\KXK_RatLA_Recording_202505.xlsx");
 % "\KXK\KXK_MLA_Recording_202410.xlsx");
-
 % "YHT\YHT_MLA_Recording_202410.xlsx");
-
+%% 
 % "GFJ\GFJ_RatLA_Recording-3.xlsx");
-
-
-
-
-
 %     "GFJ\GFJ_RatLA_Recording.xlsx");
 %                     "\KXK\KXK_RatLA_Recording.xlsx");
 %                    "YHT\YHT_RatLA_Recording.xlsx");
-
 %     "\SPR\RatBE_TBOffset_first_Recording.xlsx");
 %         "\SPR\SPR_MLA_Recording.xlsx");
-
 % "\SPR\RatBD_TB_Recording.xlsx");
 
 
 
-customInfo.idSel = [43:51];
+customInfo.idSel = [131,132];
 customInfo.MATPATH = "D:\Lab members\SPR\SPR Paper\(Under recording) Local Global Detection\MAT Data\";
 
 
 customInfo.thr = [8, 3];
 
-customInfo.reExportSpk = true;
+customInfo.reExportSpk   = true;
 customInfo.exportSpkWave = false;
 customInfo.ReSaveMAT = true;
-customInfo.reMerge  = false;
-customInfo.reWhiten   = false;
+customInfo.reMerge   = false;
+customInfo.reWhiten  = true;
 customInfo.ExportMUA = false;
 
 
@@ -48,7 +42,7 @@ for rIndex = 1 : length(recID)
         continue
     end
 
-    if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file')
+    if ~exist(strcat(MERGEPATH, "\mergePara.mat"),'file') || reMerge
         mkdir(MERGEPATH);
         % load data depends on recording tech
         if strcmpi(recTech, "TDT")
@@ -102,6 +96,6 @@ parseStruct(customInfo);
 run("process_SaveMAT.m");
 
 %% %%%%%%%%%%%%%%%%%%%%%% delete merged file %%%%%%%%%%%%%%%%%%%%%%%%%%%
-% for rIndex = 1 : length(customInfo.MERGEFILE)
-%     deleteItem(customInfo.MERGEFILE(rIndex));
-% end
+for rIndex = 1 : length(customInfo.MERGEFILE)
+    deleteItem(customInfo.MERGEFILE(rIndex));
+end

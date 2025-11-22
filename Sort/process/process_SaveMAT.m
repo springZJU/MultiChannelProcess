@@ -8,7 +8,7 @@ recordInfo = cell2struct(recordInfo, opts.SelectedVariableNames, 2);
 sort = {recordInfo.sort}';
 lfpExported = {recordInfo.lfpExported}';
 spkExported = {recordInfo.spkExported}';
-idSel = num2cell(ismember([recordInfo.ID]', customInfo.idSel));
+idSel = num2cell(ismember(double(string({recordInfo.ID}))', customInfo.idSel));
 
 selIdx = find(cell2mat(cellfun(@(x, y, z, w) isequal(x, 1) & (isequal(y, 0) | isequal(z, 0) | customInfo.ReSaveMAT) & isequal(w, 1), sort, lfpExported, spkExported, idSel, "uni", false)));
 if isempty(selIdx)

@@ -60,17 +60,12 @@ else
     isContinue = input('continue? y/n \n', 's');
     if strcmpi(isContinue, "n")
         error("the TTL sync signal does not match the TDT epocs [Swep] store!");
-    else %% custom
-        delta_T = mean(diff([buffer.epocs.Swep.onset(1:3149), TTL_Onset(1:3149)], 1, 2));
-%         delta_T = mean(buffer.epocs.Swep.onset) - mean(TTL_Onset);
-       
-% delta_T = 0;
     end
 end
 
 %% try to get epocs
 try
-    data.epocs  = rewriteEpocsTime(buffer.epocs, delta_T);
+    data.epocs  = rewriteEpocsTime(buffer.epocs, TTL_Onset);
 catch e
     data.epocs = [];
     disp(e.message);
