@@ -4,7 +4,7 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
 "\ISH\ISH_LocalProcessNew.xlsx");
 
-customInfo.idSel = 1:26;
+customInfo.idSel = 17;
 customInfo.MATPATH = "D:\Lab members\ISH\(preliminary) LocalProcessing\MAT Data\";
 
 
