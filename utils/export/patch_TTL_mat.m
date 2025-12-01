@@ -1,7 +1,7 @@
 ccc
-temp     = dir('D:\Lab members\ISH\(preliminary) LocalProcessing\DATA\RHD\**\TTL.mat');
+temp     = dir('D:\Lab members\GSR\Offset\BDF Data\RAT_AC\**\TTL.mat');
 TTLPATH  = {temp.folder}';
-temp     = dir('D:\Lab members\ISH\(preliminary) LocalProcessing\DATA\RHD\**\*.rhd');
+temp     = dir('D:\Lab members\GSR\Offset\BDF Data\RAT_AC\**\*.rhd');
 RHDPATH  = {temp.folder}';
 TODOPATH = rowFcn(@(x) fullfile(x.folder, x.name), temp(~matches(RHDPATH, TTLPATH)), "UniformOutput", false); 
 SAVEPATH = rowFcn(@(x) x.folder, temp(~matches(RHDPATH, TTLPATH)), "UniformOutput", false); 

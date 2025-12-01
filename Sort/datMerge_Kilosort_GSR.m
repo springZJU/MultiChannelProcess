@@ -4,7 +4,7 @@ addpath(genpath(fileparts(fileparts(mfilename("fullpath")))), "-begin");
 %% TODO:
 customInfo.recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\utils\recordingExcel\", ...
 "GSR\GSR_Rat2RHD_LocalGlobal_RecordingAC.xlsx");
-customInfo.idSel =4:9;
+customInfo.idSel = 9;
 customInfo.MATPATH = "D:\Lab members\GSR\Offset\MAT Data\";
 
 
