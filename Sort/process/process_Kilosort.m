@@ -77,9 +77,11 @@ switch chNum
     case 128
         ops.chanMap = [fileparts(mfilename("fullpath")), '\config\PKU128_kilosortChanMap.mat'];
         ops.NchanTOT = 128; 
-        ops.fs = fs;
-        
-        
+        ops.fs = fs;   
+    case 128.1
+        ops.chanMap = [fileparts(mfilename("fullpath")), '\config\PKU128_Implant_kilosortChanMap.mat'];
+        ops.NchanTOT = 128; 
+        ops.fs = fs;       
 
         %         case newCH
         %             ops.chanMap = [];
