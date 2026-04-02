@@ -41,8 +41,8 @@ end
 countRaw = cellfun(@length, spikeCell);
 excludeIndex = countRaw > mean(countRaw)+3*std(countRaw);
 spikeCell(excludeIndex) = [];
-[frMean, ~, ~, frSD] = calFr(spikeCell, respWin);
-[frBase, ~, ~, frSDBase] = calFr(spikeCell, baseWin);
+[frMean, ~, ~, frSD] = calFR(spikeCell, respWin);
+[frBase, ~, ~, frSDBase] = calFR(spikeCell, baseWin);
 % change window
 calWinRaw = respWin;
 respWin(1) = respWin(1) - psthPara.binsize;

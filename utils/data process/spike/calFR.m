@@ -1,4 +1,4 @@
-function [frMean, frSE, frRaw, frSD, trials] = calFr(spikes, window, varargin)
+function [frMean, frSE, frRaw, frSD, trials] = calFR(spikes, window, varargin)
 mIp = inputParser;
 mIp.addRequired("spikes", @(x) isnumeric(x) | iscell(x));
 mIp.addRequired("window", @isnumeric);

@@ -1,4 +1,4 @@
-function RNP_Noise(MATPATH, FIGPATH, plotWin)
+function Recover_RNP_Noise(MATPATH, FIGPATH, plotWin, toPlot)
 narginchk(2, 4);
 if nargin < 4
     plotWin = [-50, 300];
